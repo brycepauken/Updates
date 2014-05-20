@@ -15,6 +15,12 @@
 		02209F7419295E7000A28693 /* UPDBrowserBottomBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02209F7319295E7000A28693 /* UPDBrowserBottomBar.m */; };
 		02209F771929966B00A28693 /* Checkmark.png in Resources */ = {isa = PBXBuildFile; fileRef = 02209F751929966B00A28693 /* Checkmark.png */; };
 		02209F781929966B00A28693 /* Checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02209F761929966B00A28693 /* Checkmark@2x.png */; };
+		023F3660192AF2C30018B44F /* Cross.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365A192AF2C30018B44F /* Cross.png */; };
+		023F3661192AF2C30018B44F /* Cross@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365B192AF2C30018B44F /* Cross@2x.png */; };
+		023F3662192AF2C30018B44F /* LeftArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365C192AF2C30018B44F /* LeftArrow.png */; };
+		023F3663192AF2C30018B44F /* LeftArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365D192AF2C30018B44F /* LeftArrow@2x.png */; };
+		023F3664192AF2C30018B44F /* RightArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365E192AF2C30018B44F /* RightArrow.png */; };
+		023F3665192AF2C30018B44F /* RightArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365F192AF2C30018B44F /* RightArrow@2x.png */; };
 		02ED16A2192745D00038C4AF /* UPDCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168B192745D00038C4AF /* UPDCommon.m */; };
 		02ED16A3192745D00038C4AF /* UPDConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168D192745D00038C4AF /* UPDConstants.m */; };
 		02ED16A4192745D00038C4AF /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168F192745D00038C4AF /* UPDInterface.m */; };
@@ -55,6 +61,12 @@
 		02209F7319295E7000A28693 /* UPDBrowserBottomBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPDBrowserBottomBar.m; sourceTree = "<group>"; };
 		02209F751929966B00A28693 /* Checkmark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Checkmark.png; sourceTree = "<group>"; };
 		02209F761929966B00A28693 /* Checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Checkmark@2x.png"; sourceTree = "<group>"; };
+		023F365A192AF2C30018B44F /* Cross.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Cross.png; sourceTree = "<group>"; };
+		023F365B192AF2C30018B44F /* Cross@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Cross@2x.png"; sourceTree = "<group>"; };
+		023F365C192AF2C30018B44F /* LeftArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LeftArrow.png; sourceTree = "<group>"; };
+		023F365D192AF2C30018B44F /* LeftArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LeftArrow@2x.png"; sourceTree = "<group>"; };
+		023F365E192AF2C30018B44F /* RightArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RightArrow.png; sourceTree = "<group>"; };
+		023F365F192AF2C30018B44F /* RightArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "RightArrow@2x.png"; sourceTree = "<group>"; };
 		02ED168A192745D00038C4AF /* UPDCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPDCommon.h; sourceTree = "<group>"; };
 		02ED168B192745D00038C4AF /* UPDCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPDCommon.m; sourceTree = "<group>"; };
 		02ED168C192745D00038C4AF /* UPDConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPDConstants.h; sourceTree = "<group>"; };
@@ -123,6 +135,12 @@
 			children = (
 				02209F751929966B00A28693 /* Checkmark.png */,
 				02209F761929966B00A28693 /* Checkmark@2x.png */,
+				023F365A192AF2C30018B44F /* Cross.png */,
+				023F365B192AF2C30018B44F /* Cross@2x.png */,
+				023F365C192AF2C30018B44F /* LeftArrow.png */,
+				023F365D192AF2C30018B44F /* LeftArrow@2x.png */,
+				023F365E192AF2C30018B44F /* RightArrow.png */,
+				023F365F192AF2C30018B44F /* RightArrow@2x.png */,
 				02209F681928739F00A28693 /* SearchBarArrow.png */,
 				02209F691928739F00A28693 /* SearchBarArrow@2x.png */,
 			);
@@ -296,10 +314,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				023F3662192AF2C30018B44F /* LeftArrow.png in Resources */,
 				02ED16C81927C3E70038C4AF /* SearchEngineIconGoogle@2x.png in Resources */,
 				02ED16C91927C3E70038C4AF /* SearchEngineIconYahoo.png in Resources */,
+				023F3663192AF2C30018B44F /* LeftArrow@2x.png in Resources */,
 				02ED16AA192745D00038C4AF /* Images.xcassets in Resources */,
+				023F3661192AF2C30018B44F /* Cross@2x.png in Resources */,
 				02209F6A1928739F00A28693 /* SearchBarArrow.png in Resources */,
+				023F3665192AF2C30018B44F /* RightArrow@2x.png in Resources */,
+				023F3664192AF2C30018B44F /* RightArrow.png in Resources */,
 				02ED16C61927C3E70038C4AF /* SearchEngineIconBing@2x.png in Resources */,
 				02ED16C71927C3E70038C4AF /* SearchEngineIconGoogle.png in Resources */,
 				02209F781929966B00A28693 /* Checkmark@2x.png in Resources */,
@@ -307,6 +330,7 @@
 				02ED16A9192745D00038C4AF /* InfoPlist.strings in Resources */,
 				02ED16CA1927C3E70038C4AF /* SearchEngineIconYahoo@2x.png in Resources */,
 				02209F6B1928739F00A28693 /* SearchBarArrow@2x.png in Resources */,
+				023F3660192AF2C30018B44F /* Cross.png in Resources */,
 				02ED16C51927C3E70038C4AF /* SearchEngineIconBing.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -466,6 +490,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Updates/Updates-Prefix.pch";
 				INFOPLIST_FILE = "Updates/Updates-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (
 					"-lc++",
@@ -485,6 +510,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Updates/Updates-Prefix.pch";
 				INFOPLIST_FILE = "Updates/Updates-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (
 					"-lc++",

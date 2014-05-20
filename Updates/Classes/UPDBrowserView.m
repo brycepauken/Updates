@@ -67,6 +67,14 @@
                 [output appendString:@"\n"];
                 [output appendString:[instruction objectForKey:@"post"]];
                 [output appendString:@"\n"];
+                [output appendString:[[instruction objectForKey:@"headers"] description]];
+                [output appendString:@"\n"];
+                [output appendString:[instruction objectForKey:@"response"]];
+                [output appendString:@"\n"];
+                for(int i=0;i<50;i++) {
+                    [output appendString:@"-"];
+                }
+                [output appendString:@"\n"];
                 [output appendString:@"\n"];
             }
             NSLog(@"%@",output);

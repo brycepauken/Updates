@@ -41,7 +41,7 @@
     if([[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]) {
         //NSLog(@"REQUEST TO URL: %@\nPOST DATA: %@\nRESPONSE: %@\n HEADERS: %@\n",self.request.URL,[[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:nil encoding:NSUTF8StringEncoding],headers);
         if(AppDelegate.addInstruction) {
-            AppDelegate.addInstruction(self.request.URL.absoluteString,[[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:nil encoding:NSUTF8StringEncoding],headers);
+            AppDelegate.addInstruction(self.request.URL.absoluteString,[[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding],headers);
         }
     }
     [self.client URLProtocolDidFinishLoading:self];
@@ -52,7 +52,7 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    NSLog(@"error: %@",error);
+    NSLog(@"%@",error);
     [self.client URLProtocol:self didFailWithError:error];
 }
 
@@ -72,12 +72,19 @@
 
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(redirectResponse) {
-        NSMutableURLRequest *newRequest = [self.request mutableCopy];
+        NSMutableURLRequest *newRequest = [request mutableCopy];
         [newRequest setURL:request.URL];
+        if(!([self.response isKindOfClass:[NSHTTPURLResponse class]]&&((NSHTTPURLResponse *)self.response).statusCode==307)) {
+            [newRequest setHTTPMethod:@"GET"];
+        }
         [self.client URLProtocol:self wasRedirectedToRequest:newRequest redirectResponse:redirectResponse];
         return newRequest;
     }
     return request;
+}
+
+- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+    [challenge.sender performDefaultHandlingForAuthenticationChallenge:challenge];
 }
 
 @end

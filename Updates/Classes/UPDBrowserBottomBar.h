@@ -10,7 +10,8 @@
 
 @interface UPDBrowserBottomBar : UIView
 
-@property (nonatomic, retain) UIButton *finishButton;
 @property (nonatomic, copy) void (^finishButtonBlock)();
+@property (nonatomic, retain) UIView *smallDividerLeft;
+@property (nonatomic, retain) UIView *smallDividerRight;
 
 @end
