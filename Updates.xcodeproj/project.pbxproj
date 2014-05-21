@@ -21,6 +21,9 @@
 		023F3663192AF2C30018B44F /* LeftArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365D192AF2C30018B44F /* LeftArrow@2x.png */; };
 		023F3664192AF2C30018B44F /* RightArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365E192AF2C30018B44F /* RightArrow.png */; };
 		023F3665192AF2C30018B44F /* RightArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 023F365F192AF2C30018B44F /* RightArrow@2x.png */; };
+		023F3669192B07950018B44F /* UPDInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 023F3668192B07950018B44F /* UPDInstruction.m */; };
+		023F366C192B07950018B44F /* UPDInstructionList.m in Sources */ = {isa = PBXBuildFile; fileRef = 023F366B192B07950018B44F /* UPDInstructionList.m */; };
+		023F366F192B07950018B44F /* UPDKeyValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 023F366E192B07950018B44F /* UPDKeyValue.m */; };
 		02ED16A2192745D00038C4AF /* UPDCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168B192745D00038C4AF /* UPDCommon.m */; };
 		02ED16A3192745D00038C4AF /* UPDConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168D192745D00038C4AF /* UPDConstants.m */; };
 		02ED16A4192745D00038C4AF /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168F192745D00038C4AF /* UPDInterface.m */; };
@@ -67,6 +70,12 @@
 		023F365D192AF2C30018B44F /* LeftArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LeftArrow@2x.png"; sourceTree = "<group>"; };
 		023F365E192AF2C30018B44F /* RightArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RightArrow.png; sourceTree = "<group>"; };
 		023F365F192AF2C30018B44F /* RightArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "RightArrow@2x.png"; sourceTree = "<group>"; };
+		023F3667192B07950018B44F /* UPDInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInstruction.h; path = CoreData/UPDInstruction.h; sourceTree = "<group>"; };
+		023F3668192B07950018B44F /* UPDInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInstruction.m; path = CoreData/UPDInstruction.m; sourceTree = "<group>"; };
+		023F366A192B07950018B44F /* UPDInstructionList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInstructionList.h; path = CoreData/UPDInstructionList.h; sourceTree = "<group>"; };
+		023F366B192B07950018B44F /* UPDInstructionList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInstructionList.m; path = CoreData/UPDInstructionList.m; sourceTree = "<group>"; };
+		023F366D192B07950018B44F /* UPDKeyValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDKeyValue.h; path = CoreData/UPDKeyValue.h; sourceTree = "<group>"; };
+		023F366E192B07950018B44F /* UPDKeyValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDKeyValue.m; path = CoreData/UPDKeyValue.m; sourceTree = "<group>"; };
 		02ED168A192745D00038C4AF /* UPDCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPDCommon.h; sourceTree = "<group>"; };
 		02ED168B192745D00038C4AF /* UPDCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPDCommon.m; sourceTree = "<group>"; };
 		02ED168C192745D00038C4AF /* UPDConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPDConstants.h; sourceTree = "<group>"; };
@@ -147,6 +156,19 @@
 			path = Navigation;
 			sourceTree = "<group>";
 		};
+		023F3666192B075B0018B44F /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				023F366D192B07950018B44F /* UPDKeyValue.h */,
+				023F366E192B07950018B44F /* UPDKeyValue.m */,
+				023F366A192B07950018B44F /* UPDInstructionList.h */,
+				023F366B192B07950018B44F /* UPDInstructionList.m */,
+				023F3667192B07950018B44F /* UPDInstruction.h */,
+				023F3668192B07950018B44F /* UPDInstruction.m */,
+			);
+			name = CoreData;
+			sourceTree = "<group>";
+		};
 		02ED1688192745D00038C4AF /* Updates */ = {
 			isa = PBXGroup;
 			children = (
@@ -160,6 +182,7 @@
 		02ED1689192745D00038C4AF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				023F3666192B075B0018B44F /* CoreData */,
 				02209F7219295E7000A28693 /* UPDBrowserBottomBar.h */,
 				02209F7319295E7000A28693 /* UPDBrowserBottomBar.m */,
 				02209F6C19292FAB00A28693 /* UPDBrowserNavigationBar.h */,
@@ -384,14 +407,17 @@
 				02ED16AC192745D00038C4AF /* UPDAppDelegate.m in Sources */,
 				02ED16BC1927C0390038C4AF /* UPDBrowserStartViewTextField.m in Sources */,
 				02ED16B11927B8190038C4AF /* UPDBrowserStartView.m in Sources */,
+				023F366C192B07950018B44F /* UPDInstructionList.m in Sources */,
 				02209F6E19292FAB00A28693 /* UPDBrowserNavigationBar.m in Sources */,
 				02ED16A7192745D00038C4AF /* UPDURLProtocol.m in Sources */,
 				02ED16A4192745D00038C4AF /* UPDInterface.m in Sources */,
+				023F3669192B07950018B44F /* UPDInstruction.m in Sources */,
 				02ED16AD192745D00038C4AF /* Update.xcdatamodeld in Sources */,
 				02ED16A6192745D00038C4AF /* UPDTableViewContoller.m in Sources */,
 				02ED16A8192745D00038C4AF /* UPDViewController.m in Sources */,
 				02209F7419295E7000A28693 /* UPDBrowserBottomBar.m in Sources */,
 				02ED16AB192745D00038C4AF /* main.m in Sources */,
+				023F366F192B07950018B44F /* UPDKeyValue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

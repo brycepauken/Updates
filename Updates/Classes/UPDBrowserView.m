@@ -20,9 +20,8 @@
     self = [super initWithFrame:frame];
     if (self) {
         __weak UPDBrowserView *weakSelf = self;
-        self.instructions = [[NSMutableArray alloc] init];
         [AppDelegate setAddInstruction:^(NSString *url, NSString *post, NSString *response, NSDictionary *headers) {
-            [weakSelf.instructions addObject:[NSDictionary dictionaryWithObjectsAndKeys:url,@"url",post,@"post",response,@"response",headers,@"headers",nil]];
+            //[weakSelf.instructions addObject:[NSDictionary dictionaryWithObjectsAndKeys:url,@"url",post,@"post",response,@"response",headers,@"headers",nil]];
         }];
         
         CGFloat navigationBarHeight = UPD_NAVIGATION_BAR_HEIGHT+([UPDCommon isIOS7]?20:0);
@@ -61,7 +60,7 @@
         self.bottomBar = [[UPDBrowserBottomBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-UPD_NAVIGATION_BAR_HEIGHT, self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT)];
         [self.bottomBar setAutoresizingMask:UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth];
         [self.bottomBar setFinishButtonBlock:^{
-            NSMutableString *output = [[NSMutableString alloc] init];
+            /*NSMutableString *output = [[NSMutableString alloc] init];
             for(NSDictionary *instruction in weakSelf.instructions) {
                 [output appendString:[instruction objectForKey:@"url"]];
                 [output appendString:@"\n"];
@@ -77,7 +76,8 @@
                 [output appendString:@"\n"];
                 [output appendString:@"\n"];
             }
-            NSLog(@"%@",output);
+            NSLog(@"%@",output);*/
+            
         }];
         [self addSubview:self.bottomBar];
         
