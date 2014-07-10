@@ -14,6 +14,7 @@
     if([NSURLProtocol propertyForKey:@"UseDefaultImplementation" inRequest:request]) {
         return NO;
     }
+    NSLog(@"Starting: %@",request.URL.absoluteString);
     return YES;
 }
 
@@ -79,6 +80,7 @@
 
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(redirectResponse) {
+        NSLog(@"Redirecting: %@->%@",self.request.URL.absoluteString,request.URL.absoluteString);
         NSMutableURLRequest *newRequest = [request mutableCopy];
         [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:newRequest];
         if(![NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:newRequest]) {
@@ -91,6 +93,7 @@
         [self.client URLProtocol:self wasRedirectedToRequest:newRequest redirectResponse:redirectResponse];
         return newRequest;
     }
+    NSLog(@"Not Redirecting");
     return request;
 }
 

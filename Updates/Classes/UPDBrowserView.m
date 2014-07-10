@@ -13,6 +13,7 @@
 #import "UPDBrowserStartView.h"
 #import "UPDBrowserStartViewTextField.h"
 #import "UPDBrowserURLBar.h"
+#import "UPDDocumentParser.h"
 #import "UPDInstruction.h"
 #import "UPDInstructionList.h"
 #import "UPDKeyValue.h"
@@ -125,7 +126,7 @@
                 if(instruction.post.count) {
                     [output appendString:@"    Post Data:\n"];
                     for(UPDKeyValue *keyValue in instruction.post) {
-                        [output appendString:[NSString stringWithFormat:@"        %@: %@\n",keyValue.key,keyValue.value]];
+                        [output appendString:[NSString stringWithFormat:@"        %@: %@\n",[[keyValue.key stringByReplacingOccurrencesOfString:@"+" withString:@" "] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding],[[keyValue.value stringByReplacingOccurrencesOfString:@"+" withString:@" "] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
                     }
                 }
                 if(instruction.response) {
@@ -134,6 +135,11 @@
                     [output appendString:@"\n"];*/
                     [output appendString:@"    Response Input Fields:\n"];
                     
+                    UPDDocumentParser *documentParser = [[UPDDocumentParser alloc] initWithDocumentString:instruction.response];
+                    NSDictionary *inputFields = [documentParser findInputFields];
+                    for(NSString *inputName in [inputFields allKeys]) {
+                        [output appendString:[NSString stringWithFormat:@"        %@ -> %@\n",inputName,[inputFields objectForKey:inputName]]];
+                    }
                 }
             }
             NSLog(@"%@",output);
