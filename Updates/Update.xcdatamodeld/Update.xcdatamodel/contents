@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13C64" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="14A283o" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Instruction" representedClassName="UPDInstruction" syncable="YES">
         <attribute name="anchor" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="instructionNumber" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="redirectURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="response" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="get" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="KeyValue" inverseName="getParent" inverseEntity="KeyValue" syncable="YES"/>
@@ -11,7 +12,7 @@
         <relationship name="post" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="KeyValue" inverseName="postParent" inverseEntity="KeyValue" syncable="YES"/>
     </entity>
     <entity name="InstructionList" representedClassName="UPDInstructionList" syncable="YES">
-        <relationship name="instructions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Instruction" inverseName="parentList" inverseEntity="Instruction" syncable="YES"/>
+        <relationship name="instructions" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Instruction" inverseName="parentList" inverseEntity="Instruction" syncable="YES"/>
     </entity>
     <entity name="KeyValue" representedClassName="UPDKeyValue" syncable="YES">
         <attribute name="key" optional="YES" attributeType="String" syncable="YES"/>
@@ -21,8 +22,8 @@
         <relationship name="postParent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Instruction" inverseName="post" inverseEntity="Instruction" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Instruction" positionX="-54" positionY="0" width="128" height="163"/>
-        <element name="InstructionList" positionX="-333" positionY="26" width="128" height="58"/>
+        <element name="Instruction" positionX="-54" positionY="0" width="128" height="180"/>
+        <element name="InstructionList" positionX="-333" positionY="26" width="128" height="60"/>
         <element name="KeyValue" positionX="-180" positionY="36" width="128" height="118"/>
     </elements>
 </model>

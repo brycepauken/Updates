@@ -13,6 +13,7 @@
 
 @dynamic instructionNumber;
 @dynamic url;
+@dynamic redirectURL;
 @dynamic anchor;
 @dynamic response;
 @dynamic parentList;

@@ -38,10 +38,17 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     NSDictionary *headers = [(NSHTTPURLResponse *)self.response allHeaderFields];
-    if([[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]) {
-        //NSLog(@"REQUEST TO URL: %@\nPOST DATA: %@\nRESPONSE: %@\n HEADERS: %@\n",self.request.URL,[[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:nil encoding:NSUTF8StringEncoding],headers);
+    if([[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
         if(AppDelegate.addInstruction) {
-            AppDelegate.addInstruction(self.request.URL.absoluteString,[[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding],headers);
+            NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
+            NSString *redirectURL = nil;
+            if(firstRequest!=nil) {
+                redirectURL = self.request.URL.absoluteString;
+            }
+            else {
+                firstRequest = self.request;
+            }
+            AppDelegate.addInstruction(firstRequest.URL.absoluteString,[[NSString alloc] initWithData:firstRequest.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding],headers,redirectURL);
         }
     }
     [self.client URLProtocolDidFinishLoading:self];
@@ -73,6 +80,10 @@
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(redirectResponse) {
         NSMutableURLRequest *newRequest = [request mutableCopy];
+        [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:newRequest];
+        if(![NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:newRequest]) {
+            [NSURLProtocol setProperty:self.request forKey:@"OriginalRequest" inRequest:newRequest];
+        }
         [newRequest setURL:request.URL];
         if(!([self.response isKindOfClass:[NSHTTPURLResponse class]]&&((NSHTTPURLResponse *)self.response).statusCode==307)) {
             [newRequest setHTTPMethod:@"GET"];

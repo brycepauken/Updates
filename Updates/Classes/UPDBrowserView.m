@@ -13,6 +13,22 @@
 #import "UPDBrowserStartView.h"
 #import "UPDBrowserStartViewTextField.h"
 #import "UPDBrowserURLBar.h"
+#import "UPDInstruction.h"
+#import "UPDInstructionList.h"
+#import "UPDKeyValue.h"
+
+/*
+ Instructions:
+ 
+ @dynamic instructionNumber;
+ @dynamic url;
+ @dynamic anchor;
+ @dynamic response;
+ @dynamic parentList;
+ @dynamic headers;
+ @dynamic post;
+ @dynamic get;
+ */
 
 @implementation UPDBrowserView
 
@@ -20,8 +36,49 @@
     self = [super initWithFrame:frame];
     if (self) {
         __weak UPDBrowserView *weakSelf = self;
-        [AppDelegate setAddInstruction:^(NSString *url, NSString *post, NSString *response, NSDictionary *headers) {
-            //[weakSelf.instructions addObject:[NSDictionary dictionaryWithObjectsAndKeys:url,@"url",post,@"post",response,@"response",headers,@"headers",nil]];
+        
+        self.instructionList = [NSEntityDescription insertNewObjectForEntityForName:@"InstructionList" inManagedObjectContext:AppDelegate.temporaryObjectContext];
+        [AppDelegate setAddInstruction:^(NSString *url, NSString *post, NSString *response, NSDictionary *headers, NSString *redirectURL) {
+            UPDInstruction *instruction = [NSEntityDescription insertNewObjectForEntityForName:@"Instruction" inManagedObjectContext:AppDelegate.temporaryObjectContext];
+            instruction.instructionNumber = @(self.instructionList.instructions.count);
+            [instruction setInstructionNumber:@(self.instructionList.instructions.count)];
+            [instruction setParentList:self.instructionList];
+            
+            [instruction setResponse:response];
+            [instruction setRedirectURL:redirectURL];
+            [instruction setUrl:([url rangeOfString:@"?" options:NSBackwardsSearch].location==NSNotFound?url:[url substringToIndex:[url rangeOfString:@"?" options:NSBackwardsSearch].location])];
+            NSURL *tempURL = [NSURL URLWithString:url];
+            for(int getOrPost=0;getOrPost<2;getOrPost++) {
+                NSString *targetString = (getOrPost?post:tempURL.query);
+                if(targetString.length) {
+                    NSMutableSet *params = [[NSMutableSet alloc] init];
+                    for(NSString *param in [targetString componentsSeparatedByString:@"&"]) {
+                        NSArray *elements = [param componentsSeparatedByString:@"="];
+                        if(elements.count==2) {
+                            UPDKeyValue *keyValue = [NSEntityDescription insertNewObjectForEntityForName:@"KeyValue" inManagedObjectContext:AppDelegate.temporaryObjectContext];
+                            [keyValue setKey:[elements objectAtIndex:0]];
+                            [keyValue setValue:[elements objectAtIndex:1]];
+                            if(getOrPost==0) {
+                                [keyValue setGetParent:instruction];
+                            }
+                            else {
+                                [keyValue setPostParent:instruction];
+                            }
+                            [params addObject:keyValue];
+                        }
+                    }
+                    if(getOrPost==0) {
+                        [instruction setGet:params];
+                    }
+                    else {
+                        [instruction setPost:params];
+                    }
+                }
+            }
+            
+            NSMutableSet *instructions = [self.instructionList.instructions mutableCopy];
+            [instructions addObject:instruction];
+            [self.instructionList setInstructions:instructions];
         }];
         
         CGFloat navigationBarHeight = UPD_NAVIGATION_BAR_HEIGHT+([UPDCommon isIOS7]?20:0);
@@ -60,24 +117,26 @@
         self.bottomBar = [[UPDBrowserBottomBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-UPD_NAVIGATION_BAR_HEIGHT, self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT)];
         [self.bottomBar setAutoresizingMask:UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth];
         [self.bottomBar setFinishButtonBlock:^{
-            /*NSMutableString *output = [[NSMutableString alloc] init];
-            for(NSDictionary *instruction in weakSelf.instructions) {
-                [output appendString:[instruction objectForKey:@"url"]];
-                [output appendString:@"\n"];
-                [output appendString:[instruction objectForKey:@"post"]];
-                [output appendString:@"\n"];
-                [output appendString:[[instruction objectForKey:@"headers"] description]];
-                [output appendString:@"\n"];
-                [output appendString:[instruction objectForKey:@"response"]];
-                [output appendString:@"\n"];
-                for(int i=0;i<50;i++) {
-                    [output appendString:@"-"];
+            NSMutableString *output = [[NSMutableString alloc] init];
+            for(UPDInstruction *instruction in weakSelf.instructionList.instructions) {
+                [output appendString:@"****************\n"];
+                [output appendString:[NSString stringWithFormat:@"%i: %@\n",instruction.instructionNumber.intValue,instruction.url]];
+                [output appendString:@"****************\n"];
+                if(instruction.post.count) {
+                    [output appendString:@"    Post Data:\n"];
+                    for(UPDKeyValue *keyValue in instruction.post) {
+                        [output appendString:[NSString stringWithFormat:@"        %@: %@\n",keyValue.key,keyValue.value]];
+                    }
                 }
-                [output appendString:@"\n"];
-                [output appendString:@"\n"];
+                if(instruction.response) {
+                    /*[output appendString:@"    Response:\n"];
+                    [output appendString:instruction.response];
+                    [output appendString:@"\n"];*/
+                    [output appendString:@"    Response Input Fields:\n"];
+                    
+                }
             }
-            NSLog(@"%@",output);*/
-            
+            NSLog(@"%@",output);
         }];
         [self addSubview:self.bottomBar];
         
@@ -85,6 +144,7 @@
         [self.startView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
         [self.startView.textField setGoBlock:^(NSString *url) {
             [weakSelf.navigationBar.urlBar setText:url];
+            [weakSelf clearCookies];
             [weakSelf loadURL:url];
             
             POPSpringAnimation *anim = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerPositionX];
@@ -110,6 +170,15 @@
         [self addSubview:self.startView];
     }
     return self;
+}
+
+- (void)clearCookies {
+    NSHTTPCookie *cookie;
+    NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    for (cookie in [storage cookies]) {
+        [storage deleteCookie:cookie];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {

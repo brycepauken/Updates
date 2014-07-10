@@ -24,6 +24,7 @@
 		023F3669192B07950018B44F /* UPDInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 023F3668192B07950018B44F /* UPDInstruction.m */; };
 		023F366C192B07950018B44F /* UPDInstructionList.m in Sources */ = {isa = PBXBuildFile; fileRef = 023F366B192B07950018B44F /* UPDInstructionList.m */; };
 		023F366F192B07950018B44F /* UPDKeyValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 023F366E192B07950018B44F /* UPDKeyValue.m */; };
+		02B96059196EF7E40060E9F1 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 02B96058196EF7E40060E9F1 /* libxml2.2.dylib */; };
 		02ED16A2192745D00038C4AF /* UPDCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168B192745D00038C4AF /* UPDCommon.m */; };
 		02ED16A3192745D00038C4AF /* UPDConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168D192745D00038C4AF /* UPDConstants.m */; };
 		02ED16A4192745D00038C4AF /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 02ED168F192745D00038C4AF /* UPDInterface.m */; };
@@ -76,6 +77,7 @@
 		023F366B192B07950018B44F /* UPDInstructionList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInstructionList.m; path = CoreData/UPDInstructionList.m; sourceTree = "<group>"; };
 		023F366D192B07950018B44F /* UPDKeyValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDKeyValue.h; path = CoreData/UPDKeyValue.h; sourceTree = "<group>"; };
 		023F366E192B07950018B44F /* UPDKeyValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDKeyValue.m; path = CoreData/UPDKeyValue.m; sourceTree = "<group>"; };
+		02B96058196EF7E40060E9F1 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = usr/lib/libxml2.2.dylib; sourceTree = SDKROOT; };
 		02ED168A192745D00038C4AF /* UPDCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPDCommon.h; sourceTree = "<group>"; };
 		02ED168B192745D00038C4AF /* UPDCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPDCommon.m; sourceTree = "<group>"; };
 		02ED168C192745D00038C4AF /* UPDConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPDConstants.h; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02B96059196EF7E40060E9F1 /* libxml2.2.dylib in Frameworks */,
 				02F02FD11925B34D00A720B1 /* CoreData.framework in Frameworks */,
 				02F02FCD1925B34D00A720B1 /* CoreGraphics.framework in Frameworks */,
 				02F02FCB1925B34D00A720B1 /* Foundation.framework in Frameworks */,
@@ -159,12 +162,12 @@
 		023F3666192B075B0018B44F /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				023F366D192B07950018B44F /* UPDKeyValue.h */,
-				023F366E192B07950018B44F /* UPDKeyValue.m */,
-				023F366A192B07950018B44F /* UPDInstructionList.h */,
-				023F366B192B07950018B44F /* UPDInstructionList.m */,
 				023F3667192B07950018B44F /* UPDInstruction.h */,
 				023F3668192B07950018B44F /* UPDInstruction.m */,
+				023F366A192B07950018B44F /* UPDInstructionList.h */,
+				023F366B192B07950018B44F /* UPDInstructionList.m */,
+				023F366D192B07950018B44F /* UPDKeyValue.h */,
+				023F366E192B07950018B44F /* UPDKeyValue.m */,
 			);
 			name = CoreData;
 			sourceTree = "<group>";
@@ -273,6 +276,7 @@
 		02F02FC91925B34D00A720B1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				02B96058196EF7E40060E9F1 /* libxml2.2.dylib */,
 				02F02FD01925B34D00A720B1 /* CoreData.framework */,
 				02F02FCC1925B34D00A720B1 /* CoreGraphics.framework */,
 				02F02FCA1925B34D00A720B1 /* Foundation.framework */,

@@ -11,10 +11,12 @@
 @class UPDBrowserBottomBar;
 @class UPDBrowserNavigationBar;
 @class UPDBrowserStartView;
+@class UPDInstructionList;
 
 @interface UPDBrowserView : UIView <UIGestureRecognizerDelegate, UIWebViewDelegate>
 
 @property (nonatomic, retain) UPDBrowserBottomBar *bottomBar;
+@property (nonatomic, retain) UPDInstructionList *instructionList;
 @property (nonatomic, retain) UPDBrowserNavigationBar *navigationBar;
 @property (nonatomic, retain) UPDBrowserStartView *startView;
 @property (nonatomic, retain) UIWebView *webView;

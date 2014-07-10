@@ -14,6 +14,7 @@
 
 @property (nonatomic, retain) NSNumber * instructionNumber;
 @property (nonatomic, retain) NSString * url;
+@property (nonatomic, retain) NSString * redirectURL;
 @property (nonatomic, retain) NSString * anchor;
 @property (nonatomic, retain) NSString * response;
 @property (nonatomic, retain) NSManagedObject *parentList;
