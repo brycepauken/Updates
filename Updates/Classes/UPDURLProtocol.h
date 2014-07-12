@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@interface UPDURLProtocol : NSURLProtocol <NSURLConnectionDataDelegate>
+@interface UPDURLProtocol : NSURLProtocol <NSURLSessionDelegate>
 
-@property (nonatomic, retain) NSURLConnection *connection;
 @property (nonatomic, retain) NSMutableData *data;
 @property (nonatomic, retain) NSURLResponse *response;
+@property (nonatomic, retain) NSURLSession *session;
+@property (nonatomic, retain) NSURLSessionDataTask *task;
 
 @end

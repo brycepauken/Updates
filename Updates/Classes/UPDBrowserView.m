@@ -179,6 +179,8 @@
 }
 
 - (void)clearCookies {
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
+    
     NSHTTPCookie *cookie;
     NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for (cookie in [storage cookies]) {
