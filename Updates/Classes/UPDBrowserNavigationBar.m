@@ -49,6 +49,9 @@
 }
 
 - (void)progressBarAnimateToWidth:(CGFloat)width withDuration:(CGFloat)duration onCompletion:(void (^)(BOOL finished))completion {
+    CGFloat currentWidth = ((CALayer *)self.progressBar.layer.presentationLayer).frame.size.width;
+    [self.progressBar.layer removeAllAnimations];
+    [self.progressBar setFrame:CGRectMake(0, self.contentView.bounds.size.height-2, currentWidth, 2)];
     if(duration==0) {
         [self.progressBar setFrame:CGRectMake(0, self.contentView.bounds.size.height-2, self.contentView.bounds.size.width*(width), 2)];
         if(completion) {
@@ -60,6 +63,10 @@
             [self.progressBar setFrame:CGRectMake(0, self.contentView.bounds.size.height-2, self.contentView.bounds.size.width*(width), 2)];
         } completion:completion];
     }
+}
+
+- (BOOL)progressBarVisible {
+    return self.progressBar.frame.size.width>0;
 }
 
 @end

@@ -197,12 +197,15 @@
 }
 
 - (void)loadURL:(NSString *)url {
+    [self.navigationBar resetProgressBarWithFade:NO];
+    [self.navigationBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
     [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    [self.navigationBar resetProgressBarWithFade:NO];
-    [self.navigationBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
+    if(!self.navigationBar.progressBarVisible) {
+        [self.navigationBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
+    }
     return YES;
 }
 
