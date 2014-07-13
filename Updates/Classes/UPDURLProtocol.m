@@ -39,15 +39,8 @@
             NSDictionary *headers = [(NSHTTPURLResponse *)response allHeaderFields];
             if([[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
                 if(AppDelegate.addInstruction) {
-                    NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
-                    NSString *redirectURL = nil;
-                    if(firstRequest!=nil) {
-                        redirectURL = self.request.URL.absoluteString;
-                    }
-                    else {
-                        firstRequest = self.request;
-                    }
-                    AppDelegate.addInstruction(firstRequest.URL.absoluteString,[[NSString alloc] initWithData:firstRequest.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding],headers,redirectURL);
+                    NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request]?:self.request;
+                    AppDelegate.addInstruction(firstRequest.URL.absoluteString,[[NSString alloc] initWithData:firstRequest.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding],headers);
                 }
             }
         }

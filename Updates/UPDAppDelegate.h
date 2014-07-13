@@ -12,7 +12,7 @@
 
 @interface UPDAppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (nonatomic, copy) void(^addInstruction)(NSString *url, NSString *post, NSString *response, NSDictionary *headers, NSString *redirectURL);
+@property (nonatomic, copy) void(^addInstruction)(NSString *url, NSString *post, NSString *response, NSDictionary *headers);
 
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;

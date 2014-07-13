@@ -12,8 +12,8 @@
 @implementation UPDInstruction
 
 @dynamic instructionNumber;
-@dynamic url;
-@dynamic redirectURL;
+@dynamic baseURL;
+@dynamic fullURL;
 @dynamic anchor;
 @dynamic response;
 @dynamic parentList;

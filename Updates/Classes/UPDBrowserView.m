@@ -39,15 +39,15 @@
         __weak UPDBrowserView *weakSelf = self;
         
         self.instructionList = [NSEntityDescription insertNewObjectForEntityForName:@"InstructionList" inManagedObjectContext:AppDelegate.temporaryObjectContext];
-        [AppDelegate setAddInstruction:^(NSString *url, NSString *post, NSString *response, NSDictionary *headers, NSString *redirectURL) {
+        [AppDelegate setAddInstruction:^(NSString *url, NSString *post, NSString *response, NSDictionary *headers) {
             UPDInstruction *instruction = [NSEntityDescription insertNewObjectForEntityForName:@"Instruction" inManagedObjectContext:AppDelegate.temporaryObjectContext];
             instruction.instructionNumber = @(self.instructionList.instructions.count);
             [instruction setInstructionNumber:@(self.instructionList.instructions.count)];
             [instruction setParentList:self.instructionList];
             
             [instruction setResponse:response];
-            [instruction setRedirectURL:redirectURL];
-            [instruction setUrl:([url rangeOfString:@"?" options:NSBackwardsSearch].location==NSNotFound?url:[url substringToIndex:[url rangeOfString:@"?" options:NSBackwardsSearch].location])];
+            [instruction setFullURL:url];
+            [instruction setBaseURL:([url rangeOfString:@"?" options:NSBackwardsSearch].location==NSNotFound?url:[url substringToIndex:[url rangeOfString:@"?" options:NSBackwardsSearch].location])];
             NSURL *tempURL = [NSURL URLWithString:url];
             for(int getOrPost=0;getOrPost<2;getOrPost++) {
                 NSString *targetString = (getOrPost?post:tempURL.query);
@@ -121,7 +121,7 @@
             NSMutableString *output = [[NSMutableString alloc] init];
             for(UPDInstruction *instruction in weakSelf.instructionList.instructions) {
                 [output appendString:@"****************\n"];
-                [output appendString:[NSString stringWithFormat:@"%i: %@\n",instruction.instructionNumber.intValue,instruction.url]];
+                [output appendString:[NSString stringWithFormat:@"%i: %@\n",instruction.instructionNumber.intValue,instruction.fullURL]];
                 [output appendString:@"****************\n"];
                 if(instruction.post.count) {
                     [output appendString:@"    Post Data:\n"];
