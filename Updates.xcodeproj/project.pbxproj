@@ -8,19 +8,26 @@
 
 /* Begin PBXBuildFile section */
 		0213C23A1974FE0C006BC204 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0213C2391974FE0C006BC204 /* main.m */; };
-		0213C23D1974FE0C006BC204 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0213C23C1974FE0C006BC204 /* AppDelegate.m */; };
 		0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0213C23E1974FE0C006BC204 /* Updates.xcdatamodeld */; };
 		0213C2421974FE0C006BC204 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0213C2411974FE0C006BC204 /* Images.xcassets */; };
+		02A73D151975C24B000A7C48 /* UPDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A73D141975C24B000A7C48 /* UPDViewController.m */; };
+		02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A73D171975C256000A7C48 /* UPDAppDelegate.m */; };
+		02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A73D1B1975C501000A7C48 /* UPDCommon.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0213C2341974FE0C006BC204 /* Updates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Updates.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0213C2381974FE0C006BC204 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0213C2391974FE0C006BC204 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		0213C23B1974FE0C006BC204 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		0213C23C1974FE0C006BC204 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		0213C23F1974FE0C006BC204 /* Updates.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Updates.xcdatamodel; sourceTree = "<group>"; };
 		0213C2411974FE0C006BC204 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		02A73D131975C24B000A7C48 /* UPDViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDViewController.h; path = Classes/UPDViewController.h; sourceTree = "<group>"; };
+		02A73D141975C24B000A7C48 /* UPDViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDViewController.m; path = Classes/UPDViewController.m; sourceTree = "<group>"; };
+		02A73D161975C256000A7C48 /* UPDAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDAppDelegate.h; path = Classes/UPDAppDelegate.h; sourceTree = "<group>"; };
+		02A73D171975C256000A7C48 /* UPDAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAppDelegate.m; path = Classes/UPDAppDelegate.m; sourceTree = "<group>"; };
+		02A73D1A1975C501000A7C48 /* UPDCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDCommon.h; path = Classes/UPDCommon.h; sourceTree = "<group>"; };
+		02A73D1B1975C501000A7C48 /* UPDCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDCommon.m; path = Classes/UPDCommon.m; sourceTree = "<group>"; };
+		02A73D1D1975C555000A7C48 /* UPDPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UPDPrefixHeader.pch; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,10 +60,7 @@
 		0213C2361974FE0C006BC204 /* Updates */ = {
 			isa = PBXGroup;
 			children = (
-				0213C23B1974FE0C006BC204 /* AppDelegate.h */,
-				0213C23C1974FE0C006BC204 /* AppDelegate.m */,
-				0213C2411974FE0C006BC204 /* Images.xcassets */,
-				0213C23E1974FE0C006BC204 /* Updates.xcdatamodeld */,
+				02A73D191975C269000A7C48 /* Classes */,
 				0213C2371974FE0C006BC204 /* Supporting Files */,
 			);
 			path = Updates;
@@ -65,10 +69,26 @@
 		0213C2371974FE0C006BC204 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				0213C2411974FE0C006BC204 /* Images.xcassets */,
 				0213C2381974FE0C006BC204 /* Info.plist */,
 				0213C2391974FE0C006BC204 /* main.m */,
+				0213C23E1974FE0C006BC204 /* Updates.xcdatamodeld */,
+				02A73D1D1975C555000A7C48 /* UPDPrefixHeader.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		02A73D191975C269000A7C48 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				02A73D161975C256000A7C48 /* UPDAppDelegate.h */,
+				02A73D171975C256000A7C48 /* UPDAppDelegate.m */,
+				02A73D1A1975C501000A7C48 /* UPDCommon.h */,
+				02A73D1B1975C501000A7C48 /* UPDCommon.m */,
+				02A73D131975C24B000A7C48 /* UPDViewController.h */,
+				02A73D141975C24B000A7C48 /* UPDViewController.m */,
+			);
+			name = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -139,7 +159,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */,
-				0213C23D1974FE0C006BC204 /* AppDelegate.m in Sources */,
+				02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */,
+				02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */,
+				02A73D151975C24B000A7C48 /* UPDViewController.m in Sources */,
 				0213C23A1974FE0C006BC204 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -170,6 +192,8 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Updates/UPDPrefixHeader.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -211,6 +235,8 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Updates/UPDPrefixHeader.pch;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

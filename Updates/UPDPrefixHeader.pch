@@ -1,0 +1,14 @@
+//
+//  UPDPrefixHeader.pch
+//  Updates
+//
+//  Created by Bryce Pauken on 7/15/14.
+//  Copyright (c) 2014 Kingfish. All rights reserved.
+//
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #import <CoreData/CoreData.h>
+    #import "UPDCommon.h"
+#endif

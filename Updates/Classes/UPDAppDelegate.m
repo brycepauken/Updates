@@ -8,16 +8,24 @@
 
 #import "UPDAppDelegate.h"
 
+#import "UPDViewController.h"
+
 @implementation UPDAppDelegate
             
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 
+/*
+ Creates our View Controller and gets our app going!
+ */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
+    _window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    [_window setBackgroundColor:[UIColor blackColor]];
+    
+    _viewController = [[UPDViewController alloc] init];
+    [_window setRootViewController:_viewController];
+    
     [self.window makeKeyAndVisible];
     return YES;
 }
