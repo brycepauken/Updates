@@ -6,12 +6,6 @@
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
-/*
- The starting point of the application.
- Essentially just creates our UPDViewController, then handles
- a few Core Data releated functions.
- */
-
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 

@@ -6,12 +6,12 @@
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
-/*
- 
- */
-
 #import <UIKit/UIKit.h>
 
+@class UPDInterface;
+
 @interface UPDViewController : UIViewController
+
+@property (nonatomic, strong) UPDInterface *interface;
 
 @end

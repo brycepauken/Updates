@@ -6,21 +6,33 @@
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
+/*
+ Our view controller just creates another UIView (a UPDInterface, to
+ be precise) and adds that to its view. This view-in-the-middle is
+ necessary so we can give it a layoutSubviews implementation.
+ */
+
 #import "UPDViewController.h"
 
-@interface UPDViewController ()
-
-@property (nonatomic, strong) UIScrollView *scrollView;
-
-@end
+#import "UPDInterface.h"
 
 @implementation UPDViewController
 
 - (void)viewDidLoad {
-    self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
-    [self.scrollView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
-    [self.scrollView setBackgroundColor:[UIColor blueColor]];
-    [self.view addSubview:self.scrollView];
+    [self setNeedsStatusBarAppearanceUpdate];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.view setBackgroundColor:[UIColor UPDApplicationBackgroundColor]];
+        [self.view setClipsToBounds:YES];
+        
+        self.interface = [[UPDInterface alloc] initWithFrame:self.view.bounds];
+        [self.interface setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.view addSubview:self.interface];
+    });
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
 }
 
 @end

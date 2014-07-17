@@ -6,6 +6,12 @@
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
+/*
+ The starting point of the application.
+ Essentially just creates our UPDViewController, then handles
+ a few Core Data releated functions.
+ */
+
 #import "UPDAppDelegate.h"
 
 #import "UPDViewController.h"
@@ -20,6 +26,13 @@
  Creates our View Controller and gets our app going!
  */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    /*preload the keyboard*/
+    UITextField *field = [UITextField new];
+    [[[[UIApplication sharedApplication] windows] lastObject] addSubview:field];
+    [field becomeFirstResponder];
+    [field resignFirstResponder];
+    [field removeFromSuperview];
+    
     _window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [_window setBackgroundColor:[UIColor blackColor]];
     
