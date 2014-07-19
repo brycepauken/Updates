@@ -22,6 +22,7 @@
 @interface UPDBrowserView()
 
 @property (nonatomic, strong) UPDBrowserBottomBar *bottomBar;
+@property (nonatomic, strong) UIView *browserOverlay;
 @property (nonatomic, strong) UIWebView *webView;
 @property (nonatomic, strong) UPDBrowserURLBar *urlBar;
 
@@ -34,21 +35,47 @@
     if(self) {
         [self setBackgroundColor:[UIColor UPDOffWhiteColor]];
         
+        __unsafe_unretained UPDBrowserView *weakSelf = self;
         self.urlBar = [[UPDBrowserURLBar alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT+2)];
         [self.urlBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self.urlBar setBeginEditingBlock:^{
+            [weakSelf.browserOverlay setUserInteractionEnabled:YES];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.browserOverlay setAlpha:0.5];
+            }];
+        }];
+        [self.urlBar setEndEditingBlock:^{
+            [weakSelf browserOverlayTapped];
+        }];
         [self addSubview:self.urlBar];
         
         self.bottomBar = [[UPDBrowserBottomBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-(UPD_NAVIGATION_BAR_HEIGHT-20), self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT-20)];
         [self.bottomBar setAutoresizingMask:UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth];
         [self addSubview:self.bottomBar];
         
-        self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.height, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
+        self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
         [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
         [self.webView setDelegate:self];
-        
         [self addSubview:self.webView];
+        
+        self.browserOverlay = [[UIView alloc] initWithFrame:CGRectMake(0, self.urlBar.bounds.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.bounds.size.height)];
+        [self.browserOverlay setAlpha:0];
+        [self.browserOverlay setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.browserOverlay setBackgroundColor:[UIColor UPDOffBlackColor]];
+        [self.browserOverlay setUserInteractionEnabled:NO];
+        [self addSubview:self.browserOverlay];
+        UITapGestureRecognizer *browserOverlayTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(browserOverlayTapped)];
+        [self.browserOverlay addGestureRecognizer:browserOverlayTapRecognizer];
     }
     return self;
+}
+
+- (void)browserOverlayTapped {
+    [self.urlBar resignFirstResponder];
+    [self.browserOverlay setUserInteractionEnabled:NO];
+    [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+        [self.browserOverlay setAlpha:0];
+    }];
 }
 
 /*
@@ -80,17 +107,10 @@
             checkURL = [NSURL URLWithString:[@"http://" stringByAppendingString:url]];
         }
     }
-    if(checkURL && checkURL.scheme && checkURL.host) {
-        NSString *displayURL = checkURL.host.lowercaseString;
-        if([displayURL length]>4&&[[displayURL substringToIndex:4] isEqualToString:@"www."]) {
-            displayURL = [displayURL substringFromIndex:4];
-        }
-        [self.urlBar setText:displayURL];
-    }
-    else {
+    if(!checkURL || !checkURL.scheme || !checkURL.host) {
         checkURL = [NSURL URLWithString:[@"http://www.google.com/search?sourceid=chrome&ie=UTF-8&q=" stringByAppendingString:[[url stringByReplacingOccurrencesOfString:@" " withString:@"+"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-        [self.urlBar setText:url];
     }
+    [self.urlBar setText:checkURL.absoluteString];
     [self.urlBar resetProgressBarWithFade:NO];
     [self.urlBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
     [self.webView loadRequest:[NSURLRequest requestWithURL:checkURL]];

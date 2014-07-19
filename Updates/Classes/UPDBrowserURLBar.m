@@ -64,40 +64,33 @@
     }
 }
 
+- (BOOL)resignFirstResponder {
+    [self.textField resignFirstResponder];
+    return YES;
+}
+
 - (void)setText:(NSString *)text {
     [self.textField setText:text];
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
-    CGSize textFieldSize = [self.textField sizeThatFits:self.textFieldContainer.bounds.size];
-    CGRect textFieldRect = CGRectMake((self.textFieldContainer.bounds.size.width-textFieldSize.width)/2, 0, textFieldSize.width, self.textFieldContainer.bounds.size.height);
-    [self.textField setClearButtonMode:UITextFieldViewModeNever];
-    [self.textField setFrame:textFieldRect];
-    [UIView animateWithDuration:0.2 animations:^{
-        [self.textField setFrame:CGRectMake(0, 0, textFieldSize.width, self.textFieldContainer.bounds.size.height)];
-    } completion:^(BOOL finished) {
-        [self.textField setClearButtonMode:UITextFieldViewModeWhileEditing];
-        [self.textField setFrame:self.textFieldContainer.bounds];
-        [self.textField setTextAlignment:NSTextAlignmentLeft];
-    }];
+    if(self.beginEditingBlock) {
+        self.beginEditingBlock();
+    }
+    UITextRange *range = [self.textField textRangeFromPosition:self.textField.endOfDocument toPosition:self.textField.endOfDocument];
+    [self.textField setSelectedTextRange:range];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UITextRange *range = [self.textField textRangeFromPosition:self.textField.beginningOfDocument toPosition:self.textField.endOfDocument];
+        [self.textField setSelectedTextRange:range];
+    });
     
     return YES;
 }
 
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
-    CGSize textFieldSize = [self.textField sizeThatFits:self.textFieldContainer.bounds.size];
-    CGRect textFieldRect = self.textField.frame;
-    textFieldRect.size.width = textFieldSize.width;
-    [self.textField setClearButtonMode:UITextFieldViewModeNever];
-    [self.textField setFrame:textFieldRect];
-    [UIView animateWithDuration:0.25 animations:^{
-        [self.textField setFrame:CGRectMake((self.textFieldContainer.bounds.size.width-textFieldSize.width)/2, 0, textFieldSize.width, self.textFieldContainer.bounds.size.height)];
-    } completion:^(BOOL finished){
-        [self.textField setClearButtonMode:UITextFieldViewModeWhileEditing];
-        [self.textField setFrame:self.textFieldContainer.bounds];
-        [self.textField setTextAlignment:NSTextAlignmentCenter];
-    }];
-    
+    if(self.endEditingBlock) {
+        self.endEditingBlock();
+    }
     return YES;
 }
 

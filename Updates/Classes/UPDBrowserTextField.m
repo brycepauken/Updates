@@ -22,18 +22,18 @@
         [self setKeyboardType:UIKeyboardTypeURL];
         [self setPlaceholder:@"Enter Address"];
         [self setReturnKeyType:UIReturnKeyGo];
-        [self setTextAlignment:NSTextAlignmentCenter];
+        [self setTextAlignment:NSTextAlignmentNatural];
         [self setTextColor:[UIColor darkGrayColor]];
     }
     return self;
 }
 
 /*
- The returned CGRect's width has an extra 20 pixels removed so
+ The returned CGRect's width has an extra 30 pixels removed so
  that the text doesn't overlap the clear button.
  */
 - (CGRect)editingRectForBounds:(CGRect)bounds {
-    return CGRectMake(bounds.origin.x+10, bounds.origin.y, bounds.size.width-30, bounds.size.height);
+    return CGRectMake(bounds.origin.x+10, bounds.origin.y, bounds.size.width-40, bounds.size.height);
 }
 
 - (CGRect)textRectForBounds:(CGRect)bounds {

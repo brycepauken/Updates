@@ -10,6 +10,8 @@
 
 @interface UPDBrowserURLBar : UIView <UITextFieldDelegate>
 
+@property (nonatomic, copy) void(^beginEditingBlock)();
+@property (nonatomic, copy) void(^endEditingBlock)();
 @property (nonatomic, copy) void(^goButtonBlock)(NSString *url);
 
 - (void)setText:(NSString *)text;
