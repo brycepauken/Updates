@@ -88,6 +88,7 @@
 
 - (void)backButtonTapped {
     if(self.backButtonBlock) {
+        [self.urlBar resignFirstResponder];
         self.backButtonBlock();
     }
 }
@@ -193,6 +194,14 @@
             break;
         }
     }
+}
+
+/*
+ Simply forwarding this along to our URL bar, which
+ is in charge of the go block
+ */
+- (void)setGoButtonBlock:(void (^)(NSString *))goButtonBlock {
+    [self.urlBar setGoButtonBlock:goButtonBlock];
 }
 
 @end

@@ -11,8 +11,10 @@
 @interface UIColor (UPDColors)
 
 + (UIColor *)UPDApplicationBackgroundColor;
++ (UIColor *)UPDBrightBlueColor;
 + (UIColor *)UPDLightBlueColor;
 + (UIColor *)UPDLighterBlueColor;
++ (UIColor *)UPDLightGreyBlueColor;
 + (UIColor *)UPDLightGreyColor;
 + (UIColor *)UPDOffBlackColor;
 + (UIColor *)UPDOffWhiteColor;

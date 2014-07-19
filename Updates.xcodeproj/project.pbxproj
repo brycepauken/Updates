@@ -10,12 +10,16 @@
 		0213C23A1974FE0C006BC204 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0213C2391974FE0C006BC204 /* main.m */; };
 		0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0213C23E1974FE0C006BC204 /* Updates.xcdatamodeld */; };
 		0213C2421974FE0C006BC204 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0213C2411974FE0C006BC204 /* Images.xcassets */; };
+		0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 0220020B1978897B002FF38D /* UPDBrowserTextField.m */; };
+		0220020F1978B646002FF38D /* UPDBrowserBottomBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 0220020E1978B646002FF38D /* UPDBrowserBottomBar.m */; };
 		024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45101975CF8B000896E4 /* UIColor+UPDColors.m */; };
 		024C45141975D269000896E4 /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45131975D269000896E4 /* UPDInterface.m */; };
 		024C451B1975E51F000896E4 /* KingfishIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45171975E51F000896E4 /* KingfishIcon.png */; };
 		024C451C1975E51F000896E4 /* KingfishIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45181975E51F000896E4 /* KingfishIcon@2x.png */; };
 		024C451D1975E51F000896E4 /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45191975E51F000896E4 /* UpdatesIcon.png */; };
 		024C451E1975E51F000896E4 /* UpdatesIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C451A1975E51F000896E4 /* UpdatesIcon@2x.png */; };
+		02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */; };
+		02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */; };
 		02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */; };
 		02A733E8197700C4002A86F3 /* Back.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A733E6197700C4002A86F3 /* Back.png */; };
 		02A733E9197700C4002A86F3 /* Back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A733E7197700C4002A86F3 /* Back@2x.png */; };
@@ -46,6 +50,10 @@
 		0213C2391974FE0C006BC204 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		0213C23F1974FE0C006BC204 /* Updates.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Updates.xcdatamodel; sourceTree = "<group>"; };
 		0213C2411974FE0C006BC204 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		0220020A1978897B002FF38D /* UPDBrowserTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserTextField.h; path = Classes/UPDBrowserTextField.h; sourceTree = "<group>"; };
+		0220020B1978897B002FF38D /* UPDBrowserTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserTextField.m; path = Classes/UPDBrowserTextField.m; sourceTree = "<group>"; };
+		0220020D1978B646002FF38D /* UPDBrowserBottomBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserBottomBar.h; path = Classes/UPDBrowserBottomBar.h; sourceTree = "<group>"; };
+		0220020E1978B646002FF38D /* UPDBrowserBottomBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserBottomBar.m; path = Classes/UPDBrowserBottomBar.m; sourceTree = "<group>"; };
 		024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+UPDColors.h"; path = "Classes/UIColor+UPDColors.h"; sourceTree = "<group>"; };
 		024C45101975CF8B000896E4 /* UIColor+UPDColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+UPDColors.m"; path = "Classes/UIColor+UPDColors.m"; sourceTree = "<group>"; };
 		024C45121975D269000896E4 /* UPDInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInterface.h; path = Classes/UPDInterface.h; sourceTree = "<group>"; };
@@ -54,6 +62,10 @@
 		024C45181975E51F000896E4 /* KingfishIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "KingfishIcon@2x.png"; path = "Resources/Images/KingfishIcon@2x.png"; sourceTree = "<group>"; };
 		024C45191975E51F000896E4 /* UpdatesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpdatesIcon.png; path = Resources/Images/UpdatesIcon.png; sourceTree = "<group>"; };
 		024C451A1975E51F000896E4 /* UpdatesIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "UpdatesIcon@2x.png"; path = "Resources/Images/UpdatesIcon@2x.png"; sourceTree = "<group>"; };
+		02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserURLBar.h; path = Classes/UPDBrowserURLBar.h; sourceTree = "<group>"; };
+		02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserURLBar.m; path = Classes/UPDBrowserURLBar.m; sourceTree = "<group>"; };
+		02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserView.h; path = Classes/UPDBrowserView.h; sourceTree = "<group>"; };
+		02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserView.m; path = Classes/UPDBrowserView.m; sourceTree = "<group>"; };
 		02A733E31976F95A002A86F3 /* UPDPreBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDPreBrowserView.h; path = Classes/UPDPreBrowserView.h; sourceTree = "<group>"; };
 		02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDPreBrowserView.m; path = Classes/UPDPreBrowserView.m; sourceTree = "<group>"; };
 		02A733E6197700C4002A86F3 /* Back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Back.png; path = Resources/Images/Back.png; sourceTree = "<group>"; };
@@ -176,6 +188,14 @@
 				024C45101975CF8B000896E4 /* UIColor+UPDColors.m */,
 				02A73D161975C256000A7C48 /* UPDAppDelegate.h */,
 				02A73D171975C256000A7C48 /* UPDAppDelegate.m */,
+				0220020D1978B646002FF38D /* UPDBrowserBottomBar.h */,
+				0220020E1978B646002FF38D /* UPDBrowserBottomBar.m */,
+				0220020A1978897B002FF38D /* UPDBrowserTextField.h */,
+				0220020B1978897B002FF38D /* UPDBrowserTextField.m */,
+				02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */,
+				02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */,
+				02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */,
+				02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */,
 				02A73D1A1975C501000A7C48 /* UPDCommon.h */,
 				02A73D1B1975C501000A7C48 /* UPDCommon.m */,
 				02C2387B1976C7A9009327F8 /* UPDNavigationBar.h */,
@@ -285,6 +305,7 @@
 				024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
 				02C238841976D594009327F8 /* UPDTableView.m in Sources */,
+				0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */,
 				02A733EC19770AB6002A86F3 /* UPDPreBrowserURLBar.m in Sources */,
 				0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */,
 				024C45141975D269000896E4 /* UPDInterface.m in Sources */,
@@ -292,7 +313,10 @@
 				02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */,
 				02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */,
 				02A73D151975C24B000A7C48 /* UPDViewController.m in Sources */,
+				0220020F1978B646002FF38D /* UPDBrowserBottomBar.m in Sources */,
+				02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */,
 				0213C23A1974FE0C006BC204 /* main.m in Sources */,
+				02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

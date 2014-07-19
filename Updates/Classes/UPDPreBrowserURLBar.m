@@ -43,6 +43,9 @@
 }
 
 - (void)goButtonTapped {
+    if(self.textField.isFirstResponder) {
+        [self.textField resignFirstResponder];
+    }
     if(self.goButtonBlock) {
         self.goButtonBlock(self.textField.text);
     }
@@ -76,6 +79,12 @@
 
 - (void)textFieldDidChange {
     [self setButtonEnabled:[self.textField.text length]];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [self.textField resignFirstResponder];
+    [self goButtonTapped];
+    return YES;
 }
 
 @end

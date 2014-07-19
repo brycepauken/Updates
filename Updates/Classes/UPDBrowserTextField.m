@@ -1,20 +1,14 @@
 //
-//  UPDPreBrowserTextField.m
+//  UPDBrowserTextField.m
 //  Updates
 //
-//  Created by Bryce Pauken on 7/16/14.
+//  Created by Bryce Pauken on 7/17/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
-/*
- Making our own subclass of UITextField allows us to give the
- text a bit of padding—we'll also set up the text field here,
- while we're at it.
- */
+#import "UPDBrowserTextField.h"
 
-#import "UPDPreBrowserTextField.h"
-
-@implementation UPDPreBrowserTextField
+@implementation UPDBrowserTextField
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -23,11 +17,12 @@
         [self setAutocorrectionType:UITextAutocorrectionTypeNo];
         [self setBackgroundColor:[UIColor UPDOffWhiteColor]];
         [self setClearButtonMode:UITextFieldViewModeWhileEditing];
-        [self setClipsToBounds:NO];
+        [self setClipsToBounds:YES];
         [self setFont:[UIFont systemFontOfSize:18]];
         [self setKeyboardType:UIKeyboardTypeURL];
         [self setPlaceholder:@"Enter Address"];
         [self setReturnKeyType:UIReturnKeyGo];
+        [self setTextAlignment:NSTextAlignmentCenter];
         [self setTextColor:[UIColor darkGrayColor]];
     }
     return self;

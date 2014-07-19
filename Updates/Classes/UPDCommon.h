@@ -30,3 +30,5 @@ extern const int UPD_PREBROWSER_URL_BAR_WIDTH;
 extern const int UPD_SEARCH_ENGINE_ICON_PADDING;
 extern const int UPD_SEARCH_ENGINE_ICON_SIZE;
 extern const int UPD_START_LABEL_WIDTH;
+extern const int UPD_URL_BAR_HEIGHT;
+extern const int UPD_URL_BAR_PADDING;

@@ -15,12 +15,14 @@
 #import "UPDInterface.h"
 
 #import "QuartzCore/CALayer.h"
+#import "UPDBrowserView.h"
 #import "UPDNavigationBar.h"
 #import "UPDPreBrowserView.h"
 #import "UPDTableView.h"
 
 @interface UPDInterface ()
 
+@property (nonatomic, strong) UPDBrowserView *browserView;
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UPDNavigationBar *navigationBar;
 @property (nonatomic, strong) UPDPreBrowserView *preBrowserView;
@@ -65,7 +67,18 @@
                 [weakSelf.scrollView setContentOffset:CGPointZero];
             }];
         }];
+        [self.preBrowserView setGoButtonBlock:^(NSString *url){
+            [weakSelf.browserView loadURL:url];
+            [weakSelf.scrollView setTag:2];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width*2, 0)];
+            }];
+        }];
+        
         [self.scrollView addSubview:self.preBrowserView];
+        
+        self.browserView = [[UPDBrowserView alloc] initWithFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+        [self.scrollView addSubview:self.browserView];
         
         [self setNeedsDisplay];
     }
@@ -76,6 +89,7 @@
     [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width*3, 0)];
     [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*self.scrollView.tag, 0)];
     [self.preBrowserView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+    [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
 @end

@@ -14,6 +14,17 @@
     return [self UPDLightGreyColor];
 }
 
++ (UIColor *)UPDBrightBlueColor {
+    static UIColor *brightBlueColor = nil;
+    static dispatch_once_t dispatchOnceToken;
+    
+    dispatch_once(&dispatchOnceToken, ^{
+        brightBlueColor = [UIColor colorWithRed:99/255.0 green:161/255.0 blue:247/255.0 alpha:1];
+    });
+    
+    return brightBlueColor;
+}
+
 + (UIColor *)UPDLightBlueColor {
     static UIColor *lightBlueColor = nil;
     static dispatch_once_t dispatchOnceToken;
@@ -34,6 +45,17 @@
     });
     
     return lighterBlueColor;
+}
+
++ (UIColor *)UPDLightGreyBlueColor {
+    static UIColor *lightBlueColor = nil;
+    static dispatch_once_t dispatchOnceToken;
+    
+    dispatch_once(&dispatchOnceToken, ^{
+        lightBlueColor = [UIColor colorWithRed:126/255.0f green:152/255.0f blue:167/255.0f alpha:1];
+    });
+    
+    return lightBlueColor;
 }
 
 + (UIColor *)UPDLightGreyColor {
