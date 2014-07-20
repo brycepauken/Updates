@@ -12,6 +12,7 @@
 
 @property (nonatomic, copy) void(^backButtonBlock)();
 
+- (void)reset;
 - (void)setGoButtonBlock:(void (^)(NSString *))goButtonBlock;
 
 @end

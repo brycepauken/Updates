@@ -88,30 +88,11 @@
 }
 
 - (void)dismiss {
-    /*begin alert animation*/
-    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
-    
-    CATransform3D scale1 = CATransform3DMakeScale(0.9, 0.9, 1);
-    CATransform3D scale2 = CATransform3DMakeScale(1.2, 1.2, 1);
-    CATransform3D scale3 = CATransform3DMakeScale(0.0, 0.0, 1);
-    
-    NSArray *frameValues = [NSArray arrayWithObjects:[NSValue valueWithCATransform3D:scale1],[NSValue valueWithCATransform3D:scale2],[NSValue valueWithCATransform3D:scale3], nil];
-    [animation setValues:frameValues];
-    
-    NSArray *frameTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.1],[NSNumber numberWithFloat:0.5],[NSNumber numberWithFloat:1], nil];
-    [animation setKeyTimes:frameTimes];
-    
-    animation.fillMode = kCAFillModeForwards;
-    animation.removedOnCompletion = NO;
-    animation.duration = UPD_TRANSITION_DURATION;
-    
-    [self.layer addAnimation:animation forKey:@"popdown"];
-    /*end alert animation*/
-    
     [self setUserInteractionEnabled:NO];
     [self.interfaceOverlay setUserInteractionEnabled:NO];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [self setAlpha:0];
+        [self setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5)];
         [self.interfaceOverlay setAlpha:0];
     } completion:^(BOOL finished) {
         [self removeFromSuperview];
@@ -160,7 +141,7 @@
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
     
     CATransform3D scale1 = CATransform3DMakeScale(0.5, 0.5, 1);
-    CATransform3D scale2 = CATransform3DMakeScale(1.2, 1.2, 1);
+    CATransform3D scale2 = CATransform3DMakeScale(1.1, 1.1, 1);
     CATransform3D scale3 = CATransform3DMakeScale(0.9, 0.9, 1);
     CATransform3D scale4 = CATransform3DMakeScale(1.0, 1.0, 1);
     

@@ -81,11 +81,6 @@
         }];
         [self addSubview:self.bottomBar];
         
-        self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
-        [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
-        [self.webView setDelegate:self];
-        [self addSubview:self.webView];
-        
         self.browserOverlay = [[UIView alloc] initWithFrame:CGRectMake(0, self.urlBar.bounds.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.bounds.size.height)];
         [self.browserOverlay setAlpha:0];
         [self.browserOverlay setAutoresizingMask:UIViewAutoresizingFlexibleSize];
@@ -108,6 +103,14 @@
     self.instructionAccumulator = [[UPDInstructionAccumulator alloc] init];
     [UPDURLProtocol setInstructionAccumulator:self.instructionAccumulator];
     [NSURLProtocol registerClass:[UPDURLProtocol class]];
+    
+    if(self.webView.superview) {
+        [self.webView removeFromSuperview];
+    }
+    self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
+    [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+    [self.webView setDelegate:self];
+    [self addSubview:self.webView];
 }
 
 - (void)browserOverlayTapped {

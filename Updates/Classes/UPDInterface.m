@@ -48,6 +48,7 @@
         __unsafe_unretained UPDInterface *weakSelf = self;
         self.navigationBar = [[UPDNavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT)];
         [self.navigationBar setAddButtonBlock:^{
+            [weakSelf.preBrowserView reset];
             [weakSelf.scrollView setTag:1];
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
                [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
@@ -79,8 +80,10 @@
         [self.scrollView addSubview:self.preBrowserView];
         
         self.browserView = [[UPDBrowserView alloc] initWithFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+        [self.browserView setTag:2]; /*what page of the scollview the browser should be on*/
         [self.browserView setCancelSessionBlock:^{
             /*move browser view over for a more seamless animation*/
+            [weakSelf.browserView setTag:1];
             [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
             [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
             
@@ -88,6 +91,7 @@
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
                 [weakSelf.scrollView setContentOffset:CGPointZero];
             } completion:^(BOOL finsished) {
+                [weakSelf.browserView setTag:2];
                 [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
             }];
         }];
@@ -102,7 +106,7 @@
     [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width*3, 0)];
     [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*self.scrollView.tag, 0)];
     [self.preBrowserView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
-    [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+    [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
 @end

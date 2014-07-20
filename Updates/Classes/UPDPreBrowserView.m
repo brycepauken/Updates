@@ -157,6 +157,24 @@
 }
 
 /*
+ Sets the pre browser view to its original state. This probably should
+ never be called when the view is visible—rather, just before it appears.
+ */
+- (void)reset {
+    [self.urlBar resignFirstResponder];
+    self.keyboardHeight = 0;
+    [self.urlBar setText:@""];
+    
+    [self.searchEngineLabel setAlpha:1];
+    [self.searchEngineLabel setTag:1];
+    
+    for(UIButton *button in self.searchEngineButtons) {
+        [button setAlpha:0];
+        [button setTag:0];
+    }
+}
+
+/*
  Animate the search engine label down off the screen, and then each
  search engine icon up (after an increasing delay). The search engine
  icons are actually located where they're supposed to end up, so we have
@@ -169,6 +187,8 @@
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [self.searchEngineLabel setAlpha:0];
         [self.searchEngineLabel setFrame:searchEngineLabelFrame];
+    } completion:^(BOOL finished) {
+        [self.searchEngineLabel setFrame:CGRectMake(10, self.urlBar.frame.origin.y+self.urlBar.frame.size.height+20, self.bounds.size.width-20, 50)];
     }];
     for(int i=0;i<self.searchEngineButtons.count;i++) {
         UIButton *button = [self.searchEngineButtons objectAtIndex:i];
