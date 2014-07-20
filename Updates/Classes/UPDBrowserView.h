@@ -10,6 +10,7 @@
 
 @interface UPDBrowserView : UIView <UIWebViewDelegate>
 
+- (void)beginSession;
 - (void)loadURL:(NSString *)url;
 
 @end

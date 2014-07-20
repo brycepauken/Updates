@@ -68,6 +68,7 @@
             }];
         }];
         [self.preBrowserView setGoButtonBlock:^(NSString *url){
+            [weakSelf.browserView beginSession];
             [weakSelf.browserView loadURL:url];
             [weakSelf.scrollView setTag:2];
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{

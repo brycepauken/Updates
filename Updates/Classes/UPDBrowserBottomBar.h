@@ -10,4 +10,7 @@
 
 @interface UPDBrowserBottomBar : UIView
 
+- (void)setBlockForButtonWithName:(NSString *)name block:(void (^)())block;
+- (void)setButtonEnabledWithName:(NSString *)name enabled:(BOOL)enabled;
+
 @end

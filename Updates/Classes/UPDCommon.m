@@ -40,7 +40,8 @@ const int UPD_NAVIGATION_BAR_HEIGHT = 64;
 /*
  General UI
  */
-const int UPD_PREBROWSER_URL_BAR_BUTTON_SIZE = 16; /*this is just the size of the button image, the button itself is square*/
+const int UPD_BOTTOM_BAR_BUTTON_SIZE = 16;
+const int UPD_PREBROWSER_URL_BAR_BUTTON_SIZE = 16; /*this is just the size of the button image, the button itself is a square based on the bar's height*/
 const int UPD_PREBROWSER_URL_BAR_HEIGHT = 50;
 const int UPD_PREBROWSER_URL_BAR_WIDTH = 280;
 const int UPD_SEARCH_ENGINE_ICON_PADDING = 10;

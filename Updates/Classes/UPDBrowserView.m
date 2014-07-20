@@ -18,13 +18,16 @@
 
 #import "UPDBrowserBottomBar.h"
 #import "UPDBrowserURLBar.h"
+#import "UPDInstructionAccumulator.h"
+#import "UPDURLProtocol.h"
 
 @interface UPDBrowserView()
 
 @property (nonatomic, strong) UPDBrowserBottomBar *bottomBar;
 @property (nonatomic, strong) UIView *browserOverlay;
-@property (nonatomic, strong) UIWebView *webView;
+@property (nonatomic, strong) UPDInstructionAccumulator *instructionAccumulator;
 @property (nonatomic, strong) UPDBrowserURLBar *urlBar;
+@property (nonatomic, strong) UIWebView *webView;
 
 @end
 
@@ -51,6 +54,16 @@
         
         self.bottomBar = [[UPDBrowserBottomBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-(UPD_NAVIGATION_BAR_HEIGHT-20), self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT-20)];
         [self.bottomBar setAutoresizingMask:UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth];
+        [self.bottomBar setBlockForButtonWithName:@"Back" block:^{
+            if(weakSelf.webView.canGoBack) {
+                [weakSelf.webView goBack];
+            }
+        }];
+        [self.bottomBar setBlockForButtonWithName:@"Forward" block:^{
+            if(weakSelf.webView.canGoForward) {
+                [weakSelf.webView goForward];
+            }
+        }];
         [self addSubview:self.bottomBar];
         
         self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
@@ -70,6 +83,18 @@
     return self;
 }
 
+/*
+ Clear the cache and cookies, then register our custom
+ url protocol to handle new requests and forward them
+ to our accumulator
+ */
+- (void)beginSession {
+    [self clearPersistentData];
+    self.instructionAccumulator = [[UPDInstructionAccumulator alloc] init];
+    [UPDURLProtocol setInstructionAccumulator:self.instructionAccumulator];
+    [NSURLProtocol registerClass:[UPDURLProtocol class]];
+}
+
 - (void)browserOverlayTapped {
     [self.urlBar resignFirstResponder];
     [self.browserOverlay setUserInteractionEnabled:NO];
@@ -82,7 +107,7 @@
  Clears cookies and the cache—important for making sure a request
  can be duplicated every time.
  */
-- (void)clearCookies {
+- (void)clearPersistentData {
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
     
     NSHTTPCookie *cookie;
@@ -128,6 +153,8 @@
     [self.urlBar progressBarAnimateToWidth:1 withDuration:0.3 onCompletion:^(BOOL finished) {
         [self.urlBar performSelector:@selector(resetProgressBar) withObject:nil afterDelay:0.5];
     }];
+    [self.bottomBar setButtonEnabledWithName:@"Back" enabled:[webView canGoBack]];
+    [self.bottomBar setButtonEnabledWithName:@"Forward" enabled:[webView canGoForward]];
 }
 
 

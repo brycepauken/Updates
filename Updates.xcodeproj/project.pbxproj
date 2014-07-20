@@ -38,6 +38,14 @@
 		02A73D151975C24B000A7C48 /* UPDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A73D141975C24B000A7C48 /* UPDViewController.m */; };
 		02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A73D171975C256000A7C48 /* UPDAppDelegate.m */; };
 		02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A73D1B1975C501000A7C48 /* UPDCommon.m */; };
+		02AF8754197A2F9C007D06C5 /* UPDURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF8753197A2F9C007D06C5 /* UPDURLProtocol.m */; };
+		02AF8757197A3124007D06C5 /* UPDInstructionAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF8756197A3124007D06C5 /* UPDInstructionAccumulator.m */; };
+		02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF8759197B7488007D06C5 /* UPDInternalInstruction.m */; };
+		02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF875C197B7939007D06C5 /* UPDBrowserBottomButton.m */; };
+		02AF8760197B7E79007D06C5 /* Cancel.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF875E197B7E79007D06C5 /* Cancel.png */; };
+		02AF8761197B7E79007D06C5 /* Cancel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF875F197B7E79007D06C5 /* Cancel@2x.png */; };
+		02AF8764197B7E7E007D06C5 /* Accept.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF8762197B7E7E007D06C5 /* Accept.png */; };
+		02AF8765197B7E7E007D06C5 /* Accept@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF8763197B7E7E007D06C5 /* Accept@2x.png */; };
 		02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */; };
 		02C238801976CED9009327F8 /* Add.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387E1976CED9009327F8 /* Add.png */; };
 		02C238811976CED9009327F8 /* Add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387F1976CED9009327F8 /* Add@2x.png */; };
@@ -91,6 +99,18 @@
 		02A73D1A1975C501000A7C48 /* UPDCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDCommon.h; path = Classes/UPDCommon.h; sourceTree = "<group>"; };
 		02A73D1B1975C501000A7C48 /* UPDCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDCommon.m; path = Classes/UPDCommon.m; sourceTree = "<group>"; };
 		02A73D1D1975C555000A7C48 /* UPDPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UPDPrefixHeader.pch; sourceTree = "<group>"; };
+		02AF8752197A2F9C007D06C5 /* UPDURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDURLProtocol.h; path = Classes/UPDURLProtocol.h; sourceTree = "<group>"; };
+		02AF8753197A2F9C007D06C5 /* UPDURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDURLProtocol.m; path = Classes/UPDURLProtocol.m; sourceTree = "<group>"; };
+		02AF8755197A3124007D06C5 /* UPDInstructionAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInstructionAccumulator.h; path = Classes/UPDInstructionAccumulator.h; sourceTree = "<group>"; };
+		02AF8756197A3124007D06C5 /* UPDInstructionAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInstructionAccumulator.m; path = Classes/UPDInstructionAccumulator.m; sourceTree = "<group>"; };
+		02AF8758197B7488007D06C5 /* UPDInternalInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInternalInstruction.h; path = Classes/UPDInternalInstruction.h; sourceTree = "<group>"; };
+		02AF8759197B7488007D06C5 /* UPDInternalInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInternalInstruction.m; path = Classes/UPDInternalInstruction.m; sourceTree = "<group>"; };
+		02AF875B197B7939007D06C5 /* UPDBrowserBottomButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserBottomButton.h; path = Classes/UPDBrowserBottomButton.h; sourceTree = "<group>"; };
+		02AF875C197B7939007D06C5 /* UPDBrowserBottomButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserBottomButton.m; path = Classes/UPDBrowserBottomButton.m; sourceTree = "<group>"; };
+		02AF875E197B7E79007D06C5 /* Cancel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Cancel.png; path = Resources/Images/Cancel.png; sourceTree = "<group>"; };
+		02AF875F197B7E79007D06C5 /* Cancel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Cancel@2x.png"; path = "Resources/Images/Cancel@2x.png"; sourceTree = "<group>"; };
+		02AF8762197B7E7E007D06C5 /* Accept.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Accept.png; path = Resources/Images/Accept.png; sourceTree = "<group>"; };
+		02AF8763197B7E7E007D06C5 /* Accept@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Accept@2x.png"; path = "Resources/Images/Accept@2x.png"; sourceTree = "<group>"; };
 		02C2387B1976C7A9009327F8 /* UPDNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDNavigationBar.h; path = Classes/UPDNavigationBar.h; sourceTree = "<group>"; };
 		02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDNavigationBar.m; path = Classes/UPDNavigationBar.m; sourceTree = "<group>"; };
 		02C2387E1976CED9009327F8 /* Add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Add.png; path = Resources/Images/Add.png; sourceTree = "<group>"; };
@@ -159,10 +179,14 @@
 		024C45161975E4F8000896E4 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				02AF8762197B7E7E007D06C5 /* Accept.png */,
+				02AF8763197B7E7E007D06C5 /* Accept@2x.png */,
 				02C2387E1976CED9009327F8 /* Add.png */,
 				02C2387F1976CED9009327F8 /* Add@2x.png */,
 				02A733E6197700C4002A86F3 /* Back.png */,
 				02A733E7197700C4002A86F3 /* Back@2x.png */,
+				02AF875E197B7E79007D06C5 /* Cancel.png */,
+				02AF875F197B7E79007D06C5 /* Cancel@2x.png */,
 				02A733ED1977226B002A86F3 /* Forward.png */,
 				02A733EE1977226B002A86F3 /* Forward@2x.png */,
 				024C45171975E51F000896E4 /* KingfishIcon.png */,
@@ -190,6 +214,8 @@
 				02A73D171975C256000A7C48 /* UPDAppDelegate.m */,
 				0220020D1978B646002FF38D /* UPDBrowserBottomBar.h */,
 				0220020E1978B646002FF38D /* UPDBrowserBottomBar.m */,
+				02AF875B197B7939007D06C5 /* UPDBrowserBottomButton.h */,
+				02AF875C197B7939007D06C5 /* UPDBrowserBottomButton.m */,
 				0220020A1978897B002FF38D /* UPDBrowserTextField.h */,
 				0220020B1978897B002FF38D /* UPDBrowserTextField.m */,
 				02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */,
@@ -200,8 +226,12 @@
 				02A73D1B1975C501000A7C48 /* UPDCommon.m */,
 				02C2387B1976C7A9009327F8 /* UPDNavigationBar.h */,
 				02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */,
+				02AF8755197A3124007D06C5 /* UPDInstructionAccumulator.h */,
+				02AF8756197A3124007D06C5 /* UPDInstructionAccumulator.m */,
 				024C45121975D269000896E4 /* UPDInterface.h */,
 				024C45131975D269000896E4 /* UPDInterface.m */,
+				02AF8758197B7488007D06C5 /* UPDInternalInstruction.h */,
+				02AF8759197B7488007D06C5 /* UPDInternalInstruction.m */,
 				02A733F1197724A6002A86F3 /* UPDPreBrowserTextField.h */,
 				02A733F2197724A6002A86F3 /* UPDPreBrowserTextField.m */,
 				02A733EA19770AB6002A86F3 /* UPDPreBrowserURLBar.h */,
@@ -210,6 +240,8 @@
 				02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */,
 				02C238821976D594009327F8 /* UPDTableView.h */,
 				02C238831976D594009327F8 /* UPDTableView.m */,
+				02AF8752197A2F9C007D06C5 /* UPDURLProtocol.h */,
+				02AF8753197A2F9C007D06C5 /* UPDURLProtocol.m */,
 				02A73D131975C24B000A7C48 /* UPDViewController.h */,
 				02A73D141975C24B000A7C48 /* UPDViewController.m */,
 			);
@@ -278,7 +310,10 @@
 				02C238811976CED9009327F8 /* Add@2x.png in Resources */,
 				024C451D1975E51F000896E4 /* UpdatesIcon.png in Resources */,
 				02A7340219773560002A86F3 /* SearchEngineIconDuck.png in Resources */,
+				02AF8765197B7E7E007D06C5 /* Accept@2x.png in Resources */,
+				02AF8761197B7E79007D06C5 /* Cancel@2x.png in Resources */,
 				02A733FB197731B9002A86F3 /* SearchEngineIconBing@2x.png in Resources */,
+				02AF8760197B7E79007D06C5 /* Cancel.png in Resources */,
 				024C451E1975E51F000896E4 /* UpdatesIcon@2x.png in Resources */,
 				02A733E8197700C4002A86F3 /* Back.png in Resources */,
 				02A7340319773560002A86F3 /* SearchEngineIconDuck@2x.png in Resources */,
@@ -291,6 +326,7 @@
 				02A733FD197731B9002A86F3 /* SearchEngineIconGoogle@2x.png in Resources */,
 				02A733EF1977226B002A86F3 /* Forward.png in Resources */,
 				02A733FC197731B9002A86F3 /* SearchEngineIconGoogle.png in Resources */,
+				02AF8764197B7E7E007D06C5 /* Accept.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,14 +337,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */,
 				02A733F3197724A6002A86F3 /* UPDPreBrowserTextField.m in Sources */,
+				02AF8757197A3124007D06C5 /* UPDInstructionAccumulator.m in Sources */,
 				024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
+				02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */,
 				02C238841976D594009327F8 /* UPDTableView.m in Sources */,
 				0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */,
 				02A733EC19770AB6002A86F3 /* UPDPreBrowserURLBar.m in Sources */,
 				0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */,
 				024C45141975D269000896E4 /* UPDInterface.m in Sources */,
+				02AF8754197A2F9C007D06C5 /* UPDURLProtocol.m in Sources */,
 				02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */,
 				02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */,
 				02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */,
