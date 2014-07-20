@@ -16,6 +16,7 @@
 
 #import "UPDBrowserView.h"
 
+#import "UPDAlertView.h"
 #import "UPDBrowserBottomBar.h"
 #import "UPDBrowserURLBar.h"
 #import "UPDInstructionAccumulator.h"
@@ -64,6 +65,20 @@
                 [weakSelf.webView goForward];
             }
         }];
+        [self.bottomBar setBlockForButtonWithName:@"Cancel" block:^{
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Cancel"];
+            [alertView setMessage:@"Are you sure you want to cancel the current update?\n\nNo progress will be saved."];
+            [alertView setNoButtonBlock:^{
+                [weakAlertView dismiss];
+            }];
+            [alertView setYesButtonBlock:^{
+                [weakAlertView dismiss];
+                [weakSelf cancelSession];
+            }];
+            [alertView show];
+        }];
         [self addSubview:self.bottomBar];
         
         self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
@@ -101,6 +116,13 @@
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [self.browserOverlay setAlpha:0];
     }];
+}
+
+- (void)cancelSession {
+    [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
+    if(self.cancelSessionBlock) {
+        self.cancelSessionBlock();
+    }
 }
 
 /*

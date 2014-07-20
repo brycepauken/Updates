@@ -27,7 +27,7 @@
         [self setDataSource:self];
         [self setDelegate:self];
         
-        [self setBackgroundColor:[UIColor UPDApplicationBackgroundColor]];
+        [self setBackgroundColor:[UIColor UPDLightGreyColor]];
         [self setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         
         self.startLabel = [[UILabel alloc] init];

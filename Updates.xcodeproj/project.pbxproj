@@ -46,6 +46,8 @@
 		02AF8761197B7E79007D06C5 /* Cancel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF875F197B7E79007D06C5 /* Cancel@2x.png */; };
 		02AF8764197B7E7E007D06C5 /* Accept.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF8762197B7E7E007D06C5 /* Accept.png */; };
 		02AF8765197B7E7E007D06C5 /* Accept@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF8763197B7E7E007D06C5 /* Accept@2x.png */; };
+		02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF8767197B9DC0007D06C5 /* UPDAlertView.m */; };
+		02AF876B197BA831007D06C5 /* UPDAlertViewButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF876A197BA831007D06C5 /* UPDAlertViewButton.m */; };
 		02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */; };
 		02C238801976CED9009327F8 /* Add.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387E1976CED9009327F8 /* Add.png */; };
 		02C238811976CED9009327F8 /* Add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387F1976CED9009327F8 /* Add@2x.png */; };
@@ -111,6 +113,10 @@
 		02AF875F197B7E79007D06C5 /* Cancel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Cancel@2x.png"; path = "Resources/Images/Cancel@2x.png"; sourceTree = "<group>"; };
 		02AF8762197B7E7E007D06C5 /* Accept.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Accept.png; path = Resources/Images/Accept.png; sourceTree = "<group>"; };
 		02AF8763197B7E7E007D06C5 /* Accept@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Accept@2x.png"; path = "Resources/Images/Accept@2x.png"; sourceTree = "<group>"; };
+		02AF8766197B9DC0007D06C5 /* UPDAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDAlertView.h; path = Classes/UPDAlertView.h; sourceTree = "<group>"; };
+		02AF8767197B9DC0007D06C5 /* UPDAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAlertView.m; path = Classes/UPDAlertView.m; sourceTree = "<group>"; };
+		02AF8769197BA831007D06C5 /* UPDAlertViewButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDAlertViewButton.h; path = Classes/UPDAlertViewButton.h; sourceTree = "<group>"; };
+		02AF876A197BA831007D06C5 /* UPDAlertViewButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAlertViewButton.m; path = Classes/UPDAlertViewButton.m; sourceTree = "<group>"; };
 		02C2387B1976C7A9009327F8 /* UPDNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDNavigationBar.h; path = Classes/UPDNavigationBar.h; sourceTree = "<group>"; };
 		02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDNavigationBar.m; path = Classes/UPDNavigationBar.m; sourceTree = "<group>"; };
 		02C2387E1976CED9009327F8 /* Add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Add.png; path = Resources/Images/Add.png; sourceTree = "<group>"; };
@@ -210,6 +216,10 @@
 			children = (
 				024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */,
 				024C45101975CF8B000896E4 /* UIColor+UPDColors.m */,
+				02AF8766197B9DC0007D06C5 /* UPDAlertView.h */,
+				02AF8767197B9DC0007D06C5 /* UPDAlertView.m */,
+				02AF8769197BA831007D06C5 /* UPDAlertViewButton.h */,
+				02AF876A197BA831007D06C5 /* UPDAlertViewButton.m */,
 				02A73D161975C256000A7C48 /* UPDAppDelegate.h */,
 				02A73D171975C256000A7C48 /* UPDAppDelegate.m */,
 				0220020D1978B646002FF38D /* UPDBrowserBottomBar.h */,
@@ -338,9 +348,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */,
+				02AF876B197BA831007D06C5 /* UPDAlertViewButton.m in Sources */,
 				02A733F3197724A6002A86F3 /* UPDPreBrowserTextField.m in Sources */,
 				02AF8757197A3124007D06C5 /* UPDInstructionAccumulator.m in Sources */,
 				024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */,
+				02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
 				02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */,
 				02C238841976D594009327F8 /* UPDTableView.m in Sources */,

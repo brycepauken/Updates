@@ -40,6 +40,10 @@ const int UPD_NAVIGATION_BAR_HEIGHT = 64;
 /*
  General UI
  */
+const int UPD_ALERT_BUTTON_HEIGHT = 50;
+const int UPD_ALERT_BUTTON_ICON_SIZE = 16;
+const int UPD_ALERT_PADDING = 20;
+const int UPD_ALERT_WIDTH = 280;
 const int UPD_BOTTOM_BAR_BUTTON_SIZE = 16;
 const int UPD_PREBROWSER_URL_BAR_BUTTON_SIZE = 16; /*this is just the size of the button image, the button itself is a square based on the bar's height*/
 const int UPD_PREBROWSER_URL_BAR_HEIGHT = 50;

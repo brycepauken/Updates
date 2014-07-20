@@ -10,10 +10,6 @@
 
 @implementation UIColor (UPDColors)
 
-+ (UIColor *)UPDApplicationBackgroundColor {
-    return [self UPDLightGreyColor];
-}
-
 + (UIColor *)UPDBrightBlueColor {
     static UIColor *brightBlueColor = nil;
     static dispatch_once_t dispatchOnceToken;

@@ -22,7 +22,7 @@
     [self setNeedsStatusBarAppearanceUpdate];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.view setBackgroundColor:[UIColor UPDApplicationBackgroundColor]];
+        [self.view setBackgroundColor:[UIColor UPDLightGreyColor]];
         [self.view setClipsToBounds:YES];
         
         self.interface = [[UPDInterface alloc] initWithFrame:self.view.bounds];

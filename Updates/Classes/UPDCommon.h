@@ -24,6 +24,10 @@ extern const int UPD_NAVIGATION_BAR_BUTTON_PADDING;
 extern const int UPD_NAVIGATION_BAR_BUTTON_SIZE;
 extern const int UPD_NAVIGATION_BAR_HEIGHT;
 
+extern const int UPD_ALERT_BUTTON_HEIGHT;
+extern const int UPD_ALERT_BUTTON_ICON_SIZE;
+extern const int UPD_ALERT_PADDING;
+extern const int UPD_ALERT_WIDTH;
 extern const int UPD_BOTTOM_BAR_BUTTON_SIZE;
 extern const int UPD_PREBROWSER_URL_BAR_BUTTON_SIZE;
 extern const int UPD_PREBROWSER_URL_BAR_HEIGHT;

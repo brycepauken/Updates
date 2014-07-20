@@ -10,6 +10,8 @@
 
 @interface UPDBrowserView : UIView <UIWebViewDelegate>
 
+@property (nonatomic, copy) void (^cancelSessionBlock)();
+
 - (void)beginSession;
 - (void)loadURL:(NSString *)url;
 

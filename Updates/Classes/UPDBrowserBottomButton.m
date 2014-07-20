@@ -59,4 +59,5 @@
         [self setBackgroundColor:normalBackgroundColor];
     }
 }
+
 @end

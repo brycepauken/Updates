@@ -79,6 +79,18 @@
         [self.scrollView addSubview:self.preBrowserView];
         
         self.browserView = [[UPDBrowserView alloc] initWithFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+        [self.browserView setCancelSessionBlock:^{
+            /*move browser view over for a more seamless animation*/
+            [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
+            [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
+            
+            [weakSelf.scrollView setTag:0];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.scrollView setContentOffset:CGPointZero];
+            } completion:^(BOOL finsished) {
+                [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
+            }];
+        }];
         [self.scrollView addSubview:self.browserView];
         
         [self setNeedsDisplay];
