@@ -51,6 +51,9 @@
         [self.urlBar setEndEditingBlock:^{
             [weakSelf browserOverlayTapped];
         }];
+        [self.urlBar setGoButtonBlock:^(NSString *url){
+            [weakSelf loadURL:url];
+        }];
         [self addSubview:self.urlBar];
         
         self.bottomBar = [[UPDBrowserBottomBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-(UPD_NAVIGATION_BAR_HEIGHT-20), self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT-20)];
