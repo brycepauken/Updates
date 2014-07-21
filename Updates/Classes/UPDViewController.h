@@ -1,8 +1,8 @@
 //
 //  UPDViewController.h
-//  Update
+//  Updates
 //
-//  Created by Bryce Pauken on 5/15/14.
+//  Created by Bryce Pauken on 7/15/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
@@ -12,8 +12,6 @@
 
 @interface UPDViewController : UIViewController
 
-@property (nonatomic, retain) UPDInterface *interface;
-@property (nonatomic) BOOL hideStatusBar;
-@property (nonatomic) BOOL lightStatusBarContent;
+@property (nonatomic, strong) UPDInterface *interface;
 
 @end

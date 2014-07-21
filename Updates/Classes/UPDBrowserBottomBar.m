@@ -2,65 +2,72 @@
 //  UPDBrowserBottomBar.m
 //  Updates
 //
-//  Created by Bryce Pauken on 5/18/14.
+//  Created by Bryce Pauken on 7/17/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
 #import "UPDBrowserBottomBar.h"
 
+#import "UPDBrowserBottomButton.h"
+
+@interface UPDBrowserBottomBar()
+
+@property (nonatomic, retain) NSMutableArray *buttonBlocks;
+@property (nonatomic, retain) NSArray *buttonNames;
+@property (nonatomic, retain) NSMutableArray *buttons;
+
+@end
+
 @implementation UPDBrowserBottomBar
 
-- (id)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    if (self) {
-        [self setBackgroundColor:[UIColor UPDOffWhiteColor]];
+    if(self) {
+        [self setBackgroundColor:[UIColor UPDLightBlueColor]];
+        self.buttonNames = @[@"Cancel",@"Back",@"Forward",@"Accept"];
+        self.buttons = [[NSMutableArray alloc] initWithCapacity:self.buttonNames.count];
+        self.buttonBlocks = [[NSMutableArray alloc] initWithCapacity:self.buttonNames.count];
         
-        CGFloat buttonMargin = (self.bounds.size.width-(self.bounds.size.height*4))/5;
-        for(int i=0;i<4;i++) {
-            UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake((i+1)*buttonMargin+i*self.bounds.size.height, 0, self.bounds.size.height, self.bounds.size.height)];
+        CGFloat buttonWidth = self.bounds.size.width/((CGFloat)self.buttonNames.count);
+        for(int i=0;i<self.buttonNames.count;i++) {
+            UPDBrowserBottomButton *button = [[UPDBrowserBottomButton alloc] initWithFrame:CGRectMake(buttonWidth*i, 0, buttonWidth, self.bounds.size.height)];
             [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-            [button setBackgroundImage:[UIImage imageNamed:i==0?@"Cross":(i==1?@"LeftArrow":(i==2?@"RightArrow":@"Checkmark"))] forState:UIControlStateNormal];
+            [button setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth];
+            if(i==1||i==2) {
+                /*Back and Forward buttons disabled at start*/
+                [button setEnabled:NO];
+            }
+            [button setImage:[UIImage imageNamed:[self.buttonNames objectAtIndex:i]]];
             [button setTag:i];
-            [button.layer setCornerRadius:4];
-            [button.layer setMasksToBounds:YES];
             [self addSubview:button];
-        }
-        
-        UIView *divider = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
-        [divider setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        [divider setBackgroundColor:[UIColor lightGrayColor]];
-        [self addSubview:divider];
-        
-        for(int i=0;i<2;i++) {
-            UIView *smallDivider = [[UIView alloc] initWithFrame:CGRectMake(i==0?(buttonMargin*3/2+self.bounds.size.height-1):(buttonMargin*7/2+self.bounds.size.height*3), 0, 1, self.bounds.size.height)];
-            [smallDivider setBackgroundColor:[UIColor lightGrayColor]];
-            [self addSubview:smallDivider];
-            if(i==0) {
-                self.smallDividerLeft = smallDivider;
-            }
-            else {
-                self.smallDividerRight = smallDivider;
-            }
+            [self.buttons addObject:button];
+            [self.buttonBlocks addObject:[NSNull null]];
         }
     }
     return self;
 }
 
 - (void)buttonTapped:(UIButton *)sender {
-    if(sender.tag==3&&self.finishButtonBlock) {
-        self.finishButtonBlock();
+    id buttonBlock = [self.buttonBlocks objectAtIndex:sender.tag];
+    if(![buttonBlock isEqual:[NSNull null]]) {
+        ((void (^)())buttonBlock)();
     }
 }
 
-- (void)layoutSubviews {
-    CGFloat buttonMargin = (self.bounds.size.width-(self.bounds.size.height*4))/5;
-    for(UIView *view in [self subviews]) {
-        if([view isKindOfClass:[UIButton class]]) {
-            [view setFrame:CGRectMake(view.tag==0?(buttonMargin*3/4):(view.tag==3?(buttonMargin*17/4+self.bounds.size.height*3):(view.tag+1)*buttonMargin+view.tag*self.bounds.size.height), 0, self.bounds.size.height, self.bounds.size.height)];
+- (void)setBlockForButtonWithName:(NSString *)name block:(void (^)())block {
+    for(int i=0;i<self.buttonNames.count;i++) {
+        if([[self.buttonNames objectAtIndex:i] isEqualToString:name]) {
+            [self.buttonBlocks replaceObjectAtIndex:i withObject:[block copy]];
         }
     }
-    [self.smallDividerLeft setFrame:CGRectMake(buttonMargin*3/2+self.bounds.size.height-1, 0, 1, self.bounds.size.height)];
-    [self.smallDividerRight setFrame:CGRectMake(buttonMargin*7/2+self.bounds.size.height*3, 0, 1, self.bounds.size.height)];
+}
+
+- (void)setButtonEnabledWithName:(NSString *)name enabled:(BOOL)enabled {
+    for(int i=0;i<self.buttonNames.count;i++) {
+        if([[self.buttonNames objectAtIndex:i] isEqualToString:name]) {
+            [[self.buttons objectAtIndex:i] setEnabled:enabled];
+        }
+    }
 }
 
 @end

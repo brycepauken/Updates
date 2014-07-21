@@ -2,7 +2,7 @@
 //  UPDBrowserBottomBar.h
 //  Updates
 //
-//  Created by Bryce Pauken on 5/18/14.
+//  Created by Bryce Pauken on 7/17/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
@@ -10,8 +10,7 @@
 
 @interface UPDBrowserBottomBar : UIView
 
-@property (nonatomic, copy) void (^finishButtonBlock)();
-@property (nonatomic, retain) UIView *smallDividerLeft;
-@property (nonatomic, retain) UIView *smallDividerRight;
+- (void)setBlockForButtonWithName:(NSString *)name block:(void (^)())block;
+- (void)setButtonEnabledWithName:(NSString *)name enabled:(BOOL)enabled;
 
 @end

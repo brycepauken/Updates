@@ -2,183 +2,140 @@
 //  UPDBrowserView.m
 //  Updates
 //
-//  Created by Bryce Pauken on 5/17/14.
+//  Created by Bryce Pauken on 7/16/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
+/*
+ The browser view houses everything needed to webbrowse—
+ the actual UIWebView, along with top and bottom bars for
+ navigation. It also handles a bit of the browsing logic,
+ particularly around whether a given string is a URL or a
+ search query.
+ */
+
 #import "UPDBrowserView.h"
 
+#import "UPDAlertView.h"
 #import "UPDBrowserBottomBar.h"
-#import "UPDBrowserNavigationBar.h"
-#import "UPDBrowserStartView.h"
-#import "UPDBrowserStartViewTextField.h"
 #import "UPDBrowserURLBar.h"
-#import "UPDDocumentParser.h"
-#import "UPDInstruction.h"
-#import "UPDInstructionList.h"
-#import "UPDKeyValue.h"
+#import "UPDInstructionAccumulator.h"
+#import "UPDURLProtocol.h"
 
-/*
- Instructions:
- 
- @dynamic instructionNumber;
- @dynamic url;
- @dynamic anchor;
- @dynamic response;
- @dynamic parentList;
- @dynamic headers;
- @dynamic post;
- @dynamic get;
- */
+@interface UPDBrowserView()
+
+@property (nonatomic, strong) UPDBrowserBottomBar *bottomBar;
+@property (nonatomic, strong) UIView *browserOverlay;
+@property (nonatomic, strong) UPDInstructionAccumulator *instructionAccumulator;
+@property (nonatomic, strong) UPDBrowserURLBar *urlBar;
+@property (nonatomic, strong) UIWebView *webView;
+
+@end
 
 @implementation UPDBrowserView
 
-- (id)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    if (self) {
-        __weak UPDBrowserView *weakSelf = self;
+    if(self) {
+        [self setBackgroundColor:[UIColor UPDOffWhiteColor]];
         
-        self.instructionList = [NSEntityDescription insertNewObjectForEntityForName:@"InstructionList" inManagedObjectContext:AppDelegate.temporaryObjectContext];
-        [AppDelegate setAddInstruction:^(NSString *url, NSString *post, NSString *response, NSDictionary *headers) {
-            UPDInstruction *instruction = [NSEntityDescription insertNewObjectForEntityForName:@"Instruction" inManagedObjectContext:AppDelegate.temporaryObjectContext];
-            instruction.instructionNumber = @(self.instructionList.instructions.count);
-            [instruction setInstructionNumber:@(self.instructionList.instructions.count)];
-            [instruction setParentList:self.instructionList];
-            
-            [instruction setResponse:response];
-            [instruction setFullURL:url];
-            [instruction setBaseURL:([url rangeOfString:@"?" options:NSBackwardsSearch].location==NSNotFound?url:[url substringToIndex:[url rangeOfString:@"?" options:NSBackwardsSearch].location])];
-            NSURL *tempURL = [NSURL URLWithString:url];
-            for(int getOrPost=0;getOrPost<2;getOrPost++) {
-                NSString *targetString = (getOrPost?post:tempURL.query);
-                if(targetString.length) {
-                    NSMutableSet *params = [[NSMutableSet alloc] init];
-                    for(NSString *param in [targetString componentsSeparatedByString:@"&"]) {
-                        NSArray *elements = [param componentsSeparatedByString:@"="];
-                        if(elements.count==2) {
-                            UPDKeyValue *keyValue = [NSEntityDescription insertNewObjectForEntityForName:@"KeyValue" inManagedObjectContext:AppDelegate.temporaryObjectContext];
-                            [keyValue setKey:[elements objectAtIndex:0]];
-                            [keyValue setValue:[elements objectAtIndex:1]];
-                            if(getOrPost==0) {
-                                [keyValue setGetParent:instruction];
-                            }
-                            else {
-                                [keyValue setPostParent:instruction];
-                            }
-                            [params addObject:keyValue];
-                        }
-                    }
-                    if(getOrPost==0) {
-                        [instruction setGet:params];
-                    }
-                    else {
-                        [instruction setPost:params];
-                    }
-                }
-            }
-            
-            NSMutableSet *instructions = [self.instructionList.instructions mutableCopy];
-            [instructions addObject:instruction];
-            [self.instructionList setInstructions:instructions];
-        }];
-        
-        CGFloat navigationBarHeight = UPD_NAVIGATION_BAR_HEIGHT+([UPDCommon isIOS7]?20:0);
-        
-        self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, navigationBarHeight, self.bounds.size.width, self.bounds.size.height-navigationBarHeight-UPD_NAVIGATION_BAR_HEIGHT)];
-        [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
-        [self.webView setDelegate:self];
-        [self addSubview:self.webView];
-        
-        self.webViewOverlay = [[UIView alloc] initWithFrame:self.webView.frame];
-        [self.webViewOverlay setAlpha:0];
-        [self.webViewOverlay setAutoresizingMask:UIViewAutoresizingFlexibleSize];
-        [self.webViewOverlay setBackgroundColor:[UIColor blackColor]];
-        [self addSubview:self.webViewOverlay];
-        UITapGestureRecognizer *webViewOverlayTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(webViewOverlayTapped)];
-        [webViewOverlayTapRecognizer setDelegate:self];
-        [self.webViewOverlay addGestureRecognizer:webViewOverlayTapRecognizer];
-        
-        self.navigationBar = [[UPDBrowserNavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, navigationBarHeight)];
-        [self.navigationBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        [self.navigationBar.urlBar setStartEditingBlock:^{
-            [weakSelf.webViewOverlay setTag:1];
+        __unsafe_unretained UPDBrowserView *weakSelf = self;
+        self.urlBar = [[UPDBrowserURLBar alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT+2)];
+        [self.urlBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self.urlBar setBeginEditingBlock:^{
+            [weakSelf.browserOverlay setUserInteractionEnabled:YES];
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
-                [weakSelf.webViewOverlay setAlpha:0.5];
+                [weakSelf.browserOverlay setAlpha:0.5];
             }];
         }];
-        [self.navigationBar.urlBar setGoBlock:^(NSString *url){
-            [weakSelf.webViewOverlay setTag:0];
-            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
-                [weakSelf.webViewOverlay setAlpha:0];
-            }];
+        [self.urlBar setEndEditingBlock:^{
+            [weakSelf browserOverlayTapped];
+        }];
+        [self.urlBar setGoButtonBlock:^(NSString *url){
             [weakSelf loadURL:url];
         }];
-        [self addSubview:self.navigationBar];
+        [self addSubview:self.urlBar];
         
-        self.bottomBar = [[UPDBrowserBottomBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-UPD_NAVIGATION_BAR_HEIGHT, self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT)];
+        self.bottomBar = [[UPDBrowserBottomBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-(UPD_NAVIGATION_BAR_HEIGHT-20), self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT-20)];
         [self.bottomBar setAutoresizingMask:UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth];
-        [self.bottomBar setFinishButtonBlock:^{
-            NSMutableString *output = [[NSMutableString alloc] init];
-            for(UPDInstruction *instruction in weakSelf.instructionList.instructions) {
-                [output appendString:@"****************\n"];
-                [output appendString:[NSString stringWithFormat:@"%i: %@\n",instruction.instructionNumber.intValue,instruction.fullURL]];
-                [output appendString:@"****************\n"];
-                if(instruction.post.count) {
-                    [output appendString:@"    Post Data:\n"];
-                    for(UPDKeyValue *keyValue in instruction.post) {
-                        [output appendString:[NSString stringWithFormat:@"        %@: %@\n",[[keyValue.key stringByReplacingOccurrencesOfString:@"+" withString:@" "] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding],[[keyValue.value stringByReplacingOccurrencesOfString:@"+" withString:@" "] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-                    }
-                }
-                if(instruction.response) {
-                    /*[output appendString:@"    Response:\n"];
-                    [output appendString:instruction.response];
-                    [output appendString:@"\n"];*/
-                    [output appendString:@"    Response Input Fields:\n"];
-                    
-                    UPDDocumentParser *documentParser = [[UPDDocumentParser alloc] initWithDocumentString:instruction.response];
-                    NSDictionary *inputFields = [documentParser findInputFields];
-                    for(NSString *inputName in [inputFields allKeys]) {
-                        [output appendString:[NSString stringWithFormat:@"        %@ -> %@\n",inputName,[inputFields objectForKey:inputName]]];
-                    }
-                }
+        [self.bottomBar setBlockForButtonWithName:@"Back" block:^{
+            if(weakSelf.webView.canGoBack) {
+                [weakSelf.webView goBack];
             }
-            NSLog(@"%@",output);
+        }];
+        [self.bottomBar setBlockForButtonWithName:@"Forward" block:^{
+            if(weakSelf.webView.canGoForward) {
+                [weakSelf.webView goForward];
+            }
+        }];
+        [self.bottomBar setBlockForButtonWithName:@"Cancel" block:^{
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Cancel"];
+            [alertView setMessage:@"Are you sure you want to cancel the current update?\n\nNo progress will be saved."];
+            [alertView setNoButtonBlock:^{
+                [weakAlertView dismiss];
+            }];
+            [alertView setYesButtonBlock:^{
+                [weakAlertView dismiss];
+                [weakSelf cancelSession];
+            }];
+            [alertView show];
         }];
         [self addSubview:self.bottomBar];
         
-        self.startView = [[UPDBrowserStartView alloc] initWithFrame:self.bounds];
-        [self.startView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
-        [self.startView.textField setGoBlock:^(NSString *url) {
-            [weakSelf.navigationBar.urlBar setText:url];
-            [weakSelf clearCookies];
-            [weakSelf loadURL:url];
-            
-            POPSpringAnimation *anim = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerPositionX];
-            anim.completionBlock = ^(POPAnimation *a, BOOL finished) {
-                [weakSelf.startView removeFromSuperview];
-            };
-            anim.toValue = @(-weakSelf.startView.bounds.size.width);
-            anim.velocity = @(200);
-            [weakSelf.startView.layer pop_addAnimation:anim forKey:@"disappear"];
-            
-            [AppDelegate.viewController setHideStatusBar:YES];
-            [UIView animateWithDuration:UPD_TRANSITION_DURATION/2.0f animations:^{
-                [AppDelegate.viewController setNeedsStatusBarAppearanceUpdate];
-            } completion:^(BOOL finished) {
-                [AppDelegate.viewController setHideStatusBar:NO];
-                [AppDelegate.viewController setLightStatusBarContent:NO];
-                [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
-                    [AppDelegate.viewController setNeedsStatusBarAppearanceUpdate];
-                }];
-            }];
-        }];
-        
-        [self addSubview:self.startView];
+        self.browserOverlay = [[UIView alloc] initWithFrame:CGRectMake(0, self.urlBar.bounds.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.bounds.size.height)];
+        [self.browserOverlay setAlpha:0];
+        [self.browserOverlay setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.browserOverlay setBackgroundColor:[UIColor UPDOffBlackColor]];
+        [self.browserOverlay setUserInteractionEnabled:NO];
+        [self addSubview:self.browserOverlay];
+        UITapGestureRecognizer *browserOverlayTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(browserOverlayTapped)];
+        [self.browserOverlay addGestureRecognizer:browserOverlayTapRecognizer];
     }
     return self;
 }
 
-- (void)clearCookies {
+/*
+ Clear the cache and cookies, then register our custom
+ url protocol to handle new requests and forward them
+ to our accumulator
+ */
+- (void)beginSession {
+    [self clearPersistentData];
+    self.instructionAccumulator = [[UPDInstructionAccumulator alloc] init];
+    [UPDURLProtocol setInstructionAccumulator:self.instructionAccumulator];
+    [NSURLProtocol registerClass:[UPDURLProtocol class]];
+    
+    if(self.webView.superview) {
+        [self.webView removeFromSuperview];
+    }
+    self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
+    [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+    [self.webView setDelegate:self];
+    [self addSubview:self.webView];
+}
+
+- (void)browserOverlayTapped {
+    [self.urlBar resignFirstResponder];
+    [self.browserOverlay setUserInteractionEnabled:NO];
+    [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+        [self.browserOverlay setAlpha:0];
+    }];
+}
+
+- (void)cancelSession {
+    [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
+    if(self.cancelSessionBlock) {
+        self.cancelSessionBlock();
+    }
+}
+
+/*
+ Clears cookies and the cache—important for making sure a request
+ can be duplicated every time.
+ */
+- (void)clearPersistentData {
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
     
     NSHTTPCookie *cookie;
@@ -189,39 +146,44 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if(gestureRecognizer.view==self.webViewOverlay&&self.webViewOverlay.tag==0) {
-        return NO;
-    }
-    return YES;
-}
-
+/*
+ Contrary to this method's name, loadURL accepts any string as
+ input, and then checks to see if it's a URL. If it's not, then
+ it performs a search instead.
+ */
 - (void)loadURL:(NSString *)url {
-    [self.navigationBar resetProgressBarWithFade:NO];
-    [self.navigationBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
-    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
+    NSURL *checkURL = [NSURL URLWithString:url];
+    if((!checkURL || !checkURL.scheme || !checkURL.host) && ([url length]<7 || ![[url substringToIndex:7] isEqualToString:@"http://"])) {
+        NSUInteger slashLoc = [url rangeOfString:@"/"].location;
+        NSString *baseURL = slashLoc==NSNotFound?url:[url substringToIndex:slashLoc];
+        if([baseURL rangeOfString:@"." options:NSBackwardsSearch].location!=NSNotFound && [baseURL rangeOfString:@"." options:NSBackwardsSearch].location!=baseURL.length-1 && [baseURL rangeOfString:@". " options:NSBackwardsSearch].location==NSNotFound) {
+            checkURL = [NSURL URLWithString:[@"http://" stringByAppendingString:url]];
+        }
+    }
+    if(!checkURL || !checkURL.scheme || !checkURL.host) {
+        checkURL = [NSURL URLWithString:[@"http://www.google.com/search?sourceid=chrome&ie=UTF-8&q=" stringByAppendingString:[[url stringByReplacingOccurrencesOfString:@" " withString:@"+"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+    }
+    [self.urlBar setText:checkURL.absoluteString];
+    [self.urlBar resetProgressBarWithFade:NO];
+    [self.urlBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
+    [self.webView loadRequest:[NSURLRequest requestWithURL:checkURL]];
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    if(!self.navigationBar.progressBarVisible) {
-        [self.navigationBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
+    if(!self.urlBar.progressBarVisible) {
+        [self.urlBar progressBarAnimateToWidth:0.9 withDuration:5 onCompletion:nil];
     }
     return YES;
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    [self.navigationBar.urlBar setText:webView.request.mainDocumentURL.absoluteString];
-    [self.navigationBar progressBarAnimateToWidth:1 withDuration:0.3 onCompletion:^(BOOL finished) {
-        [self.navigationBar performSelector:@selector(resetProgressBar) withObject:nil afterDelay:0.5];
+    [self.urlBar setText:webView.request.mainDocumentURL.absoluteString];
+    [self.urlBar progressBarAnimateToWidth:1 withDuration:0.3 onCompletion:^(BOOL finished) {
+        [self.urlBar performSelector:@selector(resetProgressBar) withObject:nil afterDelay:0.5];
     }];
+    [self.bottomBar setButtonEnabledWithName:@"Back" enabled:[webView canGoBack]];
+    [self.bottomBar setButtonEnabledWithName:@"Forward" enabled:[webView canGoForward]];
 }
 
-- (void)webViewOverlayTapped {
-    [self.webViewOverlay setTag:0];
-    [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
-        [self.webViewOverlay setAlpha:0];
-    }];
-    [self.navigationBar.urlBar resignFirstResponder];
-}
 
 @end

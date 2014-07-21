@@ -1,16 +1,31 @@
 //
 //  UPDURLProtocol.m
-//  Update
+//  Updates
 //
-//  Created by Bryce Pauken on 5/15/14.
+//  Created by Bryce Pauken on 7/18/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
+/*
+ Our custom URL Protocol doesn't have much logic behind it—
+ it merely captures requests and forwards them along to the
+ designated instruction accumlator.
+ */
+
 #import "UPDURLProtocol.h"
 
-#import <objc/runtime.h>
+#import "UPDInstructionAccumulator.h"
+
+@interface UPDURLProtocol()
+
+@property (nonatomic, retain) NSURLSession *session;
+@property (nonatomic, retain) NSURLSessionDataTask *task;
+
+@end
 
 @implementation UPDURLProtocol
+
+static UPDInstructionAccumulator *_instructionAccumulator;
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
     if([NSURLProtocol propertyForKey:@"UseDefaultImplementation" inRequest:request]) {
@@ -23,12 +38,15 @@
     return request;
 }
 
++ (void)setInstructionAccumulator:(UPDInstructionAccumulator *)instructionAccumulator {
+    _instructionAccumulator = instructionAccumulator;
+}
+
 - (void)startLoading {
     NSMutableURLRequest *newRequest = [self.request mutableCopy];
     [NSURLProtocol setProperty:@YES forKey:@"UseDefaultImplementation" inRequest:newRequest];
-    self.data = [[NSMutableData alloc] init];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    queue.maxConcurrentOperationCount = 5;
+    [queue setMaxConcurrentOperationCount:5];
     self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:queue];
     self.task = [_session dataTaskWithRequest:newRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if(!error) {
@@ -38,14 +56,12 @@
             
             NSDictionary *headers = [(NSHTTPURLResponse *)response allHeaderFields];
             if([[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
-                if(AppDelegate.addInstruction) {
-                    NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request]?:self.request;
-                    AppDelegate.addInstruction(firstRequest.URL.absoluteString,[[NSString alloc] initWithData:firstRequest.HTTPBody encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding],headers);
+                if(_instructionAccumulator) {
+                    [_instructionAccumulator addInstructionWithURL:self.request.URL.absoluteString post:[[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] response:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] headers:headers];
                 }
             }
         }
         else {
-            //NSLog(@"ERROR (2): %@",error);
             [self.client URLProtocol:self didFailWithError:error];
         }
     }];
@@ -55,11 +71,9 @@
 - (void)stopLoading {
     [self.task cancel];
     self.task = nil;
-    self.data = nil;
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    //NSLog(@"ERROR (1): %@",error);
     [self.client URLProtocol:self didFailWithError:error];
 }
 

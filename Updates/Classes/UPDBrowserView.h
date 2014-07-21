@@ -2,26 +2,17 @@
 //  UPDBrowserView.h
 //  Updates
 //
-//  Created by Bryce Pauken on 5/17/14.
+//  Created by Bryce Pauken on 7/16/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@class UPDBrowserBottomBar;
-@class UPDBrowserNavigationBar;
-@class UPDBrowserStartView;
-@class UPDInstructionList;
+@interface UPDBrowserView : UIView <UIWebViewDelegate>
 
-@interface UPDBrowserView : UIView <UIGestureRecognizerDelegate, UIWebViewDelegate>
+@property (nonatomic, copy) void (^cancelSessionBlock)();
 
-@property (nonatomic, retain) UPDBrowserBottomBar *bottomBar;
-@property (nonatomic, retain) UPDInstructionList *instructionList;
-@property (nonatomic, retain) UPDBrowserNavigationBar *navigationBar;
-@property (nonatomic, retain) UPDBrowserStartView *startView;
-@property (nonatomic, retain) UIWebView *webView;
-@property (nonatomic, retain) UIView *webViewOverlay;
-
+- (void)beginSession;
 - (void)loadURL:(NSString *)url;
 
 @end

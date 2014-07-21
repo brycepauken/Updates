@@ -1,57 +1,55 @@
 //
 //  UPDCommon.m
-//  Update
+//  Updates
 //
-//  Created by Bryce Pauken on 5/16/14.
+//  Created by Bryce Pauken on 7/15/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
+
+/*
+ Pieces of data (constants, inclusions, etc.) that are automatically
+ included in every header file
+ */
 
 #import "UPDCommon.h"
 
 @implementation UPDCommon
 
-+ (BOOL)isIOS7 {
-    return ([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] != NSOrderedAscending);
-}
-
-+ (BOOL)isIPad {
-    return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-}
-
-+ (CGSize)sizeOfText:(NSString *)text withFont:(UIFont *)font {
-    return [self sizeOfText:text withFont:font constrainedToWidth:MAXFLOAT singleLine:NO];
-}
-
-+ (CGSize)sizeOfText:(NSString *)text withFont:(UIFont *)font constrainedToWidth:(CGFloat)width {
-    return [self sizeOfText:text withFont:font constrainedToWidth:width singleLine:NO];
-}
-
-+ (CGSize)sizeOfText:(NSString *)text withFont:(UIFont *)font constrainedToWidth:(CGFloat)width singleLine:(BOOL)singleLine {
-    if([self isIOS7]) {
-        CGRect labelRect;
-        if(singleLine) {
-            labelRect = [text boundingRectWithSize:CGSizeMake(width, 1) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingTruncatesLastVisibleLine attributes:@{NSFontAttributeName:font} context:nil];
-        }
-        else {
-            labelRect = [text boundingRectWithSize:CGSizeMake(width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil];
-        }
-        labelRect.size.width = ceil(labelRect.size.width);
-        labelRect.size.height = ceil(labelRect.size.height);
-        return labelRect.size;
-    }
-    /*else {
-        if(singleLine) {
-            return [text sizeWithFont:font forWidth:width lineBreakMode:NSLineBreakByWordWrapping];
-        }
-        else {
-            return [text sizeWithFont:font constrainedToSize:CGSizeMake(width, MAXFLOAT)];
-        }
-    }*/
-    return CGSizeZero;
-}
-
-+ (CGSize)sizeOfText:(NSString *)text withFont:(UIFont *)font singleLine:(BOOL)singleLine {
-    return [self sizeOfText:text withFont:font constrainedToWidth:MAXFLOAT singleLine:singleLine];
-}
-
 @end
+
+/*
+ Two UIViewAutoresizing constants, one for all-around flexible
+ sizing and one for all-around flexible margins, two common combinations.
+ */
+const UIViewAutoresizing UIViewAutoresizingFlexibleMargins = UIViewAutoresizingFlexibleBottomMargin|UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleTopMargin;
+const UIViewAutoresizing UIViewAutoresizingFlexibleSize = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
+
+/*
+ General values
+ */
+const NSTimeInterval UPD_TRANSITION_DURATION = 0.25;
+const NSTimeInterval UPD_TRANSITION_DURATION_SLOW = 0.4;
+
+/*
+ Navigation bar values
+ */
+const int UPD_NAVIGATION_BAR_BUTTON_PADDING = 20;
+const int UPD_NAVIGATION_BAR_BUTTON_SIZE = 16;
+const int UPD_NAVIGATION_BAR_HEIGHT = 64;
+
+/*
+ General UI
+ */
+const int UPD_ALERT_BUTTON_HEIGHT = 50;
+const int UPD_ALERT_BUTTON_ICON_SIZE = 16;
+const int UPD_ALERT_PADDING = 20;
+const int UPD_ALERT_WIDTH = 280;
+const int UPD_BOTTOM_BAR_BUTTON_SIZE = 16;
+const int UPD_PREBROWSER_URL_BAR_BUTTON_SIZE = 16; /*this is just the size of the button image, the button itself is a square based on the bar's height*/
+const int UPD_PREBROWSER_URL_BAR_HEIGHT = 50;
+const int UPD_PREBROWSER_URL_BAR_WIDTH = 280;
+const int UPD_SEARCH_ENGINE_ICON_PADDING = 10;
+const int UPD_SEARCH_ENGINE_ICON_SIZE = 50;
+const int UPD_START_LABEL_WIDTH = 300;
+const int UPD_URL_BAR_HEIGHT = 32;
+const int UPD_URL_BAR_PADDING = 10;
