@@ -27,8 +27,10 @@ const UIViewAutoresizing UIViewAutoresizingFlexibleSize = UIViewAutoresizingFlex
 /*
  General values
  */
+const CGFloat UPD_DOUBLE_FOLD_CHANCE = (1/3.0);
 const NSTimeInterval UPD_TRANSITION_DELAY = 0.15;
 const NSTimeInterval UPD_TRANSITION_DURATION = 0.25;
+const NSTimeInterval UPD_TRANSITION_DURATION_FAST = 0.15;
 const NSTimeInterval UPD_TRANSITION_DURATION_SLOW = 0.4;
 
 /*
@@ -57,5 +59,5 @@ const int UPD_START_LABEL_WIDTH = 300;
 const int UPD_URL_BAR_HEIGHT = 32;
 const int UPD_URL_BAR_PADDING = 10;
 
-const CGFloat UPD_BROWSER_IMAGE_OPACITY = 0.5;
+const CGFloat UPD_BROWSER_IMAGE_OPACITY = 0.25;
 const CGFloat UPD_BROWSER_IMAGE_SCALE = 0.8;

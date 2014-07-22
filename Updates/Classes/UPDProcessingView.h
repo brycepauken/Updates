@@ -10,8 +10,6 @@
 
 @interface UPDProcessingView : UIView
 
-@property (nonatomic, strong) UIImage *browserImage;
-
-- (void)beginProcessing;
+- (void)beginProcessingWithBrowserImage:(UIImage *)browserImage;
 
 @end

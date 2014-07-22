@@ -17,8 +17,10 @@
 extern const UIViewAutoresizing UIViewAutoresizingFlexibleMargins;
 extern const UIViewAutoresizing UIViewAutoresizingFlexibleSize;
 
+extern const CGFloat UPD_DOUBLE_FOLD_CHANCE;
 extern const NSTimeInterval UPD_TRANSITION_DELAY;
 extern const NSTimeInterval UPD_TRANSITION_DURATION;
+extern const NSTimeInterval UPD_TRANSITION_DURATION_FAST;
 extern const NSTimeInterval UPD_TRANSITION_DURATION_SLOW;
 
 extern const int UPD_NAVIGATION_BAR_BUTTON_PADDING;

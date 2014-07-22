@@ -43,7 +43,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if(self) {
-        [self setBackgroundColor:[UIColor UPDLightGreyColor]];
+        [self setBackgroundColor:[UIColor UPDLightBlueColor]];
         
         __unsafe_unretained UPDBrowserView *weakSelf = self;
         self.urlBar = [[UPDBrowserURLBar alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT+2)];

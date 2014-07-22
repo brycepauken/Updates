@@ -98,10 +98,8 @@
             }];
         }];
         [self.browserView setConfirmBlock:^(UIImage *browserImage){
-            [weakSelf.processingView setBrowserImage:browserImage];
             [weakSelf.processingView setHidden:NO];
-            
-            [weakSelf.processingView beginProcessing];
+            [weakSelf.processingView beginProcessingWithBrowserImage:browserImage];
         }];
         [self.scrollView addSubview:self.browserView];
         
