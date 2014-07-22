@@ -19,12 +19,21 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
 
 @property (nonatomic, strong) UIImageView *browserImageView;
 @property (nonatomic, strong) UIImageView *checkmark;
+@property (nonatomic, strong) UIView *checkmarkBackground;
+@property (nonatomic, strong) UIImageView *outline;
+@property (nonatomic, strong) UIImageView *outlineQuarter;
+
 @property (nonatomic, copy) void (^individualAnimationCompletionBlock)();
 @property (nonatomic) CGRect individualAnimationFinalFrame;
 @property (nonatomic, strong) CALayer *individualAnimationFoldingLayer;
 @property (nonatomic, strong) NSString *individualAnimationKeyPath;
 @property (nonatomic) int lastFoldWasHorizontal;
-@property (nonatomic, strong) UIImageView *outline;
+
+@property (nonatomic, strong) CADisplayLink *foldedViewVerticalAnimationDisplayLink;
+@property (nonatomic) CGFloat foldedViewVerticalAnimationStartVelocity;
+@property (nonatomic) CGFloat foldedViewVerticalAnimationStartY;
+@property (nonatomic) CFTimeInterval foldedViewVerticalAnimationTimestamp;
+@property (nonatomic) CGFloat foldedViewVerticalAnimationVelocity;
 
 @end
 
@@ -39,10 +48,24 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
         [self.browserImageView setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self addSubview:self.browserImageView];
         
+        self.outlineQuarter = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
+        [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        [self.outlineQuarter setImage:[UIImage imageNamed:@"ButtonOutlineQuarter"]];
+        [self.outlineQuarter setHidden:YES];
+        [self addSubview:self.outlineQuarter];
+        
         self.outline = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
         [self.outline setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outline setImage:[UIImage imageNamed:@"ButtonOutline"]];
         [self addSubview:self.outline];
+        
+        CGFloat checkmarkBackgroundSize = UPD_CONFIRM_BUTTON_SIZE*0.9;
+        self.checkmarkBackground = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-checkmarkBackgroundSize)/2, (self.bounds.size.height-checkmarkBackgroundSize)/2, checkmarkBackgroundSize, checkmarkBackgroundSize)];
+        [self.checkmarkBackground setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        [self.checkmarkBackground setBackgroundColor:self.backgroundColor];
+        [self.checkmarkBackground setHidden:YES];
+        [self.checkmarkBackground.layer setCornerRadius:checkmarkBackgroundSize/2];
+        [self addSubview:self.checkmarkBackground];
         
         self.checkmark = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
         [self.checkmark setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
@@ -76,49 +99,150 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
     [self.browserImageView setFrame:CGRectMake((self.bounds.size.width-firstImage.size.width)/2, (self.bounds.size.height-firstImage.size.height)/2, firstImage.size.width, firstImage.size.height)];
     [self.browserImageView setImage:firstImage];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY), dispatch_get_main_queue(), ^{
-        [self foldBrowserImageUntilLessThanOrEqualsSize:CGSizeMake(50, 50) containingPoint:CGPointMake(5, 5) animationDuration:UPD_TRANSITION_DURATION_FAST];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        /*find max size for diagonal to fit in 0.8 of checkmark button diameter*/
+        CGFloat maxSize = (UPD_CONFIRM_BUTTON_SIZE*0.8)/sqrt(2);
+        
+        /*find the point that the folding should contain—must not intersect the confirmation button*/
+        CGPoint goalPoint;
+        if(self.browserImageView.frame.origin.x+maxSize+20<self.outline.frame.origin.x) {
+            goalPoint = CGPointMake(1, self.browserImageView.frame.size.height/2);
+        }
+        else {
+            goalPoint = CGPointMake(1, self.browserImageView.frame.size.height/2-sqrt(abs(UPD_CONFIRM_BUTTON_SIZE*UPD_CONFIRM_BUTTON_SIZE - (self.outline.frame.origin.x + maxSize)*(self.outline.frame.origin.x + maxSize))));
+        }
+        [self foldBrowserImageUntilLessThanOrEqualsSize:CGSizeMake(maxSize, maxSize) containingPoint:goalPoint animationDuration:UPD_TRANSITION_DURATION_FAST];
     });
+}
+
+- (void)foldAnimationCompleted {
+    [self.checkmarkBackground setHidden:NO];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        CAKeyframeAnimation *horizontalAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position.x"];
+        [horizontalAnimation setCalculationMode:kCAAnimationLinear];
+        [horizontalAnimation setDuration:UPD_FOLDED_VIEW_ANIMATION_TIME];
+        [horizontalAnimation setFillMode:kCAFillModeForwards];
+        [horizontalAnimation setRemovedOnCompletion:NO];
+        [horizontalAnimation setValues:@[@(self.browserImageView.frame.origin.x+self.browserImageView.frame.size.width/2),@(self.outline.frame.origin.x+self.outline.frame.size.width/2)]];
+        [self.browserImageView.layer addAnimation:horizontalAnimation forKey:@"horizontalAnimation"];
+        
+        CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        [rotationAnimation setCumulative:YES];
+        [rotationAnimation setDuration:UPD_FOLDED_VIEW_ANIMATION_TIME];
+        [rotationAnimation setToValue:@(M_PI*2)];
+        [rotationAnimation setRepeatCount:MAXFLOAT];
+        [self.browserImageView.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+        
+        self.foldedViewVerticalAnimationStartY = self.browserImageView.center.y;
+        self.foldedViewVerticalAnimationStartVelocity = (self.outline.center.y-self.browserImageView.center.y)/UPD_FOLDED_VIEW_ANIMATION_TIME - 0.5*UPD_FOLDED_VIEW_GRAVITY*UPD_FOLDED_VIEW_ANIMATION_TIME;
+        
+        self.foldedViewVerticalAnimationDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(foldedViewAnimateVertical)];
+        [self.foldedViewVerticalAnimationDisplayLink setFrameInterval:1];
+        [self.foldedViewVerticalAnimationDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        
+        /*the time until the bottom of the folded view hits the top of the checkmark button*/
+        CGFloat timeUntilBounce = (-self.foldedViewVerticalAnimationStartVelocity+sqrt(self.foldedViewVerticalAnimationStartVelocity*self.foldedViewVerticalAnimationStartVelocity+2*UPD_FOLDED_VIEW_GRAVITY*(self.outline.frame.origin.y-(self.browserImageView.center.y+self.browserImageView.frame.size.height/2))))/UPD_FOLDED_VIEW_GRAVITY;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, timeUntilBounce*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+            
+            CATransform3D scale1 = CATransform3DMakeScale(1.0, 1.0, 1);
+            CATransform3D scale2 = CATransform3DMakeScale(1.1, 1.1, 1);
+            CATransform3D scale3 = CATransform3DMakeScale(0.9, 0.9, 1);
+            CATransform3D scale4 = CATransform3DMakeScale(1.0, 1.0, 1);
+            
+            NSArray *frameValues = [NSArray arrayWithObjects:[NSValue valueWithCATransform3D:scale1],[NSValue valueWithCATransform3D:scale2],[NSValue valueWithCATransform3D:scale3],[NSValue valueWithCATransform3D:scale4], nil];
+            [animation setValues:frameValues];
+            
+            NSArray *frameTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0],[NSNumber numberWithFloat:0.6],[NSNumber numberWithFloat:0.9],[NSNumber numberWithFloat:1.0], nil];
+            [animation setKeyTimes:frameTimes];
+            
+            animation.fillMode = kCAFillModeForwards;
+            animation.removedOnCompletion = YES;
+            animation.duration = UPD_TRANSITION_DURATION;
+            
+            [self.checkmark.layer addAnimation:animation forKey:@"popup"];
+            [self.checkmarkBackground.layer addAnimation:animation forKey:@"popupCopy"];
+            [self.outline.layer addAnimation:animation forKey:@"popupCopy"];
+        });
+    });
+}
+
+- (void)foldedViewAnimateVertical {
+    if(!self.foldedViewVerticalAnimationTimestamp) {
+        self.foldedViewVerticalAnimationTimestamp = self.foldedViewVerticalAnimationDisplayLink.timestamp;
+    }
+    CFTimeInterval elapsedTime = (self.foldedViewVerticalAnimationDisplayLink.timestamp - self.foldedViewVerticalAnimationTimestamp);
+    
+    [self.browserImageView setCenter:CGPointMake(self.browserImageView.center.x, self.foldedViewVerticalAnimationStartY+(self.foldedViewVerticalAnimationStartVelocity*elapsedTime + 0.5*UPD_FOLDED_VIEW_GRAVITY*elapsedTime*elapsedTime))];
+
+    if(self.browserImageView.center.y >= self.outline.center.y) {
+        [self.foldedViewVerticalAnimationDisplayLink invalidate];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self.browserImageView removeFromSuperview];
+            [self.checkmarkBackground setHidden:YES];
+            [self.outlineQuarter setHidden:NO];
+            
+            CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+            [rotationAnimation setCumulative:YES];
+            [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
+            [rotationAnimation setToValue:@(M_PI*2)];
+            [rotationAnimation setRepeatCount:MAXFLOAT];
+            [self.outlineQuarter.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+            
+            [UIView animateWithDuration:UPD_PROCESSING_ANIMATION_DURATION animations:^{
+                [self.outline setAlpha:0];
+                
+                CGRect newFrame = CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height/2-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE);
+                [self.checkmark setFrame:newFrame];
+                [self.checkmarkBackground setFrame:newFrame];
+                [self.outline setFrame:newFrame];
+                [self.outlineQuarter setFrame:newFrame];
+            }];
+        });
+    }
 }
 
 #pragma mark - Folding Animation
 
 
 - (void)animationDidStop:(CAAnimation *)animation finished:(BOOL)flag {
-    [self.browserImageView setFrame:CGRectMake(self.browserImageView.frame.origin.x+self.individualAnimationFinalFrame.origin.x, self.browserImageView.frame.origin.y+self.individualAnimationFinalFrame.origin.y, self.individualAnimationFinalFrame.size.width, self.individualAnimationFinalFrame.size.height)];
-    if(self.individualAnimationFinalFrame.origin.x!=0||self.individualAnimationFinalFrame.origin.y!=0) {
-        [CATransaction begin];
-        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-        for(CALayer *layer in self.browserImageView.layer.sublayers) {
-            CGRect layerFrame = layer.frame;
-            layerFrame.origin.x -= self.individualAnimationFinalFrame.origin.x;
-            layerFrame.origin.y -= self.individualAnimationFinalFrame.origin.y;
-            [layer setFrame:layerFrame];
+    if([[animation valueForKey:@"id"] isEqualToString:@"fold"]) {
+        [self.browserImageView setFrame:CGRectMake(self.browserImageView.frame.origin.x+self.individualAnimationFinalFrame.origin.x, self.browserImageView.frame.origin.y+self.individualAnimationFinalFrame.origin.y, self.individualAnimationFinalFrame.size.width, self.individualAnimationFinalFrame.size.height)];
+        if(self.individualAnimationFinalFrame.origin.x!=0||self.individualAnimationFinalFrame.origin.y!=0) {
+            [CATransaction begin];
+            [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+            for(CALayer *layer in self.browserImageView.layer.sublayers) {
+                CGRect layerFrame = layer.frame;
+                layerFrame.origin.x -= self.individualAnimationFinalFrame.origin.x;
+                layerFrame.origin.y -= self.individualAnimationFinalFrame.origin.y;
+                [layer setFrame:layerFrame];
+            }
+            [CATransaction commit];
         }
-        [CATransaction commit];
-    }
-    
-    UIGraphicsBeginImageContext(self.browserImageView.frame.size);
-    CGContextRef c = UIGraphicsGetCurrentContext();
-    BOOL flipHorizontal = [self.individualAnimationKeyPath isEqualToString:@"transform.rotation.y"];
-    CGContextTranslateCTM (c, self.browserImageView.bounds.size.width/2, self.browserImageView.bounds.size.height/2);
-    CGContextScaleCTM(c, flipHorizontal?-1:1, !flipHorizontal?-1:1);
-    CGContextTranslateCTM (c, -self.browserImageView.bounds.size.width/2, -self.browserImageView.bounds.size.height/2);
-    [self.individualAnimationFoldingLayer renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    [self.browserImageView setImage:viewImage];
-    
-    for(int i=0;i<self.browserImageView.layer.sublayers.count;i++) {
-        if([((CALayer *)[self.browserImageView.layer.sublayers objectAtIndex:i]).name isEqualToString:@"backgroundLayer"]) {
-            [[self.browserImageView.layer.sublayers objectAtIndex:i] removeFromSuperlayer];
-            break;
+        
+        UIGraphicsBeginImageContext(self.browserImageView.frame.size);
+        CGContextRef c = UIGraphicsGetCurrentContext();
+        BOOL flipHorizontal = [self.individualAnimationKeyPath isEqualToString:@"transform.rotation.y"];
+        CGContextTranslateCTM (c, self.browserImageView.bounds.size.width/2, self.browserImageView.bounds.size.height/2);
+        CGContextScaleCTM(c, flipHorizontal?-1:1, !flipHorizontal?-1:1);
+        CGContextTranslateCTM (c, -self.browserImageView.bounds.size.width/2, -self.browserImageView.bounds.size.height/2);
+        [self.individualAnimationFoldingLayer renderInContext:UIGraphicsGetCurrentContext()];
+        UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        [self.browserImageView setImage:viewImage];
+        
+        for(int i=0;i<self.browserImageView.layer.sublayers.count;i++) {
+            if([((CALayer *)[self.browserImageView.layer.sublayers objectAtIndex:i]).name isEqualToString:@"backgroundLayer"]) {
+                [[self.browserImageView.layer.sublayers objectAtIndex:i] removeFromSuperlayer];
+                break;
+            }
         }
-    }
-    
-    if(self.individualAnimationCompletionBlock) {
-        self.individualAnimationCompletionBlock();
+        
+        if(self.individualAnimationCompletionBlock) {
+            self.individualAnimationCompletionBlock();
+        }
     }
 }
 
@@ -195,6 +319,7 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
     [flipAnimation setToValue:[NSNumber numberWithDouble:M_PI]];
     [flipAnimation setRepeatCount:1];
     [flipAnimation setRemovedOnCompletion:NO];
+    [flipAnimation setValue:@"fold" forKey:@"id"];
     
     [foldingLayer addAnimation:flipAnimation forKey:@"fold"];
     
@@ -260,6 +385,9 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
                 }
             }
             [weakSelf foldBrowserImageSideOver:foldingSide withDuration:duration];
+        }
+        else {
+            [weakSelf foldAnimationCompleted];
         }
     }];
     self.individualAnimationCompletionBlock();

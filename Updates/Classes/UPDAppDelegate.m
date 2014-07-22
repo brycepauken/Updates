@@ -26,6 +26,8 @@
  Creates our View Controller and gets our app going!
  */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [UPDCommon initialize];
+    
     /*preload the keyboard*/
     UITextField *field = [UITextField new];
     [[[[UIApplication sharedApplication] windows] lastObject] addSubview:field];

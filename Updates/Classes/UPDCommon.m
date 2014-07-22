@@ -13,10 +13,6 @@
 
 #import "UPDCommon.h"
 
-@implementation UPDCommon
-
-@end
-
 /*
  Two UIViewAutoresizing constants, one for all-around flexible
  sizing and one for all-around flexible margins, two common combinations.
@@ -28,6 +24,7 @@ const UIViewAutoresizing UIViewAutoresizingFlexibleSize = UIViewAutoresizingFlex
  General values
  */
 const CGFloat UPD_DOUBLE_FOLD_CHANCE = (1/3.0);
+const NSTimeInterval UPD_PROCESSING_ANIMATION_DURATION = 1;
 const NSTimeInterval UPD_TRANSITION_DELAY = 0.15;
 const NSTimeInterval UPD_TRANSITION_DURATION = 0.25;
 const NSTimeInterval UPD_TRANSITION_DURATION_FAST = 0.15;
@@ -58,6 +55,24 @@ const int UPD_SEARCH_ENGINE_ICON_SIZE = 50;
 const int UPD_START_LABEL_WIDTH = 300;
 const int UPD_URL_BAR_HEIGHT = 32;
 const int UPD_URL_BAR_PADDING = 10;
-
 const CGFloat UPD_BROWSER_IMAGE_OPACITY = 0.25;
 const CGFloat UPD_BROWSER_IMAGE_SCALE = 0.8;
+
+/*
+ Browser vertical animation values—for flipping the folded
+ browser image into the checkmark upon confirmation
+ */
+const NSTimeInterval UPD_FOLDED_VIEW_ANIMATION_TIME = UPD_TRANSITION_DURATION*4;
+CGFloat UPD_FOLDED_VIEW_GRAVITY;
+
+@implementation UPDCommon
+
+/*
+ We'll use this to set any variables that are too tricky for a one-line
+ implementation (like UPD_FOLDED_VIEW_GRAVITY)
+ */
++ (void)initialize {
+    UPD_FOLDED_VIEW_GRAVITY = [[UIScreen mainScreen] bounds].size.height*3;
+}
+
+@end
