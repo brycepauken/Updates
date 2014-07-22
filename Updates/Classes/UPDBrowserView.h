@@ -11,6 +11,7 @@
 @interface UPDBrowserView : UIView <UIWebViewDelegate>
 
 @property (nonatomic, copy) void (^cancelSessionBlock)();
+@property (nonatomic, copy) void (^confirmBlock)(UIImage *browserImage);
 
 - (void)beginSession;
 - (void)loadURL:(NSString *)url;

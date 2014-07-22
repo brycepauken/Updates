@@ -18,6 +18,8 @@
 
 #import "UPDAlertView.h"
 #import "UPDBrowserBottomBar.h"
+#import "UPDBrowserCancelButton.h"
+#import "UPDBrowserConfirmButton.h"
 #import "UPDBrowserURLBar.h"
 #import "UPDInstructionAccumulator.h"
 #import "UPDURLProtocol.h"
@@ -26,9 +28,13 @@
 
 @property (nonatomic, strong) UPDBrowserBottomBar *bottomBar;
 @property (nonatomic, strong) UIView *browserOverlay;
+@property (nonatomic, strong) UIButton *cancelButton;
+@property (nonatomic, strong) UIButton *confirmButton;
+@property (nonatomic, strong) UILabel *confirmLabel;
 @property (nonatomic, strong) UPDInstructionAccumulator *instructionAccumulator;
 @property (nonatomic, strong) UPDBrowserURLBar *urlBar;
 @property (nonatomic, strong) UIWebView *webView;
+@property (nonatomic, strong) UIView *completeOverlay;
 
 @end
 
@@ -37,7 +43,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if(self) {
-        [self setBackgroundColor:[UIColor UPDOffWhiteColor]];
+        [self setBackgroundColor:[UIColor UPDLightGreyColor]];
         
         __unsafe_unretained UPDBrowserView *weakSelf = self;
         self.urlBar = [[UPDBrowserURLBar alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT+2)];
@@ -82,6 +88,23 @@
             }];
             [alertView show];
         }];
+        [self.bottomBar setBlockForButtonWithName:@"Accept" block:^{
+            [weakSelf.completeOverlay setUserInteractionEnabled:YES];
+            [weakSelf bringSubviewToFront:weakSelf.completeOverlay];
+            [weakSelf bringSubviewToFront:weakSelf.confirmLabel];
+            [weakSelf bringSubviewToFront:weakSelf.cancelButton];
+            [weakSelf bringSubviewToFront:weakSelf.confirmButton];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.completeOverlay setAlpha:0.9];
+                [weakSelf.cancelButton setAlpha:1];
+                [weakSelf.confirmButton setAlpha:1];
+                [weakSelf.confirmLabel setAlpha:1];
+            } completion:^(BOOL finished) {
+                [weakSelf.confirmButton setUserInteractionEnabled:YES];
+                [weakSelf.cancelButton setUserInteractionEnabled:YES];
+            }];
+            
+        }];
         [self addSubview:self.bottomBar];
         
         self.browserOverlay = [[UIView alloc] initWithFrame:CGRectMake(0, self.urlBar.bounds.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.bounds.size.height)];
@@ -92,6 +115,36 @@
         [self addSubview:self.browserOverlay];
         UITapGestureRecognizer *browserOverlayTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(browserOverlayTapped)];
         [self.browserOverlay addGestureRecognizer:browserOverlayTapRecognizer];
+        
+        self.completeOverlay = [[UIView alloc] initWithFrame:self.bounds];
+        [self.completeOverlay setAlpha:0];
+        [self.completeOverlay setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.completeOverlay setBackgroundColor:[UIColor UPDOffBlackColor]];
+        [self.completeOverlay setUserInteractionEnabled:NO];
+        [self addSubview:self.completeOverlay];
+        
+        self.confirmLabel = [[UILabel alloc] init];
+        [self.confirmLabel setAlpha:0];
+        [self.confirmLabel setFont:[UIFont boldSystemFontOfSize:22]];
+        [self.confirmLabel setNumberOfLines:0];
+        [self.confirmLabel setText:@"Would you like to watch\nthis page for updates?"];
+        [self.confirmLabel setText:@"Is this the page you would\nlike to watch for updates?"];
+        [self.confirmLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.confirmLabel setTextColor:[UIColor UPDOffWhiteColor]];
+        [self addSubview:self.confirmLabel];
+        
+        self.confirmButton = [[UPDBrowserConfirmButton alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
+        [self.confirmButton addTarget:self action:@selector(confirmButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.confirmButton setAlpha:0];
+        [self.confirmButton setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        [self.confirmButton setUserInteractionEnabled:NO];
+        [self addSubview:self.confirmButton];
+        
+        self.cancelButton = [[UPDBrowserCancelButton alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE/2)/2, self.confirmButton.frame.origin.y+self.confirmButton.frame.size.height+10, UPD_CONFIRM_BUTTON_SIZE/2, UPD_CONFIRM_BUTTON_SIZE/2)];
+        [self.cancelButton addTarget:self action:@selector(confirmationCancelButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.cancelButton setAlpha:0];
+        [self.cancelButton setUserInteractionEnabled:NO];
+        [self addSubview:self.cancelButton];
     }
     return self;
 }
@@ -131,6 +184,67 @@
     }
 }
 
+- (void)confirmationCancelButtonTapped {
+    [self.confirmButton setUserInteractionEnabled:NO];
+    [self.cancelButton setUserInteractionEnabled:NO];
+    [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+        [self.completeOverlay setAlpha:0];
+        [self.cancelButton setAlpha:0];
+        [self.confirmButton setAlpha:0];
+        [self.confirmLabel setAlpha:0];
+    }];
+}
+
+/*
+ Renders the browser (and url/bottom bars) to an image
+ to give the processing view
+ */
+- (void)confirmButtonTapped {
+    if(self.confirmBlock) {
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, YES, 0.0);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        
+        [self.urlBar.layer renderInContext:context];
+        CGContextTranslateCTM(context, 0, self.urlBar.layer.bounds.size.height);
+        [self.webView.layer renderInContext:context];
+        CGContextTranslateCTM(context, 0, self.webView.layer.bounds.size.height);
+        [self.bottomBar.layer renderInContext:context];
+        CGContextTranslateCTM(context, 0, -self.urlBar.layer.bounds.size.height-self.webView.layer.bounds.size.height);
+        
+        UIImage *browserImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-browserImage.size.width)/2, (self.bounds.size.height-browserImage.size.height)/2, browserImage.size.width, browserImage.size.height)];
+        [imageView setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        [imageView setImage:browserImage];
+        [self addSubview:imageView];
+        [self.completeOverlay setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        
+        [self.webView removeFromSuperview];
+        [self.urlBar removeFromSuperview];
+        [self.bottomBar removeFromSuperview];
+        
+        [self bringSubviewToFront:self.completeOverlay];
+        [self bringSubviewToFront:self.confirmLabel];
+        [self bringSubviewToFront:self.cancelButton];
+        [self bringSubviewToFront:self.confirmButton];
+        
+        [self setUserInteractionEnabled:NO];
+        [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+            [self.cancelButton setAlpha:0];
+            [self.confirmLabel setAlpha:0];
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION_SLOW delay:UPD_TRANSITION_DELAY options:0 animations:^{
+                [imageView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, UPD_BROWSER_IMAGE_SCALE, UPD_BROWSER_IMAGE_SCALE)];
+                [self.completeOverlay setTransform:CGAffineTransformScale(CGAffineTransformIdentity, UPD_BROWSER_IMAGE_SCALE, UPD_BROWSER_IMAGE_SCALE)];
+                [self.completeOverlay setAlpha:UPD_BROWSER_IMAGE_OPACITY];
+            } completion:^(BOOL finished) {
+                self.confirmBlock(browserImage);
+            }];
+        }];
+    }
+}
+
 /*
  Clears cookies and the cache—important for making sure a request
  can be duplicated every time.
@@ -144,6 +258,15 @@
         [storage deleteCookie:cookie];
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)layoutSubviews {
+    CGSize confirmLabelSize = [self.confirmLabel.text boundingRectWithSize:CGSizeMake(UPD_CONFIRM_LABEL_WIDTH, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: self.confirmLabel.font} context:nil].size;
+    confirmLabelSize.height = ceilf(confirmLabelSize.height);
+    confirmLabelSize.width = ceilf(confirmLabelSize.width);
+    [self.confirmLabel setFrame:CGRectMake((self.bounds.size.width-confirmLabelSize.width)/2, self.confirmButton.frame.origin.y/2-confirmLabelSize.height/2, confirmLabelSize.width, confirmLabelSize.height)];
+    
+    [self.cancelButton setFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE/2)/2, self.confirmButton.frame.origin.y+self.confirmButton.frame.size.height+self.confirmButton.frame.origin.y/2-self.cancelButton.frame.size.height/2, UPD_CONFIRM_BUTTON_SIZE/2, UPD_CONFIRM_BUTTON_SIZE/2)];
 }
 
 /*

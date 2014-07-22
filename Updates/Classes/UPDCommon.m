@@ -27,6 +27,7 @@ const UIViewAutoresizing UIViewAutoresizingFlexibleSize = UIViewAutoresizingFlex
 /*
  General values
  */
+const NSTimeInterval UPD_TRANSITION_DELAY = 0.15;
 const NSTimeInterval UPD_TRANSITION_DURATION = 0.25;
 const NSTimeInterval UPD_TRANSITION_DURATION_SLOW = 0.4;
 
@@ -45,6 +46,8 @@ const int UPD_ALERT_BUTTON_ICON_SIZE = 16;
 const int UPD_ALERT_PADDING = 20;
 const int UPD_ALERT_WIDTH = 280;
 const int UPD_BOTTOM_BAR_BUTTON_SIZE = 16;
+const int UPD_CONFIRM_BUTTON_SIZE = 140;
+const int UPD_CONFIRM_LABEL_WIDTH = 300;
 const int UPD_PREBROWSER_URL_BAR_BUTTON_SIZE = 16; /*this is just the size of the button image, the button itself is a square based on the bar's height*/
 const int UPD_PREBROWSER_URL_BAR_HEIGHT = 50;
 const int UPD_PREBROWSER_URL_BAR_WIDTH = 280;
@@ -53,3 +56,6 @@ const int UPD_SEARCH_ENGINE_ICON_SIZE = 50;
 const int UPD_START_LABEL_WIDTH = 300;
 const int UPD_URL_BAR_HEIGHT = 32;
 const int UPD_URL_BAR_PADDING = 10;
+
+const CGFloat UPD_BROWSER_IMAGE_OPACITY = 0.5;
+const CGFloat UPD_BROWSER_IMAGE_SCALE = 0.8;

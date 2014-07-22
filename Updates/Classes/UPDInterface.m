@@ -18,6 +18,7 @@
 #import "UPDBrowserView.h"
 #import "UPDNavigationBar.h"
 #import "UPDPreBrowserView.h"
+#import "UPDProcessingView.h"
 #import "UPDTableView.h"
 
 @interface UPDInterface ()
@@ -26,6 +27,7 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UPDNavigationBar *navigationBar;
 @property (nonatomic, strong) UPDPreBrowserView *preBrowserView;
+@property (nonatomic, strong) UPDProcessingView *processingView;
 @property (nonatomic, strong) UPDTableView *tableView;
 
 @end
@@ -95,7 +97,17 @@
                 [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
             }];
         }];
+        [self.browserView setConfirmBlock:^(UIImage *browserImage){
+            [weakSelf.processingView setBrowserImage:browserImage];
+            [weakSelf.processingView setHidden:NO];
+            
+            [weakSelf.processingView beginProcessing];
+        }];
         [self.scrollView addSubview:self.browserView];
+        
+        self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
+        [self.processingView setHidden:YES];
+        [self.scrollView addSubview:self.processingView];
         
         [self setNeedsDisplay];
     }
@@ -107,6 +119,7 @@
     [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*self.scrollView.tag, 0)];
     [self.preBrowserView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+    [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
 @end
