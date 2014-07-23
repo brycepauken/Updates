@@ -11,5 +11,6 @@
 @interface UPDProcessingView : UIView
 
 - (void)beginProcessingAnimation;
+- (void)processInstructions:(NSArray *)instructions;
 
 @end

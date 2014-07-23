@@ -6,11 +6,20 @@
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
+/*
+ This view is reponsible for creating and managing the instruction
+ processor, along with asking the user questions about the update
+ on the interface side of things.
+ */
+
 #import "UPDProcessingView.h"
+
+#import "UPDInstructionProcessor.h"
 
 @interface UPDProcessingView()
 
 @property (nonatomic, strong) UIImageView *checkmark;
+@property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
 @property (nonatomic, strong) UIImageView *outline;
 @property (nonatomic, strong) UIImageView *outlineQuarter;
 
@@ -60,6 +69,12 @@
         [self.outline setFrame:newFrame];
         [self.outlineQuarter setFrame:newFrame];
     }];
+}
+
+- (void)processInstructions:(NSArray *)instructions {
+    self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
+    [self.instructionProcessor setInstructions:instructions];
+    [self.instructionProcessor beginProcessing];
 }
 
 @end

@@ -16,5 +16,6 @@
 @property (nonatomic, strong) NSString *fullURL;
 @property (nonatomic, strong) NSMutableDictionary *post;
 @property (nonatomic, strong) NSString *response;
+@property (nonatomic, strong) NSURL *urlObject;
 
 @end

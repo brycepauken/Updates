@@ -10,12 +10,6 @@
 
 #import "UPDInternalInstruction.h"
 
-@interface UPDInstructionAccumulator()
-
-@property (nonatomic, strong) NSMutableArray *instructions;
-
-@end
-
 @implementation UPDInstructionAccumulator
 
 - (instancetype)init {
@@ -39,6 +33,7 @@
     [instruction setHeaders:headers];
     [instruction setFullURL:url];
     [instruction setResponse:response];
+    [instruction setUrlObject:tempURL];
     
     for(int getOrPost=0;getOrPost<2;getOrPost++) {
         NSString *targetString = (getOrPost?post:tempURL.query);
@@ -60,6 +55,8 @@
             }
         }
     }
+    
+    [self.instructions addObject:instruction];
 }
 
 @end

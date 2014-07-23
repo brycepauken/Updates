@@ -239,7 +239,7 @@
                 [self.completeOverlay setTransform:CGAffineTransformScale(CGAffineTransformIdentity, UPD_BROWSER_IMAGE_SCALE, UPD_BROWSER_IMAGE_SCALE)];
                 [self.completeOverlay setAlpha:UPD_BROWSER_IMAGE_OPACITY];
             } completion:^(BOOL finished) {
-                self.confirmBlock(browserImage);
+                self.confirmBlock(browserImage, self.instructionAccumulator.instructions);
             }];
         }];
     }

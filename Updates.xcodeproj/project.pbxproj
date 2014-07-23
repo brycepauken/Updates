@@ -19,6 +19,8 @@
 		024C451D1975E51F000896E4 /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45191975E51F000896E4 /* UpdatesIcon.png */; };
 		024C451E1975E51F000896E4 /* UpdatesIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C451A1975E51F000896E4 /* UpdatesIcon@2x.png */; };
 		0253CD21197F2D1E0078E90E /* UPDProcessingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0253CD20197F2D1E0078E90E /* UPDProcessingView.m */; };
+		0253CD24197F90420078E90E /* UPDInstructionProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 0253CD23197F90420078E90E /* UPDInstructionProcessor.m */; };
+		0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0253CD27197F9E800078E90E /* libxml2.2.dylib */; };
 		02644070197DBBA7009CE430 /* CancelLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406E197DBBA7009CE430 /* CancelLarge.png */; };
 		02644071197DBBA7009CE430 /* CancelLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406F197DBBA7009CE430 /* CancelLarge@2x.png */; };
 		02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644073197DBC0D009CE430 /* UPDBrowserCancelButton.m */; };
@@ -86,6 +88,9 @@
 		024C451A1975E51F000896E4 /* UpdatesIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "UpdatesIcon@2x.png"; path = "Resources/Images/UpdatesIcon@2x.png"; sourceTree = "<group>"; };
 		0253CD1F197F2D1E0078E90E /* UPDProcessingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDProcessingView.h; path = Classes/UPDProcessingView.h; sourceTree = "<group>"; };
 		0253CD20197F2D1E0078E90E /* UPDProcessingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDProcessingView.m; path = Classes/UPDProcessingView.m; sourceTree = "<group>"; };
+		0253CD22197F90420078E90E /* UPDInstructionProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInstructionProcessor.h; path = Classes/UPDInstructionProcessor.h; sourceTree = "<group>"; };
+		0253CD23197F90420078E90E /* UPDInstructionProcessor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInstructionProcessor.m; path = Classes/UPDInstructionProcessor.m; sourceTree = "<group>"; };
+		0253CD27197F9E800078E90E /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = usr/lib/libxml2.2.dylib; sourceTree = SDKROOT; };
 		0264406E197DBBA7009CE430 /* CancelLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CancelLarge.png; path = Resources/Images/CancelLarge.png; sourceTree = "<group>"; };
 		0264406F197DBBA7009CE430 /* CancelLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CancelLarge@2x.png"; path = "Resources/Images/CancelLarge@2x.png"; sourceTree = "<group>"; };
 		02644072197DBC0D009CE430 /* UPDBrowserCancelButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserCancelButton.h; path = Classes/UPDBrowserCancelButton.h; sourceTree = "<group>"; };
@@ -158,6 +163,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,6 +204,7 @@
 				0213C2391974FE0C006BC204 /* main.m */,
 				0213C23E1974FE0C006BC204 /* Updates.xcdatamodeld */,
 				02A73D1D1975C555000A7C48 /* UPDPrefixHeader.pch */,
+				0253CD27197F9E800078E90E /* libxml2.2.dylib */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -278,6 +285,8 @@
 				02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */,
 				02AF8755197A3124007D06C5 /* UPDInstructionAccumulator.h */,
 				02AF8756197A3124007D06C5 /* UPDInstructionAccumulator.m */,
+				0253CD22197F90420078E90E /* UPDInstructionProcessor.h */,
+				0253CD23197F90420078E90E /* UPDInstructionProcessor.m */,
 				024C45121975D269000896E4 /* UPDInterface.h */,
 				024C45131975D269000896E4 /* UPDInterface.m */,
 				02AF8758197B7488007D06C5 /* UPDInternalInstruction.h */,
@@ -417,6 +426,7 @@
 				0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */,
 				024C45141975D269000896E4 /* UPDInterface.m in Sources */,
 				02AF8754197A2F9C007D06C5 /* UPDURLProtocol.m in Sources */,
+				0253CD24197F90420078E90E /* UPDInstructionProcessor.m in Sources */,
 				02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */,
 				02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */,
 				02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */,
@@ -518,6 +528,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Applications/Xcode6-Beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+					"/usr/include/libxml2/**",
+				);
 				INFOPLIST_FILE = Updates/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -529,6 +544,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Applications/Xcode6-Beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+					"/usr/include/libxml2/**",
+				);
 				INFOPLIST_FILE = Updates/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";

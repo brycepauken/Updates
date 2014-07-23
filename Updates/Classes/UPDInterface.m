@@ -99,9 +99,10 @@
                 [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
             }];
         }];
-        [self.browserView setConfirmBlock:^(UIImage *browserImage){
+        [self.browserView setConfirmBlock:^(UIImage *browserImage, NSArray *instructions){
             [weakSelf.preProcessingView setHidden:NO];
             [weakSelf.preProcessingView beginPreProcessingWithBrowserImage:browserImage];
+            [weakSelf.processingView processInstructions:instructions];
         }];
         [self.scrollView addSubview:self.browserView];
         
