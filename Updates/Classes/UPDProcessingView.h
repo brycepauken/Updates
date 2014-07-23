@@ -2,7 +2,7 @@
 //  UPDProcessingView.h
 //  Updates
 //
-//  Created by Bryce Pauken on 7/21/14.
+//  Created by Bryce Pauken on 7/22/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
@@ -10,6 +10,6 @@
 
 @interface UPDProcessingView : UIView
 
-- (void)beginProcessingWithBrowserImage:(UIImage *)browserImage;
+- (void)beginProcessingAnimation;
 
 @end

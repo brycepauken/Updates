@@ -18,10 +18,11 @@
 		024C451C1975E51F000896E4 /* KingfishIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45181975E51F000896E4 /* KingfishIcon@2x.png */; };
 		024C451D1975E51F000896E4 /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45191975E51F000896E4 /* UpdatesIcon.png */; };
 		024C451E1975E51F000896E4 /* UpdatesIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C451A1975E51F000896E4 /* UpdatesIcon@2x.png */; };
+		0253CD21197F2D1E0078E90E /* UPDProcessingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0253CD20197F2D1E0078E90E /* UPDProcessingView.m */; };
 		02644070197DBBA7009CE430 /* CancelLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406E197DBBA7009CE430 /* CancelLarge.png */; };
 		02644071197DBBA7009CE430 /* CancelLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406F197DBBA7009CE430 /* CancelLarge@2x.png */; };
 		02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644073197DBC0D009CE430 /* UPDBrowserCancelButton.m */; };
-		02644077197DC636009CE430 /* UPDProcessingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644076197DC636009CE430 /* UPDProcessingView.m */; };
+		02644077197DC636009CE430 /* UPDPreProcessingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644076197DC636009CE430 /* UPDPreProcessingView.m */; };
 		028D7EA8197DB41000BE0643 /* AcceptLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EA6197DB41000BE0643 /* AcceptLarge.png */; };
 		028D7EA9197DB41000BE0643 /* AcceptLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EA7197DB41000BE0643 /* AcceptLarge@2x.png */; };
 		028D7EAE197DB41700BE0643 /* ButtonOutline.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EAA197DB41700BE0643 /* ButtonOutline.png */; };
@@ -83,12 +84,14 @@
 		024C45181975E51F000896E4 /* KingfishIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "KingfishIcon@2x.png"; path = "Resources/Images/KingfishIcon@2x.png"; sourceTree = "<group>"; };
 		024C45191975E51F000896E4 /* UpdatesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpdatesIcon.png; path = Resources/Images/UpdatesIcon.png; sourceTree = "<group>"; };
 		024C451A1975E51F000896E4 /* UpdatesIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "UpdatesIcon@2x.png"; path = "Resources/Images/UpdatesIcon@2x.png"; sourceTree = "<group>"; };
+		0253CD1F197F2D1E0078E90E /* UPDProcessingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDProcessingView.h; path = Classes/UPDProcessingView.h; sourceTree = "<group>"; };
+		0253CD20197F2D1E0078E90E /* UPDProcessingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDProcessingView.m; path = Classes/UPDProcessingView.m; sourceTree = "<group>"; };
 		0264406E197DBBA7009CE430 /* CancelLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CancelLarge.png; path = Resources/Images/CancelLarge.png; sourceTree = "<group>"; };
 		0264406F197DBBA7009CE430 /* CancelLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CancelLarge@2x.png"; path = "Resources/Images/CancelLarge@2x.png"; sourceTree = "<group>"; };
 		02644072197DBC0D009CE430 /* UPDBrowserCancelButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserCancelButton.h; path = Classes/UPDBrowserCancelButton.h; sourceTree = "<group>"; };
 		02644073197DBC0D009CE430 /* UPDBrowserCancelButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserCancelButton.m; path = Classes/UPDBrowserCancelButton.m; sourceTree = "<group>"; };
-		02644075197DC636009CE430 /* UPDProcessingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDProcessingView.h; path = Classes/UPDProcessingView.h; sourceTree = "<group>"; };
-		02644076197DC636009CE430 /* UPDProcessingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDProcessingView.m; path = Classes/UPDProcessingView.m; sourceTree = "<group>"; };
+		02644075197DC636009CE430 /* UPDPreProcessingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDPreProcessingView.h; path = Classes/UPDPreProcessingView.h; sourceTree = "<group>"; };
+		02644076197DC636009CE430 /* UPDPreProcessingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDPreProcessingView.m; path = Classes/UPDPreProcessingView.m; sourceTree = "<group>"; };
 		028D7EA6197DB41000BE0643 /* AcceptLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AcceptLarge.png; path = Resources/Images/AcceptLarge.png; sourceTree = "<group>"; };
 		028D7EA7197DB41000BE0643 /* AcceptLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AcceptLarge@2x.png"; path = "Resources/Images/AcceptLarge@2x.png"; sourceTree = "<group>"; };
 		028D7EAA197DB41700BE0643 /* ButtonOutline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonOutline.png; path = Resources/Images/ButtonOutline.png; sourceTree = "<group>"; };
@@ -285,8 +288,10 @@
 				02A733EB19770AB6002A86F3 /* UPDPreBrowserURLBar.m */,
 				02A733E31976F95A002A86F3 /* UPDPreBrowserView.h */,
 				02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */,
-				02644075197DC636009CE430 /* UPDProcessingView.h */,
-				02644076197DC636009CE430 /* UPDProcessingView.m */,
+				02644075197DC636009CE430 /* UPDPreProcessingView.h */,
+				02644076197DC636009CE430 /* UPDPreProcessingView.m */,
+				0253CD1F197F2D1E0078E90E /* UPDProcessingView.h */,
+				0253CD20197F2D1E0078E90E /* UPDProcessingView.m */,
 				02C238821976D594009327F8 /* UPDTableView.h */,
 				02C238831976D594009327F8 /* UPDTableView.m */,
 				02AF8752197A2F9C007D06C5 /* UPDURLProtocol.h */,
@@ -397,6 +402,7 @@
 				02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */,
 				02AF876B197BA831007D06C5 /* UPDAlertViewButton.m in Sources */,
 				02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */,
+				0253CD21197F2D1E0078E90E /* UPDProcessingView.m in Sources */,
 				02A733F3197724A6002A86F3 /* UPDPreBrowserTextField.m in Sources */,
 				02AF8757197A3124007D06C5 /* UPDInstructionAccumulator.m in Sources */,
 				024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */,
@@ -407,7 +413,7 @@
 				0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */,
 				02A733EC19770AB6002A86F3 /* UPDPreBrowserURLBar.m in Sources */,
 				028D7EB4197DB62B00BE0643 /* UPDBrowserConfirmButton.m in Sources */,
-				02644077197DC636009CE430 /* UPDProcessingView.m in Sources */,
+				02644077197DC636009CE430 /* UPDPreProcessingView.m in Sources */,
 				0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */,
 				024C45141975D269000896E4 /* UPDInterface.m in Sources */,
 				02AF8754197A2F9C007D06C5 /* UPDURLProtocol.m in Sources */,

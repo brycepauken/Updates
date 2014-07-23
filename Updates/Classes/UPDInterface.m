@@ -18,6 +18,7 @@
 #import "UPDBrowserView.h"
 #import "UPDNavigationBar.h"
 #import "UPDPreBrowserView.h"
+#import "UPDPreProcessingView.h"
 #import "UPDProcessingView.h"
 #import "UPDTableView.h"
 
@@ -27,6 +28,7 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UPDNavigationBar *navigationBar;
 @property (nonatomic, strong) UPDPreBrowserView *preBrowserView;
+@property (nonatomic, strong) UPDPreProcessingView *preProcessingView;
 @property (nonatomic, strong) UPDProcessingView *processingView;
 @property (nonatomic, strong) UPDTableView *tableView;
 
@@ -98,10 +100,19 @@
             }];
         }];
         [self.browserView setConfirmBlock:^(UIImage *browserImage){
-            [weakSelf.processingView setHidden:NO];
-            [weakSelf.processingView beginProcessingWithBrowserImage:browserImage];
+            [weakSelf.preProcessingView setHidden:NO];
+            [weakSelf.preProcessingView beginPreProcessingWithBrowserImage:browserImage];
         }];
         [self.scrollView addSubview:self.browserView];
+        
+        self.preProcessingView = [[UPDPreProcessingView alloc] initWithFrame:self.bounds];
+        [self.preProcessingView setHidden:YES];
+        [self.preProcessingView setCompletionBlock:^{
+            [weakSelf.processingView setHidden:NO];
+            [weakSelf.processingView beginProcessingAnimation];
+        }];
+        
+        [self.scrollView addSubview:self.preProcessingView];
         
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
@@ -117,6 +128,7 @@
     [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*self.scrollView.tag, 0)];
     [self.preBrowserView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+    [self.preProcessingView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
