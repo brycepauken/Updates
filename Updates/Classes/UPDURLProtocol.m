@@ -57,7 +57,7 @@ static UPDInstructionAccumulator *_instructionAccumulator;
             NSDictionary *headers = [(NSHTTPURLResponse *)response allHeaderFields];
             if([[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
                 if(_instructionAccumulator) {
-                    [_instructionAccumulator addInstructionWithURL:self.request.URL.absoluteString post:[[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] response:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] headers:headers];
+                    [_instructionAccumulator addInstructionWithRequest:self.request response:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] headers:headers];
                 }
             }
         }
@@ -82,7 +82,7 @@ static UPDInstructionAccumulator *_instructionAccumulator;
         NSMutableURLRequest *mutableRequest = [request mutableCopy];
         [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
         
-        [self.client URLProtocol:self wasRedirectedToRequest:request redirectResponse:response];
+        [self.client URLProtocol:self wasRedirectedToRequest:mutableRequest redirectResponse:response];
         [self.task cancel];
         [self.client URLProtocol:self didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
     }

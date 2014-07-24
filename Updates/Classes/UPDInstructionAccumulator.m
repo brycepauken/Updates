@@ -25,18 +25,16 @@
  it recieves. The post argument is an NSString, so this method must
  also parse the string into an NSDictionary.
  */
-- (void)addInstructionWithURL:(NSString *)url post:(NSString *)post response:(NSString *)response headers:(NSDictionary *)headers {
+- (void)addInstructionWithRequest:(NSURLRequest *)request response:(NSString *)response headers:(NSDictionary *)headers {
     UPDInternalInstruction *instruction = [[UPDInternalInstruction alloc] init];
-    NSURL *tempURL = [NSURL URLWithString:url];
-    
-    [instruction setBaseURL:([url rangeOfString:@"?" options:NSBackwardsSearch].location==NSNotFound?url:[url substringToIndex:[url rangeOfString:@"?" options:NSBackwardsSearch].location])];
+    [instruction setBaseURL:([request.URL.absoluteString rangeOfString:@"?" options:NSBackwardsSearch].location==NSNotFound?request.URL.absoluteString:[request.URL.absoluteString substringToIndex:[request.URL.absoluteString rangeOfString:@"?" options:NSBackwardsSearch].location])];
     [instruction setHeaders:headers];
-    [instruction setFullURL:url];
+    [instruction setFullURL:request.URL.absoluteString];
+    [instruction setRequest:request];
     [instruction setResponse:response];
-    [instruction setUrlObject:tempURL];
     
     for(int getOrPost=0;getOrPost<2;getOrPost++) {
-        NSString *targetString = (getOrPost?post:tempURL.query);
+        NSString *targetString = (getOrPost?[[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]:request.URL.query);
         if(targetString.length) {
             NSArray *keyValuePairs = [targetString componentsSeparatedByString:@"&"];
             for(NSString *keyValuePair in keyValuePairs) {

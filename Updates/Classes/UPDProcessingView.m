@@ -57,8 +57,8 @@
     CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     [rotationAnimation setCumulative:YES];
     [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
-    [rotationAnimation setToValue:@(M_PI*2)];
     [rotationAnimation setRepeatCount:MAXFLOAT];
+    [rotationAnimation setToValue:@(M_PI*2)];
     [self.outlineQuarter.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     
     [UIView animateWithDuration:UPD_PROCESSING_ANIMATION_DURATION animations:^{
@@ -68,6 +68,7 @@
         [self.checkmark setFrame:newFrame];
         [self.outline setFrame:newFrame];
         [self.outlineQuarter setFrame:newFrame];
+        [self.processing setFrame:newFrame];
     }];
 }
 

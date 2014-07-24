@@ -12,6 +12,6 @@
 
 @property (nonatomic, strong) NSMutableArray *instructions;
 
-- (void)addInstructionWithURL:(NSString *)url post:(NSString *)post response:(NSString *)response headers:(NSDictionary *)headers;
+- (void)addInstructionWithRequest:(NSURLRequest *)request response:(NSString *)response headers:(NSDictionary *)headers;
 
 @end
