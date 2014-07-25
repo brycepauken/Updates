@@ -22,6 +22,8 @@
 @property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
 @property (nonatomic, strong) UIImageView *outline;
 @property (nonatomic, strong) UIImageView *outlineQuarter;
+@property (nonatomic, strong) UILabel *processingLabel;
+@property (nonatomic, strong) UIScrollView *scrollView;
 
 @end
 
@@ -47,6 +49,19 @@
         [self.checkmark setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.checkmark setImage:[UIImage imageNamed:@"AcceptLarge"]];
         [self addSubview:self.checkmark];
+        
+        self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, UPD_PROCESSING_SCROLLVIEW_SIZE, UPD_PROCESSING_SCROLLVIEW_SIZE)];
+        [self.scrollView setClipsToBounds:NO];
+        [self addSubview:self.scrollView];
+        
+        self.processingLabel = [[UILabel alloc] init];
+        [self.processingLabel setBackgroundColor:[UIColor UPDLightBlueColor]];
+        [self.processingLabel setFont:[UIFont systemFontOfSize:18]];
+        [self.processingLabel setNumberOfLines:0];
+        [self.processingLabel setText:@"Your new update is processing.\nThis may take a few moments.\n\nDon't worry!\nYou can use this time to set\nup your update's information."];
+        [self.processingLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.processingLabel setTextColor:[UIColor UPDOffWhiteColor]];
+        [self.scrollView addSubview:self.processingLabel];
     }
     return self;
 }
@@ -61,15 +76,54 @@
     [rotationAnimation setToValue:@(M_PI*2)];
     [self.outlineQuarter.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     
+    CGRect newCheckFrame, newScrollViewFrame;
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && self.bounds.size.width>self.bounds.size.height) {
+        CGFloat padding = (self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE-UPD_PROCESSING_SCROLLVIEW_SIZE)/3;
+        newCheckFrame = CGRectMake(padding, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE);
+        newScrollViewFrame = CGRectMake(padding+UPD_CONFIRM_BUTTON_SIZE+padding, (self.bounds.size.height-UPD_PROCESSING_SCROLLVIEW_SIZE)/2, UPD_PROCESSING_SCROLLVIEW_SIZE, UPD_PROCESSING_SCROLLVIEW_SIZE);
+    }
+    else {
+        CGFloat padding = (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE-UPD_PROCESSING_SCROLLVIEW_SIZE)/3;
+        newCheckFrame = CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, padding, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE);
+        newScrollViewFrame = CGRectMake((self.bounds.size.width-UPD_PROCESSING_SCROLLVIEW_SIZE)/2, padding+UPD_CONFIRM_BUTTON_SIZE+padding, UPD_PROCESSING_SCROLLVIEW_SIZE, UPD_PROCESSING_SCROLLVIEW_SIZE);
+    }
+    [self.scrollView setFrame:newScrollViewFrame];
+    [self layoutIfNeeded];
+    [self.checkmark setAutoresizingMask:UIViewAutoresizingNone];
+    [self.outline setAutoresizingMask:UIViewAutoresizingNone];
+    [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingNone];
     [UIView animateWithDuration:UPD_PROCESSING_ANIMATION_DURATION animations:^{
         [self.outline setAlpha:0];
         
-        CGRect newFrame = CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height/2-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE);
-        [self.checkmark setFrame:newFrame];
-        [self.outline setFrame:newFrame];
-        [self.outlineQuarter setFrame:newFrame];
-        [self.processing setFrame:newFrame];
+        [self.checkmark setFrame:newCheckFrame];
+        [self.outline setFrame:newCheckFrame];
+        [self.outlineQuarter setFrame:newCheckFrame];
     }];
+}
+
+- (void)layoutSubviews {
+    CGSize processingLabelSize = [self.processingLabel.text boundingRectWithSize:CGSizeMake(self.scrollView.bounds.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: self.processingLabel.font} context:nil].size;
+    processingLabelSize.height = ceilf(processingLabelSize.height);
+    processingLabelSize.width = ceilf(processingLabelSize.width);
+    [self.processingLabel setFrame:CGRectMake((self.scrollView.bounds.size.width-processingLabelSize.width)/2, (self.scrollView.bounds.size.height-processingLabelSize.height)/2, processingLabelSize.width, processingLabelSize.height)];
+
+    if(self.checkmark.autoresizingMask==UIViewAutoresizingNone) {
+        CGRect newCheckFrame, newScrollViewFrame;
+        if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && self.bounds.size.width>self.bounds.size.height) {
+            CGFloat padding = (self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE-UPD_PROCESSING_SCROLLVIEW_SIZE)/3;
+            newCheckFrame = CGRectMake(padding, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE);
+            newScrollViewFrame = CGRectMake(padding+UPD_CONFIRM_BUTTON_SIZE+padding, (self.bounds.size.height-UPD_PROCESSING_SCROLLVIEW_SIZE)/2, UPD_PROCESSING_SCROLLVIEW_SIZE, UPD_PROCESSING_SCROLLVIEW_SIZE);
+        }
+        else {
+            CGFloat padding = (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE-UPD_PROCESSING_SCROLLVIEW_SIZE)/3;
+            newCheckFrame = CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, padding, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE);
+            newScrollViewFrame = CGRectMake((self.bounds.size.width-UPD_PROCESSING_SCROLLVIEW_SIZE)/2, padding+UPD_CONFIRM_BUTTON_SIZE+padding, UPD_PROCESSING_SCROLLVIEW_SIZE, UPD_PROCESSING_SCROLLVIEW_SIZE);
+        }
+        [self.checkmark setFrame:newCheckFrame];
+        [self.outline setFrame:newCheckFrame];
+        [self.outlineQuarter setFrame:newCheckFrame];
+        [self.scrollView setFrame:newScrollViewFrame];
+    }
 }
 
 - (void)processInstructions:(NSArray *)instructions {

@@ -44,10 +44,6 @@
         
         self.progressBar = [[UIView alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-4, 0, 2)];
         [self.progressBar setBackgroundColor:[UIColor UPDOffWhiteColor]];
-        /*[self.progressBar.layer setMasksToBounds:NO];
-        [self.progressBar.layer setShadowColor:self.progressBar.backgroundColor.CGColor];
-        [self.progressBar.layer setShadowOpacity:0.9];
-        [self.progressBar.layer setShadowRadius:4];*/
         
         [self addSubview:self.progressBar];
         
