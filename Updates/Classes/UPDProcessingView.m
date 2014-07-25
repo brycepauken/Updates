@@ -14,6 +14,7 @@
 
 #import "UPDProcessingView.h"
 
+#import "UPDButton.h"
 #import "UPDInstructionProcessor.h"
 
 @interface UPDProcessingView()
@@ -22,6 +23,7 @@
 @property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
 @property (nonatomic, strong) UIImageView *outline;
 @property (nonatomic, strong) UIImageView *outlineQuarter;
+@property (nonatomic, strong) UPDButton *processingButton;
 @property (nonatomic, strong) UILabel *processingLabel;
 @property (nonatomic, strong) UIScrollView *scrollView;
 
@@ -52,16 +54,25 @@
         
         self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, UPD_PROCESSING_SCROLLVIEW_SIZE, UPD_PROCESSING_SCROLLVIEW_SIZE)];
         [self.scrollView setClipsToBounds:NO];
+        [self.scrollView setScrollEnabled:NO];
+        [self.scrollView setScrollsToTop:NO];
+        [self.scrollView setShowsHorizontalScrollIndicator:NO];
+        [self.scrollView setShowsVerticalScrollIndicator:NO];
         [self addSubview:self.scrollView];
         
         self.processingLabel = [[UILabel alloc] init];
-        [self.processingLabel setBackgroundColor:[UIColor UPDLightBlueColor]];
+        [self.processingLabel setAlpha:0];
         [self.processingLabel setFont:[UIFont systemFontOfSize:18]];
         [self.processingLabel setNumberOfLines:0];
         [self.processingLabel setText:@"Your new update is processing.\nThis may take a few moments.\n\nDon't worry!\nYou can use this time to set\nup your update's information."];
         [self.processingLabel setTextAlignment:NSTextAlignmentCenter];
         [self.processingLabel setTextColor:[UIColor UPDOffWhiteColor]];
         [self.scrollView addSubview:self.processingLabel];
+        
+        self.processingButton = [[UPDButton alloc] init];
+        [self.processingButton setAlpha:0];
+        [self.processingButton setTitle:@"OK"];
+        [self.scrollView addSubview:self.processingButton];
     }
     return self;
 }
@@ -98,15 +109,22 @@
         [self.checkmark setFrame:newCheckFrame];
         [self.outline setFrame:newCheckFrame];
         [self.outlineQuarter setFrame:newCheckFrame];
+        
+        [self.processingButton setAlpha:1];
+        [self.processingLabel setAlpha:1];
     }];
 }
 
 - (void)layoutSubviews {
+    /*page 1*/
     CGSize processingLabelSize = [self.processingLabel.text boundingRectWithSize:CGSizeMake(self.scrollView.bounds.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: self.processingLabel.font} context:nil].size;
     processingLabelSize.height = ceilf(processingLabelSize.height);
     processingLabelSize.width = ceilf(processingLabelSize.width);
-    [self.processingLabel setFrame:CGRectMake((self.scrollView.bounds.size.width-processingLabelSize.width)/2, (self.scrollView.bounds.size.height-processingLabelSize.height)/2, processingLabelSize.width, processingLabelSize.height)];
-
+    CGFloat padding1 = (self.scrollView.bounds.size.height-processingLabelSize.height-UPD_PROCESSING_BUTTON_HEIGHT)/3;
+    [self.processingLabel setFrame:CGRectMake((self.scrollView.bounds.size.width-processingLabelSize.width)/2, padding1, processingLabelSize.width, processingLabelSize.height)];
+    [self.processingButton setFrame:CGRectMake((self.scrollView.bounds.size.width-UPD_PROCESSING_BUTTON_WIDTH)/2, padding1+processingLabelSize.height+padding1, UPD_PROCESSING_BUTTON_WIDTH, UPD_PROCESSING_BUTTON_HEIGHT)];
+    
+    /*checkmark and scrollview positions*/
     if(self.checkmark.autoresizingMask==UIViewAutoresizingNone) {
         CGRect newCheckFrame, newScrollViewFrame;
         if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && self.bounds.size.width>self.bounds.size.height) {

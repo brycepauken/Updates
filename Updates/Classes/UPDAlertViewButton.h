@@ -10,8 +10,8 @@
 
 @interface UPDAlertViewButton : UIButton
 
-@property (nonatomic, strong) UIColor *normalBackgroundColor;
 @property (nonatomic, strong) UIColor *highlightedBackgroundColor;
+@property (nonatomic, strong) UIColor *normalBackgroundColor;
 
 - (void)setImage:(UIImage *)image;
 - (void)setTitle:(NSString *)title;

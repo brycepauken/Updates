@@ -33,6 +33,7 @@
 		028D7EB0197DB41700BE0643 /* ButtonOutlineQuarter.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EAC197DB41700BE0643 /* ButtonOutlineQuarter.png */; };
 		028D7EB1197DB41700BE0643 /* ButtonOutlineQuarter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EAD197DB41700BE0643 /* ButtonOutlineQuarter@2x.png */; };
 		028D7EB4197DB62B00BE0643 /* UPDBrowserConfirmButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 028D7EB3197DB62B00BE0643 /* UPDBrowserConfirmButton.m */; };
+		02934A3119830E3100FEBB03 /* UPDButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3019830E3100FEBB03 /* UPDButton.m */; };
 		02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */; };
 		02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */; };
 		02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */; };
@@ -108,6 +109,8 @@
 		028D7EAD197DB41700BE0643 /* ButtonOutlineQuarter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ButtonOutlineQuarter@2x.png"; path = "Resources/Images/ButtonOutlineQuarter@2x.png"; sourceTree = "<group>"; };
 		028D7EB2197DB62B00BE0643 /* UPDBrowserConfirmButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserConfirmButton.h; path = Classes/UPDBrowserConfirmButton.h; sourceTree = "<group>"; };
 		028D7EB3197DB62B00BE0643 /* UPDBrowserConfirmButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserConfirmButton.m; path = Classes/UPDBrowserConfirmButton.m; sourceTree = "<group>"; };
+		02934A2F19830E3100FEBB03 /* UPDButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDButton.h; path = Classes/UPDButton.h; sourceTree = "<group>"; };
+		02934A3019830E3100FEBB03 /* UPDButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDButton.m; path = Classes/UPDButton.m; sourceTree = "<group>"; };
 		02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserURLBar.h; path = Classes/UPDBrowserURLBar.h; sourceTree = "<group>"; };
 		02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserURLBar.m; path = Classes/UPDBrowserURLBar.m; sourceTree = "<group>"; };
 		02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserView.h; path = Classes/UPDBrowserView.h; sourceTree = "<group>"; };
@@ -282,6 +285,8 @@
 				02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */,
 				02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */,
 				02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */,
+				02934A2F19830E3100FEBB03 /* UPDButton.h */,
+				02934A3019830E3100FEBB03 /* UPDButton.m */,
 				02A73D1A1975C501000A7C48 /* UPDCommon.h */,
 				02A73D1B1975C501000A7C48 /* UPDCommon.m */,
 				021F93791980999700F77395 /* UPDDocumentComparator.h */,
@@ -434,6 +439,7 @@
 				0253CD24197F90420078E90E /* UPDInstructionProcessor.m in Sources */,
 				02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */,
 				02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */,
+				02934A3119830E3100FEBB03 /* UPDButton.m in Sources */,
 				02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */,
 				021F937B1980999700F77395 /* UPDDocumentComparator.mm in Sources */,
 				02A73D151975C24B000A7C48 /* UPDViewController.m in Sources */,
