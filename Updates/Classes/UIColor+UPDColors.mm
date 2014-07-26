@@ -115,6 +115,17 @@
     return lightGrayColor;
 }
 
++ (UIColor *)UPDMoreOffWhiteColor {
+    static UIColor *offMoreWhiteColor = nil;
+    static dispatch_once_t dispatchOnceToken;
+    
+    dispatch_once(&dispatchOnceToken, ^{
+        offMoreWhiteColor = [UIColor colorWithWhite:0.94 alpha:1];
+    });
+    
+    return offMoreWhiteColor;
+}
+
 + (UIColor *)UPDOffBlackColor {
     static UIColor *offBlackColor = nil;
     static dispatch_once_t dispatchOnceToken;

@@ -21,6 +21,10 @@
 
 @interface UPDTableView()
 
+@property (nonatomic, strong) UILabel *refreshLabel;
+@property (nonatomic, strong) NSString *refreshLabelFontSize;
+@property (nonatomic, strong) NSString *refreshLabelFormat;
+@property (nonatomic, strong) UIView *refreshView;
 @property (nonatomic, strong) UILabel *startLabel;
 @property (nonatomic, strong) NSMutableArray *updates;
 
@@ -52,6 +56,20 @@
         [self.startLabel setFrame:CGRectMake((self.bounds.size.width-startLabelSize.width)/2, (self.bounds.size.height-startLabelSize.height)/2, startLabelSize.width, startLabelSize.height)];
         [self addSubview:self.startLabel];
         
+        self.refreshView = [[UIView alloc] initWithFrame:CGRectMake(0, -UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT, self.bounds.size.width, UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT)];
+        [self.refreshView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self addSubview:self.refreshView];
+        
+        self.refreshLabel = [[UILabel alloc] init];
+        [self.refreshLabel setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        [self.refreshLabel setFont:[UIFont systemFontOfSize:18]];
+        [self.refreshLabel setNumberOfLines:0];
+        [self.refreshLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.refreshLabel setTextColor:[UIColor lightGrayColor]];
+        [self.refreshView addSubview:self.refreshLabel];
+        [self setRefreshLabelFormat:@"You've saved %@ so far\nPull to save more!"];
+        [self updateRefreshLabel];
+        
         [self registerClass:[UPDTableViewCell class] forCellReuseIdentifier:@"UPDTableViewCell"];
     }
     return self;
@@ -59,6 +77,19 @@
 
 - (UPDAppDelegate *)appDelegate {
     return [[UIApplication sharedApplication] delegate];
+}
+
+- (void)beginRefresh {
+    
+}
+
+- (void)endRefresh {
+    [self.refreshView setTag:0];
+    [self setRefreshLabelFormat:@"You've saved %@ so far\nPull to save more!"];
+    [self updateRefreshLabel];
+    [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+       [self setContentInset:UIEdgeInsetsZero]; 
+    }];
 }
 
 /*
@@ -89,6 +120,53 @@
     BOOL tableFilled = [self numberOfRowsInSection:0]>0;
     [self setScrollEnabled:tableFilled];
     [self.startLabel setHidden:tableFilled];
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if(scrollView.contentOffset.y<=-UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT && self.refreshView.tag<2) {
+        [self.refreshView setTag:2];
+        [self setRefreshLabelFormat:@"You've saved %@ so far"];
+        [self updateRefreshLabel];
+        [self beginRefresh];
+        [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST delay:UPD_TRANSITION_DELAY options:0 animations:^{
+            [self setContentInset:UIEdgeInsetsMake(UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT, 0, 0, 0)];
+        } completion:nil];
+    }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if(self.refreshView.tag==2) {
+        if(scrollView.contentOffset.y > 0) {
+            [scrollView setContentInset:UIEdgeInsetsZero];
+        }
+        else if(scrollView.contentOffset.y>=-UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT) {
+            [scrollView setContentInset:UIEdgeInsetsMake(-scrollView.contentOffset.y, 0, 0, 0)];
+        }
+    }
+    else {
+        if(scrollView.contentOffset.y<=-UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT && self.refreshView.tag==0) {
+            [self.refreshView setTag:1];
+            [self setRefreshLabelFormat:@"You've saved %@ so far\nRelease to save more!"];
+            [self updateRefreshLabel];
+        }
+        else if(scrollView.contentOffset.y>-UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT && self.refreshView.tag==1) {
+            [self.refreshView setTag:0];
+            [self setRefreshLabelFormat:@"You've saved %@ so far\nPull to save more!"];
+            [self updateRefreshLabel];
+        }
+    }
+}
+
+- (void)updateRefreshLabel {
+    NSString *timeText = @"0 seconds";
+    NSMutableAttributedString *newText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:self.refreshLabelFormat,timeText]];
+    NSUInteger timeTextLocation = [self.refreshLabelFormat rangeOfString:@"%@"].location;
+    [newText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:18] range:NSMakeRange(0, timeTextLocation)];
+    [newText addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:18] range:NSMakeRange(timeTextLocation, timeText.length)];
+    [newText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:18] range:NSMakeRange(timeTextLocation+timeText.length, self.refreshLabelFormat.length-(timeTextLocation+timeText.length))];
+    [self.refreshLabel setAttributedText:newText];
+    [self.refreshLabel sizeToFit];
+    [self.refreshLabel setFrame:CGRectMake((self.refreshView.bounds.size.width-self.refreshLabel.bounds.size.width)/2, (self.refreshView.bounds.size.height-self.refreshLabel.bounds.size.height)/2, self.refreshLabel.bounds.size.width, self.refreshLabel.bounds.size.height)];
 }
 
 #pragma mark - Data Source Methods

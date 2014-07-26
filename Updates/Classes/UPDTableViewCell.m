@@ -23,14 +23,21 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        self.bar = [[UIView alloc] init];
-        [self.bar setBackgroundColor:[UIColor redColor]];
-        [self addSubview:self.bar];
+        [self setClipsToBounds:YES];
         
         self.divider = [[UIView alloc] init];
         [self.divider setBackgroundColor:[UIColor UPDLightGreyColor]];
         [self.divider setHidden:YES];
         [self addSubview:self.divider];
+        
+        self.bar = [[UIView alloc] init];
+        [self.bar setBackgroundColor:[UIColor whiteColor]];
+        /*[self.bar.layer setMasksToBounds:NO];
+        [self.bar.layer setShadowColor:[UIColor UPDOffBlackColor].CGColor];
+        [self.bar.layer setShadowOpacity:0.8];
+        [self.bar.layer setShadowRadius:1];
+        [self.bar.layer setShadowOffset:CGSizeZero];*/
+        [self addSubview:self.bar];
         
         self.faviconView = [[UIImageView alloc] init];
         [self addSubview:self.faviconView];
@@ -63,12 +70,8 @@
     [self.nameLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2-nameLabelSize.height/2-10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, nameLabelSize.height)];
     [self.updatedLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2+10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, updatedLabelSize.height)];
     
-    [self.bar setFrame:CGRectMake(0, 0, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height)];
+    [self.bar setFrame:CGRectMake(0, -10, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height+20)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
-}
-
--(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    NSLog(@"%f",scrollView.contentOffset.x);
 }
 
 - (void)setDividerHidden:(BOOL)hidden {
@@ -80,12 +83,22 @@
     [self.bar setBackgroundColor:[UIColor colorFromImage:favicon]];
 }
 
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    [self setBackgroundColor:highlighted?[UIColor UPDMoreOffWhiteColor]:[UIColor UPDOffWhiteColor]];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {}
+
 - (void)setLastUpdated:(NSDate *)lastUpdated {
     [self.updatedLabel setText:@"Last updated 5 minutes ago"];
 }
 
 - (void)setName:(NSString *)name {
     [self.nameLabel setText:name];
+}
+
+- (void)showSpinner {
+    [self setBounds:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0, self.bounds.size.width, self.bounds.size.height)];
 }
 
 @end

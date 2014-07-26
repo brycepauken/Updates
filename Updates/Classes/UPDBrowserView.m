@@ -160,6 +160,19 @@
     [UPDURLProtocol setInstructionAccumulator:self.instructionAccumulator];
     [NSURLProtocol registerClass:[UPDURLProtocol class]];
     
+    for(UIView *view in [self subviews]) {
+        if([view isKindOfClass:[UIImageView class]]) {
+            [view removeFromSuperview];
+            break;
+        }
+    }
+    if(!self.urlBar.superview) {
+        [self addSubview:self.urlBar];
+    }
+    if(!self.bottomBar.superview) {
+        [self addSubview:self.bottomBar];
+    }
+    
     if(self.webView.superview) {
         [self.webView removeFromSuperview];
     }
@@ -167,6 +180,7 @@
     [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
     [self.webView setDelegate:self];
     [self addSubview:self.webView];
+    [self setUserInteractionEnabled:YES];
 }
 
 - (void)browserOverlayTapped {

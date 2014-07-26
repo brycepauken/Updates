@@ -47,7 +47,8 @@
         }
     }
     if(lastInstruction) {
-        UIImage *favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://www.google.com/s2/favicons?domain=" stringByAppendingString:lastInstruction.request.URL.host]]]];
+        /*find a better source than this! could be an error later on!*/
+        UIImage *favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://g.etfv.co/" stringByAppendingString:lastInstruction.request.URL.absoluteString]]]];
         
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         [queue setMaxConcurrentOperationCount:5];

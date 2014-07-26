@@ -14,5 +14,6 @@
 - (void)setFavicon:(UIImage *)favicon;
 - (void)setLastUpdated:(NSDate *)lastUpdated;
 - (void)setName:(NSString *)name;
+- (void)showSpinner;
 
 @end
