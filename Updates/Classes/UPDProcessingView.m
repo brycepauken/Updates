@@ -200,11 +200,11 @@
         [self.confirmationLabel setTextColor:[UIColor UPDOffWhiteColor]];
         [self.scrollView addSubview:self.confirmationLabel];
         NSMutableAttributedString *confirmationLabelText = [[NSMutableAttributedString alloc] initWithString:@"Watching for any change can lead to false updates on some websites\n(like \"Posted Five Minutes Ago\"\nchanging to \"Six\" later on).\n\nAre you sure you want to continue?"];
-        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Futura-Medium" size:16] range:NSMakeRange(0, 73)];
-        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Verdana-Bold" size:16] range:NSMakeRange(73, 25)];
-        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Futura-Medium" size:16] range:NSMakeRange(98, 13)];
-        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Verdana-Bold" size:16] range:NSMakeRange(111, 5)];
-        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Futura-Medium" size:16] range:NSMakeRange(116, 47)];
+        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:16] range:NSMakeRange(0, 73)];
+        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:16] range:NSMakeRange(73, 25)];
+        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:16] range:NSMakeRange(98, 13)];
+        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:16] range:NSMakeRange(111, 5)];
+        [confirmationLabelText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:16] range:NSMakeRange(116, 47)];
         [self.confirmationLabel setAttributedText:confirmationLabelText];
         
         for(int i=0;i<2;i++) {
