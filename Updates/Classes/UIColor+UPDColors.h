@@ -10,6 +10,7 @@
 
 @interface UIColor (UPDColors)
 
++ (UIColor *)colorFromImage:(UIImage *)image;
 + (UIColor *)UPDBrightBlueColor;
 + (UIColor *)UPDLightBlueColor;
 + (UIColor *)UPDLighterBlueColor;

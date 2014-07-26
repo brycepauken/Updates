@@ -8,7 +8,57 @@
 
 #import "UIColor+UPDColors.h"
 
+#include <iostream>
+#include <vector>
+
 @implementation UIColor (UPDColors)
+
++ (UIColor *)colorFromImage:(UIImage *)image {
+    struct Pixel {
+        unsigned char r, g, b, a;
+    };
+    struct PixelCount {
+        Pixel pixel;
+        int count;
+    };
+    struct PixelCountComparison {
+        PixelCountComparison(Pixel compareTo) : compareTo(compareTo) {}
+        bool operator()(PixelCount pc) const {return  pc.pixel.r==compareTo.r&&pc.pixel.g==compareTo.g&&pc.pixel.b==compareTo.b&&pc.pixel.a==compareTo.a;}
+    private:
+        Pixel compareTo;
+    };
+    struct Pixel *pixels = (struct Pixel*) calloc(1, image.size.width * image.size.height * sizeof(struct Pixel));
+    if(pixels != nil) {
+        CGContextRef context = CGBitmapContextCreate((void *)pixels, image.size.width, image.size.height, 8, image.size.width * 4, CGImageGetColorSpace(image.CGImage), kCGImageAlphaPremultipliedLast);
+        if(context != NULL) {
+            std::vector<PixelCount>pixelCounts;
+            CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, image.size.width, image.size.height), image.CGImage);
+            int pixelsRemaining = image.size.width * image.size.height;
+            while(pixelsRemaining > 0) {
+                auto existingPixel = std::find_if(pixelCounts.begin(), pixelCounts.end(), PixelCountComparison(*pixels));
+                if(existingPixel != std::end(pixelCounts)) {
+                    existingPixel->count++;
+                    while(existingPixel != std::begin(pixelCounts) && existingPixel->count>(existingPixel-1)->count) {
+                        iter_swap(existingPixel, existingPixel-1);
+                        existingPixel--;
+                    }
+                }
+                else {
+                    Pixel newPixel = {.r = pixels->r, .b = pixels->b, .g = pixels->g, .a = pixels->a};
+                    PixelCount newPixelCount = {.pixel = newPixel, .count = 1};
+                    pixelCounts.push_back(newPixelCount);
+                }
+                pixels++;
+                pixelsRemaining--;
+            }
+            CGContextRelease(context);
+            Pixel commonPixel = pixelCounts.at(0).pixel;
+            return [UIColor colorWithRed:(commonPixel.r/255.0f) green:(commonPixel.g/255.0f) blue:(commonPixel.b/255.0f) alpha:(commonPixel.a/255.0f)];
+        }
+        free(pixels);
+    }
+    return [UIColor whiteColor];
+}
 
 + (UIColor *)UPDBrightBlueColor {
     static UIColor *brightBlueColor = nil;

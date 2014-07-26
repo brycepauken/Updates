@@ -19,7 +19,6 @@
 #import <libxml/HTMLparser.h>
 
 #include <algorithm>
-#include <iostream>
 #include <numeric>
 #include <vector>
 

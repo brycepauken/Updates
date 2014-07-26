@@ -10,6 +10,7 @@
 
 @interface UPDTableViewCell()
 
+@property (nonatomic, strong) UIView *bar;
 @property (nonatomic, strong) UIView *divider;
 @property (nonatomic, strong) UIImageView *faviconView;
 @property (nonatomic, strong) UILabel *nameLabel;
@@ -22,6 +23,10 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        self.bar = [[UIView alloc] init];
+        [self.bar setBackgroundColor:[UIColor redColor]];
+        [self addSubview:self.bar];
+        
         self.divider = [[UIView alloc] init];
         [self.divider setBackgroundColor:[UIColor UPDLightGreyColor]];
         [self.divider setHidden:YES];
@@ -57,7 +62,8 @@
     [self.faviconView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_FAVICON_SIZE)/2, (self.bounds.size.height-UPD_TABLEVIEW_FAVICON_SIZE)/2, UPD_TABLEVIEW_FAVICON_SIZE, UPD_TABLEVIEW_FAVICON_SIZE)];
     [self.nameLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2-nameLabelSize.height/2-10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, nameLabelSize.height)];
     [self.updatedLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2+10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, updatedLabelSize.height)];
-
+    
+    [self.bar setFrame:CGRectMake(0, 0, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
 }
 
@@ -71,6 +77,7 @@
 
 - (void)setFavicon:(UIImage *)favicon {
     [self.faviconView setImage:favicon];
+    [self.bar setBackgroundColor:[UIColor colorFromImage:favicon]];
 }
 
 - (void)setLastUpdated:(NSDate *)lastUpdated {

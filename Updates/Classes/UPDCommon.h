@@ -29,9 +29,11 @@ extern const int UPD_NAVIGATION_BAR_BUTTON_SIZE;
 extern const int UPD_NAVIGATION_BAR_HEIGHT;
 
 extern const int UPD_TABLEVIEW_CELL_HEIGHT;
+extern const int UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH;
 extern const int UPD_TABLEVIEW_CELL_LEFT_WIDTH;
 extern const int UPD_TABLEVIEW_FAVICON_SIZE;
 extern const int UPD_TABLEVIEW_LABEL_WIDTH;
+extern const int UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT;
 
 extern const int UPD_ALERT_BUTTON_HEIGHT;
 extern const int UPD_ALERT_BUTTON_ICON_SIZE;

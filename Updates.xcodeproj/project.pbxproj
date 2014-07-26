@@ -13,7 +13,7 @@
 		021F937B1980999700F77395 /* UPDDocumentComparator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021F937A1980999700F77395 /* UPDDocumentComparator.mm */; };
 		0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 0220020B1978897B002FF38D /* UPDBrowserTextField.m */; };
 		0220020F1978B646002FF38D /* UPDBrowserBottomBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 0220020E1978B646002FF38D /* UPDBrowserBottomBar.m */; };
-		024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45101975CF8B000896E4 /* UIColor+UPDColors.m */; };
+		024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */; };
 		024C45141975D269000896E4 /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45131975D269000896E4 /* UPDInterface.m */; };
 		024C451B1975E51F000896E4 /* KingfishIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45171975E51F000896E4 /* KingfishIcon.png */; };
 		024C451C1975E51F000896E4 /* KingfishIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45181975E51F000896E4 /* KingfishIcon@2x.png */; };
@@ -89,7 +89,7 @@
 		0220020D1978B646002FF38D /* UPDBrowserBottomBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserBottomBar.h; path = Classes/UPDBrowserBottomBar.h; sourceTree = "<group>"; };
 		0220020E1978B646002FF38D /* UPDBrowserBottomBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserBottomBar.m; path = Classes/UPDBrowserBottomBar.m; sourceTree = "<group>"; };
 		024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+UPDColors.h"; path = "Classes/UIColor+UPDColors.h"; sourceTree = "<group>"; };
-		024C45101975CF8B000896E4 /* UIColor+UPDColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+UPDColors.m"; path = "Classes/UIColor+UPDColors.m"; sourceTree = "<group>"; };
+		024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "UIColor+UPDColors.mm"; path = "Classes/UIColor+UPDColors.mm"; sourceTree = "<group>"; };
 		024C45121975D269000896E4 /* UPDInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInterface.h; path = Classes/UPDInterface.h; sourceTree = "<group>"; };
 		024C45131975D269000896E4 /* UPDInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInterface.m; path = Classes/UPDInterface.m; sourceTree = "<group>"; };
 		024C45171975E51F000896E4 /* KingfishIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = KingfishIcon.png; path = Resources/Images/KingfishIcon.png; sourceTree = "<group>"; };
@@ -286,7 +286,7 @@
 				02934A351983FE3F00FEBB03 /* CoreDataModelUpdateList.h */,
 				02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */,
 				024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */,
-				024C45101975CF8B000896E4 /* UIColor+UPDColors.m */,
+				024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */,
 				02AF8766197B9DC0007D06C5 /* UPDAlertView.h */,
 				02AF8767197B9DC0007D06C5 /* UPDAlertView.m */,
 				02AF8769197BA831007D06C5 /* UPDAlertViewButton.h */,
@@ -457,7 +457,7 @@
 				02AF8757197A3124007D06C5 /* UPDInstructionAccumulator.m in Sources */,
 				02934A3A1983FE4000FEBB03 /* CoreDataModelUpdate.m in Sources */,
 				02934A371983FE3F00FEBB03 /* CoreDataModelUpdateList.m in Sources */,
-				024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */,
+				024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */,
 				02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
 				02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */,
