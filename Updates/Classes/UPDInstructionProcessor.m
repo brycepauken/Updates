@@ -43,6 +43,8 @@
         }
     }
     if(lastInstruction) {
+        UIImage *favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://www.google.com/s2/favicons?domain=" stringByAppendingString:lastInstruction.request.URL.host]]]];
+        
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         [queue setMaxConcurrentOperationCount:5];
         [self clearPersistentData];
@@ -51,7 +53,7 @@
             if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
                 /*the last request works on its own, use it!*/
                 if(self.completionBlock) {
-                    self.completionBlock(workingInstructions);
+                    self.completionBlock(workingInstructions, favicon);
                 }
             }
             else {

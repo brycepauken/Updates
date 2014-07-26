@@ -11,6 +11,16 @@
  instruction during prosessing, before being saved to disk.
  */
 
+/*
+ @property (nonatomic, strong) NSString *baseURL;
+ @property (nonatomic, strong) NSMutableDictionary *get;
+ @property (nonatomic, strong) NSDictionary *headers;
+ @property (nonatomic, strong) NSString *fullURL;
+ @property (nonatomic, strong) NSMutableDictionary *post;
+ @property (nonatomic, strong) NSURLRequest *request;
+ @property (nonatomic, strong) NSString *response;
+ */
+
 #import "UPDInternalInstruction.h"
 
 @implementation UPDInternalInstruction
@@ -23,6 +33,30 @@
         self.post = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    self = [super init];
+    if(self) {
+        self.baseURL = [decoder decodeObjectForKey:@"baseURL"];
+        self.get = [decoder decodeObjectForKey:@"get"];
+        self.headers = [decoder decodeObjectForKey:@"headers"];
+        self.fullURL = [decoder decodeObjectForKey:@"fullURL"];
+        self.post = [decoder decodeObjectForKey:@"post"];
+        self.request = [decoder decodeObjectForKey:@"request"];
+        self.response = [decoder decodeObjectForKey:@"response"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeObject:self.baseURL forKey:@"baseURL"];
+    [encoder encodeObject:self.get forKey:@"get"];
+    [encoder encodeObject:self.headers forKey:@"headers"];
+    [encoder encodeObject:self.fullURL forKey:@"fullURL"];
+    [encoder encodeObject:self.post forKey:@"post"];
+    [encoder encodeObject:self.request forKey:@"request"];
+    [encoder encodeObject:self.response forKey:@"response"];
 }
 
 @end

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface UPDInternalInstruction : NSObject
+@interface UPDInternalInstruction : NSObject <NSCoding>
 
 @property (nonatomic, strong) NSString *baseURL;
 @property (nonatomic, strong) NSMutableDictionary *get;

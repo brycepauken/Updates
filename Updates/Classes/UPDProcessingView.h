@@ -10,7 +10,7 @@
 
 @interface UPDProcessingView : UIView <UITextFieldDelegate>
 
-@property (nonatomic, copy) void(^completionBlock)(NSArray *instructions);
+@property (nonatomic, copy) void(^completionBlock)(NSString *name, NSArray *instructions, UIImage *favicon);
 
 - (void)beginProcessingAnimation;
 - (void)processInstructions:(NSArray *)instructions;

@@ -35,6 +35,8 @@
 		028D7EB4197DB62B00BE0643 /* UPDBrowserConfirmButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 028D7EB3197DB62B00BE0643 /* UPDBrowserConfirmButton.m */; };
 		02934A3119830E3100FEBB03 /* UPDButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3019830E3100FEBB03 /* UPDButton.m */; };
 		02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */; };
+		02934A371983FE3F00FEBB03 /* CoreDataModelUpdateList.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */; };
+		02934A3A1983FE4000FEBB03 /* CoreDataModelUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A391983FE4000FEBB03 /* CoreDataModelUpdate.m */; };
 		02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */; };
 		02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */; };
 		02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */; };
@@ -114,6 +116,10 @@
 		02934A3019830E3100FEBB03 /* UPDButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDButton.m; path = Classes/UPDButton.m; sourceTree = "<group>"; };
 		02934A3219832ACD00FEBB03 /* UPDProcessingTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDProcessingTextField.h; path = Classes/UPDProcessingTextField.h; sourceTree = "<group>"; };
 		02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDProcessingTextField.m; path = Classes/UPDProcessingTextField.m; sourceTree = "<group>"; };
+		02934A351983FE3F00FEBB03 /* CoreDataModelUpdateList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreDataModelUpdateList.h; path = Classes/CoreDataModelUpdateList.h; sourceTree = "<group>"; };
+		02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreDataModelUpdateList.m; path = Classes/CoreDataModelUpdateList.m; sourceTree = "<group>"; };
+		02934A381983FE4000FEBB03 /* CoreDataModelUpdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreDataModelUpdate.h; path = Classes/CoreDataModelUpdate.h; sourceTree = "<group>"; };
+		02934A391983FE4000FEBB03 /* CoreDataModelUpdate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreDataModelUpdate.m; path = Classes/CoreDataModelUpdate.m; sourceTree = "<group>"; };
 		02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserURLBar.h; path = Classes/UPDBrowserURLBar.h; sourceTree = "<group>"; };
 		02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserURLBar.m; path = Classes/UPDBrowserURLBar.m; sourceTree = "<group>"; };
 		02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserView.h; path = Classes/UPDBrowserView.h; sourceTree = "<group>"; };
@@ -266,6 +272,10 @@
 		02A73D191975C269000A7C48 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				02934A381983FE4000FEBB03 /* CoreDataModelUpdate.h */,
+				02934A391983FE4000FEBB03 /* CoreDataModelUpdate.m */,
+				02934A351983FE3F00FEBB03 /* CoreDataModelUpdateList.h */,
+				02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */,
 				024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */,
 				024C45101975CF8B000896E4 /* UIColor+UPDColors.m */,
 				02AF8766197B9DC0007D06C5 /* UPDAlertView.h */,
@@ -429,6 +439,8 @@
 				0253CD21197F2D1E0078E90E /* UPDProcessingView.m in Sources */,
 				02A733F3197724A6002A86F3 /* UPDPreBrowserTextField.m in Sources */,
 				02AF8757197A3124007D06C5 /* UPDInstructionAccumulator.m in Sources */,
+				02934A3A1983FE4000FEBB03 /* CoreDataModelUpdate.m in Sources */,
+				02934A371983FE3F00FEBB03 /* CoreDataModelUpdateList.m in Sources */,
 				024C45111975CF8B000896E4 /* UIColor+UPDColors.m in Sources */,
 				02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,

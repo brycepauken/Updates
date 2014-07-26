@@ -14,7 +14,10 @@
 
 #import "UPDInterface.h"
 
+#import "CoreDataModelUpdate.h"
+#import "CoreDataModelUpdateList.h"
 #import "QuartzCore/CALayer.h"
+#import "UPDAppDelegate.h"
 #import "UPDBrowserView.h"
 #import "UPDNavigationBar.h"
 #import "UPDPreBrowserView.h"
@@ -118,7 +121,9 @@
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
-        [self.processingView setCompletionBlock:^(NSArray *instructions){
+        [self.processingView setCompletionBlock:^(NSString *name, NSArray *instructions, UIImage *favicon) {
+            [weakSelf saveUpdateWithName:name instructions:instructions favicon:favicon];
+            
             /*move browser view over for a more seamless animation*/
             [weakSelf.processingView setTag:1];
             [weakSelf.processingView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
@@ -142,6 +147,10 @@
     return self;
 }
 
+- (UPDAppDelegate *)appDelegate {
+    return [[UIApplication sharedApplication] delegate];
+}
+
 - (void)layoutSubviews {
     [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width*3, 0)];
     [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*self.scrollView.tag, 0)];
@@ -149,6 +158,32 @@
     [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.preProcessingView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+}
+
+- (void)saveUpdateWithName:(NSString *)name instructions:(NSArray *)instructions favicon:(UIImage *)favicon {
+    NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
+    
+    /*get existing updates list*/
+    NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+    NSError *updateListFetchRequestError;
+    CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+    if(!updateList) {
+        updateList = [NSEntityDescription insertNewObjectForEntityForName:@"UpdateList" inManagedObjectContext:context];
+        [updateList setUpdates:[[NSOrderedSet alloc] init]];
+    }
+    
+    CoreDataModelUpdate *update = [NSEntityDescription insertNewObjectForEntityForName:@"Update" inManagedObjectContext:context];
+    [update setName:name];
+    [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
+    [update setFavicon:UIImagePNGRepresentation(favicon)];
+    [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
+    [update setParent:updateList];
+    
+    NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
+    [updates addObject:update];
+    
+    NSError *saveError;
+    [context save:&saveError];
 }
 
 @end
