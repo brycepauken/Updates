@@ -117,6 +117,24 @@
         
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
+        [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
+        [self.processingView setCompletionBlock:^(NSArray *instructions){
+            /*move browser view over for a more seamless animation*/
+            [weakSelf.processingView setTag:1];
+            [weakSelf.processingView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
+            [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
+            
+            [weakSelf.scrollView setTag:0];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.scrollView setContentOffset:CGPointZero];
+            } completion:^(BOOL finsished) {
+                [weakSelf.processingView setTag:2];
+                [weakSelf.processingView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
+                
+                [weakSelf.preProcessingView setHidden:YES];
+                [weakSelf.processingView setHidden:YES];
+            }];
+        }];
         [self.scrollView addSubview:self.processingView];
         
         [self setNeedsDisplay];
@@ -130,7 +148,7 @@
     [self.preBrowserView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.preProcessingView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
-    [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+    [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
 @end

@@ -50,7 +50,9 @@
         NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
                 /*the last request works on its own, use it!*/
-                
+                if(self.completionBlock) {
+                    self.completionBlock(workingInstructions);
+                }
             }
             else {
                 /*step 2*/

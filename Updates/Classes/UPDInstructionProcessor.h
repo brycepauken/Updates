@@ -10,6 +10,7 @@
 
 @interface UPDInstructionProcessor : NSObject
 
+@property (nonatomic, copy) void(^completionBlock)(NSArray *instructions);
 @property (nonatomic, strong) NSArray *instructions;
 
 - (void)beginProcessing;

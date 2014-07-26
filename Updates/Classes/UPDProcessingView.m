@@ -21,6 +21,7 @@
 
 @interface UPDProcessingView()
 
+@property (nonatomic) BOOL canComplete;
 @property (nonatomic, strong) UIImageView *checkmark;
 @property (nonatomic, strong) UILabel *checkTypeLabel;
 @property (nonatomic, strong) UPDButton *checkTypeButtonAll;
@@ -30,6 +31,7 @@
 @property (nonatomic, strong) UPDButton *confirmationButtonNo;
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
+@property (nonatomic, strong) NSArray *instructions;
 @property (nonatomic, strong) UPDButton *nameButton;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UPDProcessingTextField *nameTextField;
@@ -51,6 +53,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self setBackgroundColor:[UIColor UPDLightBlueColor]];
+        self.canComplete = NO;
         
         self.outlineQuarter = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
         [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
@@ -299,6 +302,11 @@
                 [self.checkmark setFrame:newCheckFrame];
                 [self.outline setFrame:newCheckFrame];
                 [self.outlineQuarter setFrame:newCheckFrame];
+            } completion:^(BOOL finished) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*4*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                    self.canComplete = YES;
+                    [self tryCompletion];
+                });
             }];
         }];
     }
@@ -416,6 +424,11 @@
 - (void)processInstructions:(NSArray *)instructions {
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
     [self.instructionProcessor setInstructions:instructions];
+    __unsafe_unretained UPDProcessingView *weakSelf = self;
+    [self.instructionProcessor setCompletionBlock:^(NSArray *instructions){
+        weakSelf.instructions = instructions;
+        [weakSelf tryCompletion];
+    }];
     [self.instructionProcessor beginProcessing];
 }
 
@@ -464,6 +477,45 @@
     [textField resignFirstResponder];
     [self scrollToPage:2];
     return YES;
+}
+
+/*
+ This method is run after the instructions are fully processed
+ and all questions have been asked of the user, continuing on if
+ both conditions have been met.
+ */
+- (void)tryCompletion {
+    if(self.instructions && self.canComplete) {
+        [self.outlineQuarter.layer removeAnimationForKey:@"rotationAnimation"];
+        [self.outline setAlpha:1];
+        [self.outlineQuarter setAlpha:0];
+        
+        CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+        
+        CATransform3D scale1 = CATransform3DMakeScale(1.0, 1.0, 1);
+        CATransform3D scale2 = CATransform3DMakeScale(1.1, 1.1, 1);
+        CATransform3D scale3 = CATransform3DMakeScale(0.9, 0.9, 1);
+        CATransform3D scale4 = CATransform3DMakeScale(1.0, 1.0, 1);
+        
+        NSArray *frameValues = [NSArray arrayWithObjects:[NSValue valueWithCATransform3D:scale1],[NSValue valueWithCATransform3D:scale2],[NSValue valueWithCATransform3D:scale3],[NSValue valueWithCATransform3D:scale4], nil];
+        [animation setValues:frameValues];
+        
+        NSArray *frameTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0],[NSNumber numberWithFloat:0.6],[NSNumber numberWithFloat:0.9],[NSNumber numberWithFloat:1.0], nil];
+        [animation setKeyTimes:frameTimes];
+        
+        animation.fillMode = kCAFillModeForwards;
+        animation.removedOnCompletion = YES;
+        animation.duration = UPD_TRANSITION_DURATION;
+        
+        [self.checkmark.layer addAnimation:animation forKey:@"popup"];
+        [self.outline.layer addAnimation:animation forKey:@"popupCopy"];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*4*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            if(self.completionBlock) {
+                self.completionBlock(self.instructions);
+            }
+        });
+    }
 }
 
 @end
