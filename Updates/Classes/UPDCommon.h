@@ -28,6 +28,11 @@ extern const int UPD_NAVIGATION_BAR_BUTTON_PADDING;
 extern const int UPD_NAVIGATION_BAR_BUTTON_SIZE;
 extern const int UPD_NAVIGATION_BAR_HEIGHT;
 
+extern const int UPD_TABLEVIEW_CELL_HEIGHT;
+extern const int UPD_TABLEVIEW_CELL_LEFT_WIDTH;
+extern const int UPD_TABLEVIEW_FAVICON_SIZE;
+extern const int UPD_TABLEVIEW_LABEL_WIDTH;
+
 extern const int UPD_ALERT_BUTTON_HEIGHT;
 extern const int UPD_ALERT_BUTTON_ICON_SIZE;
 extern const int UPD_ALERT_PADDING;
@@ -44,7 +49,6 @@ extern const int UPD_PROCESSING_SCROLLVIEW_SIZE;
 extern const int UPD_PROCESSING_TEXTFIELD_HEIGHT;
 extern const int UPD_SEARCH_ENGINE_ICON_PADDING;
 extern const int UPD_SEARCH_ENGINE_ICON_SIZE;
-extern const int UPD_START_LABEL_WIDTH;
 extern const int UPD_URL_BAR_HEIGHT;
 extern const int UPD_URL_BAR_PADDING;
 extern const CGFloat UPD_BROWSER_IMAGE_OPACITY;

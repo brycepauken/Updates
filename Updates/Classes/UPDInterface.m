@@ -123,6 +123,7 @@
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
         [self.processingView setCompletionBlock:^(NSString *name, NSArray *instructions, UIImage *favicon) {
             [weakSelf saveUpdateWithName:name instructions:instructions favicon:favicon];
+            [weakSelf.tableView reloadData];
             
             /*move browser view over for a more seamless animation*/
             [weakSelf.processingView setTag:1];
