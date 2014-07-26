@@ -10,6 +10,8 @@
 
 @interface UPDButton : UIButton
 
+- (void)setAttributedTitle:(NSAttributedString *)title;
+- (void)setFontSize:(CGFloat)size;
 - (void)setTitle:(NSString *)title;
 
 @end

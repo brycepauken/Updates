@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UPDProcessingView : UIView
+@interface UPDProcessingView : UIView <UITextFieldDelegate>
 
 - (void)beginProcessingAnimation;
 - (void)processInstructions:(NSArray *)instructions;

@@ -13,15 +13,11 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if(self) {
-        [self setAutocapitalizationType:UITextAutocapitalizationTypeNone];
-        [self setAutocorrectionType:UITextAutocorrectionTypeNo];
         [self setBackgroundColor:[UIColor UPDOffWhiteColor]];
         [self setClearButtonMode:UITextFieldViewModeWhileEditing];
         [self setClipsToBounds:YES];
         [self setFont:[UIFont systemFontOfSize:18]];
-        [self setKeyboardType:UIKeyboardTypeURL];
         [self setPlaceholder:@"New Update Name"];
-        [self setReturnKeyType:UIReturnKeyGo];
         [self setTextAlignment:NSTextAlignmentNatural];
         [self setTextColor:[UIColor darkGrayColor]];
     }

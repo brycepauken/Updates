@@ -87,4 +87,15 @@
     return offWhiteColor;
 }
 
++ (UIColor *)UPDOffWhiteColorTransparent {
+    static UIColor *UPDOffWhiteColorTransparent = nil;
+    static dispatch_once_t dispatchOnceToken;
+    
+    dispatch_once(&dispatchOnceToken, ^{
+        UPDOffWhiteColorTransparent = [UIColor colorWithWhite:0.98 alpha:0.5];
+    });
+    
+    return UPDOffWhiteColorTransparent;
+}
+
 @end

@@ -26,6 +26,7 @@
 
 @property (nonatomic, strong) UIView *interfaceOverlay;
 @property (nonatomic, strong) UPDAlertViewButton *noButton;
+@property (nonatomic, strong) UPDAlertViewButton *okButton;
 @property (nonatomic, strong) UILabel *messageLabel;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UPDAlertViewButton *yesButton;
@@ -74,6 +75,11 @@
         [self.yesButton setImage:[UIImage imageNamed:@"Accept"]];
         [self.yesButton setTitle:@"Yes"];
         [self addSubview:self.yesButton];
+        
+        self.okButton = [[UPDAlertViewButton alloc] init];
+        [self.okButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self.okButton setTitle:@"Got it"];
+        [self addSubview:self.okButton];
     }
     return self;
 }
@@ -84,6 +90,9 @@
     }
     else if(button==self.yesButton&&self.yesButtonBlock) {
         self.yesButtonBlock();
+    }
+    else if(button==self.okButton&&self.okButtonBlock) {
+        self.okButtonBlock();
     }
 }
 
@@ -101,13 +110,19 @@
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
-    return CGRectContainsPoint(self.bounds, point) || CGRectContainsPoint(self.noButton.frame, point) || CGRectContainsPoint(self.yesButton.frame, point);
+    return CGRectContainsPoint(self.bounds, point) || (!self.noButton.hidden && CGRectContainsPoint(self.noButton.frame, point)) || (!self.yesButton.hidden && CGRectContainsPoint(self.yesButton.frame, point)) || (!self.okButton.hidden && CGRectContainsPoint(self.okButton.frame, point));
 }
 
 - (void)layoutSubviews {
     CGFloat buttonWidth = (self.bounds.size.width-UPD_ALERT_PADDING)/2.0f;
     [self.noButton setFrame:CGRectMake(0, self.bounds.size.height+UPD_ALERT_PADDING, buttonWidth, UPD_ALERT_BUTTON_HEIGHT)];
     [self.yesButton setFrame:CGRectMake(buttonWidth+UPD_ALERT_PADDING, self.bounds.size.height+UPD_ALERT_PADDING, buttonWidth, UPD_ALERT_BUTTON_HEIGHT)];
+    [self.okButton setFrame:CGRectMake(0, self.bounds.size.height+UPD_ALERT_PADDING, self.bounds.size.width, UPD_ALERT_BUTTON_HEIGHT)];
+}
+
+- (void)setFontSize:(CGFloat)fontSize {
+    [self.messageLabel setFont:[UIFont systemFontOfSize:fontSize]];
+    [self.titleLabel setFont:[UIFont fontWithName:@"Futura-Medium" size:fontSize+2]];
 }
 
 - (void)setTitle:(NSString *)title {
@@ -116,6 +131,10 @@
 
 - (void)show {
     UIView *interface = ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.interface;
+    
+    [self.yesButton setHidden:!self.yesButtonBlock||!self.noButtonBlock];
+    [self.noButton setHidden:!self.yesButtonBlock||!self.noButtonBlock];
+    [self.okButton setHidden:!self.okButtonBlock];
     
     [self.interfaceOverlay setFrame:interface.bounds];
     [interface addSubview:self.interfaceOverlay];

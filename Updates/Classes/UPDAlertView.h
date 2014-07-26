@@ -12,10 +12,12 @@
 
 @property (nonatomic, strong) NSString *message;
 @property (nonatomic, copy) void (^noButtonBlock)();
+@property (nonatomic, copy) void (^okButtonBlock)();
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, copy) void (^yesButtonBlock)();
 
 - (void)dismiss;
+- (void)setFontSize:(CGFloat)fontSize;
 - (void)show;
 
 @end

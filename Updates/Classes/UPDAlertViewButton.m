@@ -42,7 +42,7 @@
     titleLabelSize.height = ceilf(titleLabelSize.height);
     titleLabelSize.width = ceilf(titleLabelSize.width);
     
-    CGFloat totalContentWidth = titleLabelSize.width+UPD_ALERT_PADDING+UPD_ALERT_BUTTON_ICON_SIZE;
+    CGFloat totalContentWidth = self.iconImageView.image?titleLabelSize.width+UPD_ALERT_PADDING+UPD_ALERT_BUTTON_ICON_SIZE:titleLabelSize.width;
     [self.label setFrame:CGRectMake((self.bounds.size.width-totalContentWidth)/2, (self.bounds.size.height-titleLabelSize.height)/2, titleLabelSize.width, titleLabelSize.height)];
     [self.iconImageView setFrame:CGRectMake(self.label.frame.origin.x+self.label.frame.size.width+UPD_ALERT_PADDING, (self.bounds.size.height-UPD_ALERT_BUTTON_ICON_SIZE)/2, UPD_ALERT_BUTTON_ICON_SIZE, UPD_ALERT_BUTTON_ICON_SIZE)];
 }

@@ -17,5 +17,6 @@
 + (UIColor *)UPDLightGreyColor;
 + (UIColor *)UPDOffBlackColor;
 + (UIColor *)UPDOffWhiteColor;
++ (UIColor *)UPDOffWhiteColorTransparent;
 
 @end

@@ -28,7 +28,8 @@
         [self.layer setCornerRadius:2];
         [self.layer setMasksToBounds:YES];
         
-        self.label = [[UILabel alloc] init];
+        self.label = [[UILabel alloc] initWithFrame:self.bounds];
+        [self.label setAutoresizingMask:UIViewAutoresizingFlexibleSize];
         [self.label setFont:[UIFont fontWithName:@"Futura-Medium" size:20]];
         [self.label setTextAlignment:NSTextAlignmentCenter];
         [self.label setTextColor:[UIColor UPDOffWhiteColor]];
@@ -37,23 +38,24 @@
     return self;
 }
 
-- (void)layoutSubviews {
-    CGSize titleLabelSize = [self.label.text boundingRectWithSize:CGSizeMake(self.bounds.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: self.label.font} context:nil].size;
-    titleLabelSize.height = ceilf(titleLabelSize.height);
-    titleLabelSize.width = ceilf(titleLabelSize.width);
-    
-    [self.label setFrame:CGRectMake((self.bounds.size.width-titleLabelSize.width)/2, (self.bounds.size.height-titleLabelSize.height)/2, titleLabelSize.width, titleLabelSize.height)];
-    
+- (void)setAttributedTitle:(NSAttributedString *)title {
+    [self.label setText:nil];
+    [self.label setAttributedText:title];
+    [self setNeedsLayout];
 }
 
 - (void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
-    [self setAlpha:enabled?1:0.5];
+    [self.label setAlpha:enabled?1:0.5];
+    [self.layer setBorderColor:enabled?[UIColor UPDOffWhiteColor].CGColor:[UIColor UPDOffWhiteColorTransparent].CGColor];
+}
+
+- (void)setFontSize:(CGFloat)size {
+    [self.label setFont:[UIFont fontWithName:@"Futura-Medium" size:size]];
 }
 
 - (void)setHighlighted:(BOOL)highlighted {
     [super setHighlighted:highlighted];
-    
     [self setBackgroundColor:highlighted?self.highlightedBackgroundColor:self.normalBackgroundColor];
 }
 
@@ -72,6 +74,7 @@
 }
 
 - (void)setTitle:(NSString *)title {
+    [self.label setAttributedText:nil];
     [self.label setText:[title uppercaseString]];
     [self setNeedsLayout];
 }

@@ -19,7 +19,7 @@
         [self setClearButtonMode:UITextFieldViewModeWhileEditing];
         [self setClipsToBounds:YES];
         [self setFont:[UIFont systemFontOfSize:18]];
-        [self setKeyboardType:UIKeyboardTypeURL];
+        [self setKeyboardType:UIKeyboardTypeWebSearch];
         [self setPlaceholder:@"Enter Address"];
         [self setReturnKeyType:UIReturnKeyGo];
         [self setTextAlignment:NSTextAlignmentNatural];
