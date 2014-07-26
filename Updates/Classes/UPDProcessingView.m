@@ -29,10 +29,12 @@
 @property (nonatomic, strong) UILabel *confirmationLabel;
 @property (nonatomic, strong) UPDButton *confirmationButtonYes;
 @property (nonatomic, strong) UPDButton *confirmationButtonNo;
+@property (nonatomic, strong) NSDictionary *differenceOptions;
 @property (nonatomic, strong) UIImage *favicon;
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
 @property (nonatomic, strong) NSArray *instructions;
+@property (nonatomic, strong) NSString *lastResponse;
 @property (nonatomic, strong) UPDButton *nameButton;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UPDProcessingTextField *nameTextField;
@@ -283,6 +285,8 @@
         [self scrollToPage:3];
     }
     else if(button==self.confirmationButtonYes) {
+        self.differenceOptions = @{@"DiffernceType":@"Any"};
+        
         [self.checkmark setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outline setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
@@ -420,9 +424,10 @@
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
     [self.instructionProcessor setInstructions:instructions];
     __unsafe_unretained UPDProcessingView *weakSelf = self;
-    [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon){
+    [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastReponse){
         weakSelf.instructions = instructions;
         weakSelf.favicon = favicon;
+        weakSelf.lastResponse = lastReponse;
         [weakSelf tryCompletion];
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
@@ -510,7 +515,7 @@
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*4*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             if(self.completionBlock) {
-                self.completionBlock(self.nameTextField.text, self.instructions, self.favicon);
+                self.completionBlock(self.nameTextField.text, self.instructions, self.favicon, self.lastResponse, self.differenceOptions);
             }
         });
     }

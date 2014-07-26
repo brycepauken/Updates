@@ -121,8 +121,8 @@
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
-        [self.processingView setCompletionBlock:^(NSString *name, NSArray *instructions, UIImage *favicon) {
-            [weakSelf saveUpdateWithName:name instructions:instructions favicon:favicon];
+        [self.processingView setCompletionBlock:^(NSString *name, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions) {
+            [weakSelf saveUpdateWithName:name instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions];
             [weakSelf.tableView reloadData];
             
             /*move browser view over for a more seamless animation*/
@@ -161,7 +161,7 @@
     [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
-- (void)saveUpdateWithName:(NSString *)name instructions:(NSArray *)instructions favicon:(UIImage *)favicon {
+- (void)saveUpdateWithName:(NSString *)name instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions {
     NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
     
     /*get existing updates list*/
@@ -175,8 +175,10 @@
     
     CoreDataModelUpdate *update = [NSEntityDescription insertNewObjectForEntityForName:@"Update" inManagedObjectContext:context];
     [update setName:name];
+    [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions]];
     [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
     [update setFavicon:UIImagePNGRepresentation(favicon)];
+    [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
     [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
     [update setParent:updateList];
     

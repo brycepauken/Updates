@@ -31,6 +31,10 @@
 
 @implementation UPDInstructionProcessor
 
+/*
+ Should call completionBlock with an array of UPDInternalInstructions,
+ which can be used to get to the given web page, along with a favicon.
+ */
 - (void)beginProcessing {
     NSMutableArray *workingInstructions = [self.instructions mutableCopy];
     
@@ -51,9 +55,9 @@
         NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:queue];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
-                /*the last request works on its own, use it!*/
+                /*the final request works on its own, use it!*/
                 if(self.completionBlock) {
-                    self.completionBlock(workingInstructions, favicon);
+                    self.completionBlock([NSArray arrayWithObject:lastInstruction], favicon, lastInstruction.response);
                 }
             }
             else {
@@ -64,7 +68,7 @@
         [task resume];
     }
     else {
-        /*no valid instruction found...*/
+        /*no valid instruction found... error*/
     }
 }
 

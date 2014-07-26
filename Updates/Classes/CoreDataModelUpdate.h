@@ -13,10 +13,12 @@
 
 @interface CoreDataModelUpdate : NSManagedObject
 
-@property (nonatomic, retain) NSString * name;
-@property (nonatomic, retain) NSData * favicon;
-@property (nonatomic, retain) NSData * instructions;
-@property (nonatomic, retain) NSDate * lastUpdated;
+@property (nonatomic, retain) NSString *name;
+@property (nonatomic, retain) NSData *differenceOptions;
+@property (nonatomic, retain) NSData *favicon;
+@property (nonatomic, retain) NSData *instructions;
+@property (nonatomic, retain) NSData *lastResponse;
+@property (nonatomic, retain) NSDate *lastUpdated;
 @property (nonatomic, retain) CoreDataModelUpdateList *parent;
 
 @end

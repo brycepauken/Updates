@@ -75,9 +75,11 @@
         for(CoreDataModelUpdate *update in updateList.updates) {
             UPDInternalUpdate *newUpdate = [[UPDInternalUpdate alloc] init];
             newUpdate.name = update.name;
+            newUpdate.differenceOptions = [NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions];
             newUpdate.favicon = [[UIImage alloc] initWithData:update.favicon];
+            newUpdate.lastReponse = update.lastResponse;
             newUpdate.lastUpdated = update.lastUpdated;
-            newUpdate.instructions = [NSKeyedUnarchiver unarchiveObjectWithData:update.instructions];
+            newUpdate.instructions = update.instructions;
             newUpdate.objectID = update.objectID;
             [self.updates insertObject:newUpdate atIndex:0];
         }

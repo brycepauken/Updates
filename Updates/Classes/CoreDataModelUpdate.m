@@ -9,12 +9,13 @@
 #import "CoreDataModelUpdate.h"
 #import "CoreDataModelUpdateList.h"
 
-
 @implementation CoreDataModelUpdate
 
 @dynamic name;
+@dynamic differenceOptions;
 @dynamic favicon;
 @dynamic instructions;
+@dynamic lastResponse;
 @dynamic lastUpdated;
 @dynamic parent;
 

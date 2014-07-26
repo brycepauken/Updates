@@ -39,6 +39,7 @@
 		02934A3A1983FE4000FEBB03 /* CoreDataModelUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A391983FE4000FEBB03 /* CoreDataModelUpdate.m */; };
 		02934A3D19840C6A00FEBB03 /* UPDInternalUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3C19840C6A00FEBB03 /* UPDInternalUpdate.m */; };
 		02934A4019840EBB00FEBB03 /* UPDTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3F19840EBB00FEBB03 /* UPDTableViewCell.m */; };
+		02934A4319842F5900FEBB03 /* UPDInstructionRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A4219842F5900FEBB03 /* UPDInstructionRunner.m */; };
 		02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */; };
 		02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */; };
 		02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */; };
@@ -126,6 +127,8 @@
 		02934A3C19840C6A00FEBB03 /* UPDInternalUpdate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInternalUpdate.m; path = Classes/UPDInternalUpdate.m; sourceTree = "<group>"; };
 		02934A3E19840EBB00FEBB03 /* UPDTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDTableViewCell.h; path = Classes/UPDTableViewCell.h; sourceTree = "<group>"; };
 		02934A3F19840EBB00FEBB03 /* UPDTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTableViewCell.m; path = Classes/UPDTableViewCell.m; sourceTree = "<group>"; };
+		02934A4119842F5900FEBB03 /* UPDInstructionRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInstructionRunner.h; path = Classes/UPDInstructionRunner.h; sourceTree = "<group>"; };
+		02934A4219842F5900FEBB03 /* UPDInstructionRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInstructionRunner.m; path = Classes/UPDInstructionRunner.m; sourceTree = "<group>"; };
 		02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserURLBar.h; path = Classes/UPDBrowserURLBar.h; sourceTree = "<group>"; };
 		02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserURLBar.m; path = Classes/UPDBrowserURLBar.m; sourceTree = "<group>"; };
 		02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserView.h; path = Classes/UPDBrowserView.h; sourceTree = "<group>"; };
@@ -316,6 +319,8 @@
 				02AF8756197A3124007D06C5 /* UPDInstructionAccumulator.m */,
 				0253CD22197F90420078E90E /* UPDInstructionProcessor.h */,
 				0253CD23197F90420078E90E /* UPDInstructionProcessor.m */,
+				02934A4119842F5900FEBB03 /* UPDInstructionRunner.h */,
+				02934A4219842F5900FEBB03 /* UPDInstructionRunner.m */,
 				024C45121975D269000896E4 /* UPDInterface.h */,
 				024C45131975D269000896E4 /* UPDInterface.m */,
 				02AF8758197B7488007D06C5 /* UPDInternalInstruction.h */,
@@ -474,6 +479,7 @@
 				021F937B1980999700F77395 /* UPDDocumentComparator.mm in Sources */,
 				02A73D151975C24B000A7C48 /* UPDViewController.m in Sources */,
 				0220020F1978B646002FF38D /* UPDBrowserBottomBar.m in Sources */,
+				02934A4319842F5900FEBB03 /* UPDInstructionRunner.m in Sources */,
 				02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */,
 				0213C23A1974FE0C006BC204 /* main.m in Sources */,
 				02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */,
