@@ -14,7 +14,14 @@
 @property (nonatomic, strong) UIView *divider;
 @property (nonatomic, strong) UIImageView *faviconView;
 @property (nonatomic, strong) UILabel *nameLabel;
+@property (nonatomic, strong) UIActivityIndicatorView *spinner;
 @property (nonatomic, strong) UILabel *updatedLabel;
+
+@property (nonatomic, copy) void((^contactBlock)());
+@property (nonatomic, strong) CADisplayLink *displayLink;
+@property (nonatomic) CGFloat startVelocity;
+@property (nonatomic) CGFloat startX;
+@property (nonatomic) CFTimeInterval startTimestamp;
 
 @end
 
@@ -32,12 +39,11 @@
         
         self.bar = [[UIView alloc] init];
         [self.bar setBackgroundColor:[UIColor whiteColor]];
-        /*[self.bar.layer setMasksToBounds:NO];
-        [self.bar.layer setShadowColor:[UIColor UPDOffBlackColor].CGColor];
-        [self.bar.layer setShadowOpacity:0.8];
-        [self.bar.layer setShadowRadius:1];
-        [self.bar.layer setShadowOffset:CGSizeZero];*/
         [self addSubview:self.bar];
+        
+        self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [self.spinner setHidesWhenStopped:YES];
+        [self addSubview:self.spinner];
         
         self.faviconView = [[UIImageView alloc] init];
         [self addSubview:self.faviconView];
@@ -55,6 +61,32 @@
     return self;
 }
 
+- (void)hideSpinnerWithContactBlock:(void (^)())contactBlock {
+    self.contactBlock = contactBlock;
+    self.startTimestamp = 0;
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(hideSpinnerAnimation)];
+    [self.displayLink setFrameInterval:1];
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+}
+
+- (void)hideSpinnerAnimation {
+    if(!self.startTimestamp) {
+        self.startTimestamp = self.displayLink.timestamp;
+    }
+    CFTimeInterval elapsedTime = (self.displayLink.timestamp - self.startTimestamp);
+    CGFloat mappedTime = -2.5*(elapsedTime*2)*(elapsedTime*2)+3.5*(elapsedTime*2);
+    [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH*mappedTime, 0, self.bounds.size.width, self.bounds.size.height)];
+    
+    if(elapsedTime>=0.2) {
+        [self.displayLink invalidate];
+        [self setBounds:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
+        
+        if(self.contactBlock) {
+            self.contactBlock();
+        }
+    }
+}
+
 - (void)layoutSubviews {
     int rightPadding = 10;
     
@@ -70,6 +102,7 @@
     [self.nameLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2-nameLabelSize.height/2-10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, nameLabelSize.height)];
     [self.updatedLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2+10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, updatedLabelSize.height)];
     
+    [self.spinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.bar setFrame:CGRectMake(0, -10, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height+20)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
 }
@@ -98,7 +131,33 @@
 }
 
 - (void)showSpinner {
-    [self setBounds:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0, self.bounds.size.width, self.bounds.size.height)];
+    [self.spinner startAnimating];
+    
+    self.startTimestamp = 0;
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(showSpinnerAnimation)];
+    [self.displayLink setFrameInterval:1];
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+}
+
+- (void)showSpinnerAnimation {
+    if(!self.startTimestamp) {
+        self.startTimestamp = self.displayLink.timestamp;
+    }
+    CFTimeInterval elapsedTime = (self.displayLink.timestamp - self.startTimestamp);
+    CGFloat mappedTime;
+    if(elapsedTime<=0.5) {
+        mappedTime = -2.5*(elapsedTime*2)*(elapsedTime*2)+3.5*(elapsedTime*2);
+    }
+    else {
+        mappedTime = -1.6*(elapsedTime*2)*(elapsedTime*2)+4*(elapsedTime*2)-1.4;
+    }
+    [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH*mappedTime, 0, self.bounds.size.width, self.bounds.size.height)];
+
+    if(elapsedTime>=0.75) {
+        [self.displayLink invalidate];
+        
+        [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0, self.bounds.size.width, self.bounds.size.height)];
+    }
 }
 
 @end

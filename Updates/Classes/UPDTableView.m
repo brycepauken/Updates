@@ -80,7 +80,35 @@
 }
 
 - (void)beginRefresh {
-    
+    UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+    [cell showSpinner];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [cell hideSpinnerWithContactBlock:^{
+            UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
+            [cell showSpinner];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                [cell hideSpinnerWithContactBlock:^{
+                    UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:0]];
+                    [cell showSpinner];
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                        [cell hideSpinnerWithContactBlock:^{
+                            UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:3 inSection:0]];
+                            [cell showSpinner];
+                            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                                [cell hideSpinnerWithContactBlock:^{
+                                    UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:4 inSection:0]];
+                                    [cell showSpinner];
+                                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                                        [cell hideSpinnerWithContactBlock:nil];
+                                    });
+                                }];
+                            });
+                        }];
+                    });
+                }];
+            });
+        }];
+    });
 }
 
 - (void)endRefresh {

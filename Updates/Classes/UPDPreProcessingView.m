@@ -33,7 +33,6 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
 @property (nonatomic) CGFloat foldedViewVerticalAnimationStartVelocity;
 @property (nonatomic) CGFloat foldedViewVerticalAnimationStartY;
 @property (nonatomic) CFTimeInterval foldedViewVerticalAnimationTimestamp;
-@property (nonatomic) CGFloat foldedViewVerticalAnimationVelocity;
 
 @end
 

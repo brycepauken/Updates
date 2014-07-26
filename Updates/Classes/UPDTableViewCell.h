@@ -10,6 +10,7 @@
 
 @interface UPDTableViewCell : UITableViewCell <UIScrollViewDelegate>
 
+- (void)hideSpinnerWithContactBlock:(void (^)())contactBlock;
 - (void)setDividerHidden:(BOOL)hidden;
 - (void)setFavicon:(UIImage *)favicon;
 - (void)setLastUpdated:(NSDate *)lastUpdated;
