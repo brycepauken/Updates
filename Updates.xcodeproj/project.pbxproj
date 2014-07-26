@@ -34,6 +34,7 @@
 		028D7EB1197DB41700BE0643 /* ButtonOutlineQuarter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EAD197DB41700BE0643 /* ButtonOutlineQuarter@2x.png */; };
 		028D7EB4197DB62B00BE0643 /* UPDBrowserConfirmButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 028D7EB3197DB62B00BE0643 /* UPDBrowserConfirmButton.m */; };
 		02934A3119830E3100FEBB03 /* UPDButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3019830E3100FEBB03 /* UPDButton.m */; };
+		02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */; };
 		02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */; };
 		02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */; };
 		02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */; };
@@ -111,6 +112,8 @@
 		028D7EB3197DB62B00BE0643 /* UPDBrowserConfirmButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserConfirmButton.m; path = Classes/UPDBrowserConfirmButton.m; sourceTree = "<group>"; };
 		02934A2F19830E3100FEBB03 /* UPDButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDButton.h; path = Classes/UPDButton.h; sourceTree = "<group>"; };
 		02934A3019830E3100FEBB03 /* UPDButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDButton.m; path = Classes/UPDButton.m; sourceTree = "<group>"; };
+		02934A3219832ACD00FEBB03 /* UPDProcessingTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDProcessingTextField.h; path = Classes/UPDProcessingTextField.h; sourceTree = "<group>"; };
+		02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDProcessingTextField.m; path = Classes/UPDProcessingTextField.m; sourceTree = "<group>"; };
 		02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserURLBar.h; path = Classes/UPDBrowserURLBar.h; sourceTree = "<group>"; };
 		02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserURLBar.m; path = Classes/UPDBrowserURLBar.m; sourceTree = "<group>"; };
 		02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserView.h; path = Classes/UPDBrowserView.h; sourceTree = "<group>"; };
@@ -309,6 +312,8 @@
 				02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */,
 				02644075197DC636009CE430 /* UPDPreProcessingView.h */,
 				02644076197DC636009CE430 /* UPDPreProcessingView.m */,
+				02934A3219832ACD00FEBB03 /* UPDProcessingTextField.h */,
+				02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */,
 				0253CD1F197F2D1E0078E90E /* UPDProcessingView.h */,
 				0253CD20197F2D1E0078E90E /* UPDProcessingView.m */,
 				02C238821976D594009327F8 /* UPDTableView.h */,
@@ -428,6 +433,7 @@
 				02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
 				02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */,
+				02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */,
 				02C238841976D594009327F8 /* UPDTableView.m in Sources */,
 				0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */,
 				02A733EC19770AB6002A86F3 /* UPDPreBrowserURLBar.m in Sources */,

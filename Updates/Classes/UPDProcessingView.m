@@ -16,11 +16,15 @@
 
 #import "UPDButton.h"
 #import "UPDInstructionProcessor.h"
+#import "UPDProcessingTextField.h"
 
 @interface UPDProcessingView()
 
 @property (nonatomic, strong) UIImageView *checkmark;
 @property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
+@property (nonatomic, strong) UPDButton *nameButton;
+@property (nonatomic, strong) UILabel *nameLabel;
+@property (nonatomic, strong) UPDProcessingTextField *nameTextField;
 @property (nonatomic, strong) UIImageView *outline;
 @property (nonatomic, strong) UIImageView *outlineQuarter;
 @property (nonatomic, strong) UPDButton *processingButton;
@@ -54,6 +58,7 @@
         
         self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, UPD_PROCESSING_SCROLLVIEW_SIZE, UPD_PROCESSING_SCROLLVIEW_SIZE)];
         [self.scrollView setClipsToBounds:NO];
+        [self.scrollView setContentSize:CGSizeMake(UPD_PROCESSING_SCROLLVIEW_SIZE*3, UPD_PROCESSING_SCROLLVIEW_SIZE)];
         [self.scrollView setScrollEnabled:NO];
         [self.scrollView setScrollsToTop:NO];
         [self.scrollView setShowsHorizontalScrollIndicator:NO];
@@ -70,9 +75,33 @@
         [self.scrollView addSubview:self.processingLabel];
         
         self.processingButton = [[UPDButton alloc] init];
+        [self.processingButton addTarget:self action:@selector(scrollToPageFromButton:) forControlEvents:UIControlEventTouchUpInside];
         [self.processingButton setAlpha:0];
         [self.processingButton setTitle:@"OK"];
         [self.scrollView addSubview:self.processingButton];
+        
+        self.nameLabel = [[UILabel alloc] init];
+        [self.nameLabel setAlpha:0];
+        [self.nameLabel setFont:[UIFont systemFontOfSize:18]];
+        [self.nameLabel setNumberOfLines:0];
+        [self.nameLabel setTag:1];
+        [self.nameLabel setText:@"Choose a name for\nyour new update:"];
+        [self.nameLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.nameLabel setTextColor:[UIColor UPDOffWhiteColor]];
+        [self.scrollView addSubview:self.nameLabel];
+        
+        self.nameTextField = [[UPDProcessingTextField alloc] init];
+        [self.nameTextField setAlpha:0];
+        [self.nameTextField setTag:1];
+        [self.scrollView addSubview:self.nameTextField];
+        
+        self.nameButton = [[UPDButton alloc] init];
+        [self.nameButton addTarget:self action:@selector(scrollToPageFromButton:) forControlEvents:UIControlEventTouchUpInside];
+        [self.nameButton setAlpha:0];
+        [self.nameButton setEnabled:NO];
+        [self.nameButton setTag:1];
+        [self.nameButton setTitle:@"OK"];
+        [self.scrollView addSubview:self.nameButton];
     }
     return self;
 }
@@ -124,6 +153,15 @@
     [self.processingLabel setFrame:CGRectMake((self.scrollView.bounds.size.width-processingLabelSize.width)/2, padding1, processingLabelSize.width, processingLabelSize.height)];
     [self.processingButton setFrame:CGRectMake((self.scrollView.bounds.size.width-UPD_PROCESSING_BUTTON_WIDTH)/2, padding1+processingLabelSize.height+padding1, UPD_PROCESSING_BUTTON_WIDTH, UPD_PROCESSING_BUTTON_HEIGHT)];
     
+    /*page 2*/
+    CGSize nameLabelSize = [self.nameLabel.text boundingRectWithSize:CGSizeMake(self.scrollView.bounds.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: self.nameLabel.font} context:nil].size;
+    nameLabelSize.height = ceilf(nameLabelSize.height);
+    nameLabelSize.width = ceilf(nameLabelSize.width);
+    CGFloat padding2 = (self.scrollView.bounds.size.height-nameLabelSize.height-UPD_PROCESSING_TEXTFIELD_HEIGHT-UPD_PROCESSING_BUTTON_HEIGHT)/4;
+    [self.nameLabel setFrame:CGRectMake(self.scrollView.bounds.size.width+(self.scrollView.bounds.size.width-nameLabelSize.width)/2, padding2, nameLabelSize.width, nameLabelSize.height)];
+    [self.nameTextField setFrame:CGRectMake(self.scrollView.bounds.size.width, (padding2+nameLabelSize.height+padding2), self.scrollView.bounds.size.width, UPD_PROCESSING_TEXTFIELD_HEIGHT)];
+    [self.nameButton setFrame:CGRectMake(self.scrollView.bounds.size.width+(self.scrollView.bounds.size.width-UPD_PROCESSING_BUTTON_WIDTH)/2, padding2+nameLabelSize.height+padding2+UPD_PROCESSING_TEXTFIELD_HEIGHT+padding2, UPD_PROCESSING_BUTTON_WIDTH, UPD_PROCESSING_BUTTON_HEIGHT)];
+    
     /*checkmark and scrollview positions*/
     if(self.checkmark.autoresizingMask==UIViewAutoresizingNone) {
         CGRect newCheckFrame, newScrollViewFrame;
@@ -148,6 +186,25 @@
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
     [self.instructionProcessor setInstructions:instructions];
     [self.instructionProcessor beginProcessing];
+}
+
+- (void)scrollToPageFromButton:(UIButton *)button {
+    if(button==self.processingButton) {
+        [self scrollToPage:1];
+    }
+    else if(button==self.nameButton) {
+        [self scrollToPage:2];
+    }
+}
+
+- (void)scrollToPage:(int)page {
+    [self.scrollView setTag:page];
+    [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+        [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*page, 0)];
+        for(UIView *view in [self.scrollView subviews]) {
+            [view setAlpha:page==view.tag?1:0];
+        }
+    }];
 }
 
 @end

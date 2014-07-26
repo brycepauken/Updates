@@ -48,7 +48,7 @@
 
 - (void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
-    [self.label setAlpha:enabled?1:0.5];
+    [self setAlpha:enabled?1:0.5];
 }
 
 - (void)setHighlighted:(BOOL)highlighted {

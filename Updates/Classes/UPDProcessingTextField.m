@@ -1,14 +1,14 @@
 //
-//  UPDBrowserTextField.m
+//  UPDProcessingTextField.m
 //  Updates
 //
-//  Created by Bryce Pauken on 7/17/14.
+//  Created by Bryce Pauken on 7/25/14.
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
-#import "UPDBrowserTextField.h"
+#import "UPDProcessingTextField.h"
 
-@implementation UPDBrowserTextField
+@implementation UPDProcessingTextField
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -20,7 +20,7 @@
         [self setClipsToBounds:YES];
         [self setFont:[UIFont systemFontOfSize:18]];
         [self setKeyboardType:UIKeyboardTypeURL];
-        [self setPlaceholder:@"Enter Address"];
+        [self setPlaceholder:@"New Update Name"];
         [self setReturnKeyType:UIReturnKeyGo];
         [self setTextAlignment:NSTextAlignmentNatural];
         [self setTextColor:[UIColor darkGrayColor]];
