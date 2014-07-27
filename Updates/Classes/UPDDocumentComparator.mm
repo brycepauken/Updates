@@ -44,6 +44,8 @@ struct ElementCount {
     });
 }
 
+#pragma mark - Equivilant
+
 /*
  Analyzes the structure of each document, and returns YES if the two should
  be considered the same (specifically, if the cosine similarity between the two
@@ -122,6 +124,99 @@ struct ElementCount {
         }
         [self addElementsFromNode:node->children toCountVector:htmlElementCounts previousCountVector:prevHtmlElementCounts];
     }
+}
+
+#pragma mark - Visible Text Equal
+
++ (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2 {
+    xmlNode *currentNode1 = (xmlNode *)htmlReadDoc((xmlChar *)[doc1 UTF8String], NULL, _enc, _options);
+    xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[doc2 UTF8String], NULL, _enc, _options);
+    
+    while(true) {
+        if(currentNode1->name && strcmp((char *)currentNode1->name, "text")==0) {
+            bool stringIsWhiteSpace = true;
+            char *s = (char *)currentNode1->content;
+            while(*s != '\0') {
+                if(!isspace(*s)) {
+                    stringIsWhiteSpace = false;
+                    break;
+                }
+                s++;
+            }
+            if(!stringIsWhiteSpace) {
+                while(true) {
+                    BOOL breakNotContinue = false;
+                    if(currentNode2->name && strcmp((char *)currentNode2->name, "text")==0) {
+                        bool stringIsWhiteSpace2 = true;
+                        char *s2 = (char *)currentNode2->content;
+                        while(*s2 != '\0') {
+                            if(!isspace(*s2)) {
+                                stringIsWhiteSpace2 = false;
+                                break;
+                            }
+                            s2++;
+                        }
+                        if(!stringIsWhiteSpace2) {
+                            if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0) {
+                                return NO;
+                            }
+                            breakNotContinue = true;
+                        }
+                    }
+                    
+                    if(currentNode2->children != NULL) {
+                        currentNode2 = currentNode2->children;
+                        if(breakNotContinue) {
+                            break;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    if(currentNode2->next != NULL) {
+                        currentNode2 = currentNode2->next;
+                        if(breakNotContinue) {
+                            break;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    while(currentNode2->parent != NULL && currentNode2->parent->next == NULL) {
+                        currentNode2 = currentNode2->parent;
+                    }
+                    if(currentNode2->parent != NULL && currentNode2->parent->next != NULL) {
+                        currentNode2 = currentNode2->parent->next;
+                        if(breakNotContinue) {
+                            break;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        if(currentNode1->children != NULL) {
+            currentNode1 = currentNode1->children;
+            continue;
+        }
+        if(currentNode1->next != NULL) {
+            currentNode1 = currentNode1->next;
+            continue;
+        }
+        while(currentNode1->parent != NULL && currentNode1->parent->next == NULL) {
+            currentNode1 = currentNode1->parent;
+        }
+        if(currentNode1->parent != NULL && currentNode1->parent->next != NULL) {
+            currentNode1 = currentNode1->parent->next;
+            continue;
+        }
+        break;
+    }
+    return YES;
 }
 
 @end

@@ -49,6 +49,7 @@ static UPDInstructionAccumulator *_instructionAccumulator;
     [queue setMaxConcurrentOperationCount:5];
     self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:queue];
     self.task = [_session dataTaskWithRequest:newRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSLog(@"\n%@\n%@",self.request.URL.absoluteString,response);
         if(!error) {
             [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
             [self.client URLProtocol:self didLoadData:data];

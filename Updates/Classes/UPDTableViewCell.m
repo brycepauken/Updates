@@ -11,16 +11,16 @@
 @interface UPDTableViewCell()
 
 @property (nonatomic, strong) UIView *bar;
+@property (nonatomic) BOOL canHide;
 @property (nonatomic, strong) UIView *divider;
 @property (nonatomic, strong) UIImageView *faviconView;
+@property (nonatomic) BOOL hideMessageReceived;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UIActivityIndicatorView *spinner;
 @property (nonatomic, strong) UILabel *updatedLabel;
 
 @property (nonatomic, copy) void((^contactBlock)());
 @property (nonatomic, strong) CADisplayLink *displayLink;
-@property (nonatomic) CGFloat startVelocity;
-@property (nonatomic) CGFloat startX;
 @property (nonatomic) CFTimeInterval startTimestamp;
 
 @end
@@ -62,11 +62,9 @@
 }
 
 - (void)hideSpinnerWithContactBlock:(void (^)())contactBlock {
-    self.contactBlock = contactBlock;
-    self.startTimestamp = 0;
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(hideSpinnerAnimation)];
-    [self.displayLink setFrameInterval:1];
-    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    [self setContactBlock:contactBlock];
+    [self setHideMessageReceived:YES];
+    [self tryHiding];
 }
 
 - (void)hideSpinnerAnimation {
@@ -134,10 +132,18 @@
 - (void)showSpinner {
     [self.spinner startAnimating];
     
+    [self setCanHide:NO];
+    [self setHideMessageReceived:NO];
+    
     self.startTimestamp = 0;
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(showSpinnerAnimation)];
     [self.displayLink setFrameInterval:1];
     [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self setCanHide:YES];
+        [self tryHiding];
+    });
 }
 
 - (void)showSpinnerAnimation {
@@ -158,6 +164,15 @@
         [self.displayLink invalidate];
         
         [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0, self.bounds.size.width, self.bounds.size.height)];
+    }
+}
+
+- (void)tryHiding {
+    if(self.canHide && self.hideMessageReceived) {
+        self.startTimestamp = 0;
+        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(hideSpinnerAnimation)];
+        [self.displayLink setFrameInterval:1];
+        [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     }
 }
 

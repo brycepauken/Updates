@@ -8,6 +8,7 @@
 
 #import "UPDInstructionRunner.h"
 
+#import "UPDDocumentComparator.h"
 #import "UPDInternalInstruction.h"
 
 @implementation UPDInstructionRunner
@@ -45,7 +46,15 @@
 }
 
 + (UPDInstructionRunnerResult)page:(NSString *)page differsFromPage:(NSString *)difPage differenceOptions:(NSDictionary *)differenceOptions {
-   return UPDInstructionRunnerResultNoChange;
+    if([[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Any"]) {
+        if([UPDDocumentComparator document:page visibleTextIsEqualToDocument:difPage]) {
+            return UPDInstructionRunnerResultNoChange;
+        }
+        else {
+            return UPDInstructionRunnerResultChange;
+        }
+    }
+    return UPDInstructionRunnerResultNoChange;
 }
 
 @end

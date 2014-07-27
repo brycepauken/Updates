@@ -11,5 +11,6 @@
 @interface UPDDocumentComparator : NSObject
 
 + (BOOL)document:(NSString *)doc1 isEquivalentToDocument:(NSString *)doc2;
++ (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2;
 
 @end

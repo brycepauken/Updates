@@ -285,7 +285,7 @@
         [self scrollToPage:3];
     }
     else if(button==self.confirmationButtonYes) {
-        self.differenceOptions = @{@"DiffernceType":@"Any"};
+        self.differenceOptions = @{@"DifferenceType":@"Any"};
         
         [self.checkmark setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outline setAutoresizingMask:UIViewAutoresizingFlexibleMargins];

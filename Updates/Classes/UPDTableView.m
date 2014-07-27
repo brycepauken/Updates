@@ -16,6 +16,7 @@
 #import "CoreDataModelUpdate.h"
 #import "CoreDataModelUpdateList.h"
 #import "UPDAppDelegate.h"
+#import "UPDInstructionRunner.h"
 #import "UPDInternalUpdate.h"
 #import "UPDTableViewCell.h"
 
@@ -80,37 +81,7 @@
 }
 
 - (void)beginRefresh {
-    UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-    [cell showSpinner];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [cell hideSpinnerWithContactBlock:^{
-            UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
-            [cell showSpinner];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                [cell hideSpinnerWithContactBlock:^{
-                    UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:0]];
-                    [cell showSpinner];
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                        [cell hideSpinnerWithContactBlock:^{
-                            UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:3 inSection:0]];
-                            [cell showSpinner];
-                            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                                [cell hideSpinnerWithContactBlock:^{
-                                    UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:4 inSection:0]];
-                                    [cell showSpinner];
-                                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                                        [cell hideSpinnerWithContactBlock:^{
-                                            [self endRefresh];
-                                        }];
-                                    });
-                                }];
-                            });
-                        }];
-                    });
-                }];
-            });
-        }];
-    });
+    [self refreshRow:0];
 }
 
 - (void)endRefresh {
@@ -120,6 +91,32 @@
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
        [self setContentInset:UIEdgeInsetsZero]; 
     }];
+}
+
+- (void)refreshRow:(int)row {
+    if(row<[self numberOfRowsInSection:0]) {
+        UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+        if(row==0) {
+            [cell showSpinner];
+        }
+        UPDInternalUpdate *update = [self.updates objectAtIndex:row];
+        [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastReponse] differenceOptions:update.differenceOptions completionBlock:^(UPDInstructionRunnerResult result) {
+            NSLog(@"%i: %lu",row,result);
+            if(row<[self numberOfRowsInSection:0]-1) {
+                UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row+1 inSection:0]];
+                [cell hideSpinnerWithContactBlock:^{
+                    [nextCell showSpinner];
+                    [self refreshRow:row+1];
+                }];
+            }
+            else {
+                /*last one!*/
+                [cell hideSpinnerWithContactBlock:^{
+                    [self endRefresh];
+                }];
+            }
+        }];
+    }
 }
 
 /*
