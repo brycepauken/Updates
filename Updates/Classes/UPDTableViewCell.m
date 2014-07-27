@@ -149,7 +149,9 @@
     self.startTimestamp = 0;
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(showSpinnerAnimation)];
     [self.displayLink setFrameInterval:1];
-    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self setCanHide:YES];
@@ -183,16 +185,18 @@
         self.startTimestamp = 0;
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(hideSpinnerAnimation)];
         [self.displayLink setFrameInterval:1];
-        [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        });
     }
 }
 
 - (void)updateDateText {
-    if(self.lastUpdated) {
+    if(self.lastUpdated && [self.lastUpdated timeIntervalSince1970]>0) {
         [self.updatedLabel setText:[NSString stringWithFormat:@"Last updated %@",[self.lastUpdated relativeDateFromDate:[NSDate date]]]];
     }
     else {
-        [self.updatedLabel setText:@""];
+        [self.updatedLabel setText:@"Never updated"];
     }
 }
 
