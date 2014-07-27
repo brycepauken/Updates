@@ -27,7 +27,9 @@
     private:
         Pixel compareTo;
     };
+    UIColor *commonColor;
     struct Pixel *pixels = (struct Pixel*) calloc(1, image.size.width * image.size.height * sizeof(struct Pixel));
+    struct Pixel *pixelsOrig = pixels;
     if(pixels != nil) {
         CGContextRef context = CGBitmapContextCreate((void *)pixels, image.size.width, image.size.height, 8, image.size.width * 4, CGImageGetColorSpace(image.CGImage), kCGImageAlphaPremultipliedLast);
         if(context != NULL) {
@@ -53,9 +55,34 @@
             }
             CGContextRelease(context);
             Pixel commonPixel = pixelCounts.at(0).pixel;
-            return [UIColor colorWithRed:(commonPixel.r/255.0f) green:(commonPixel.g/255.0f) blue:(commonPixel.b/255.0f) alpha:(commonPixel.a/255.0f)];
+            //sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
+            if(commonPixel.a<255) {
+                CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+                unsigned char rgba[4];
+                CGContextRef context = CGBitmapContextCreate(rgba, 1, 1, 8, 4, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+                CGContextSetFillColorWithColor(context, [UIColor UPDOffWhiteColor].CGColor);
+                CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
+                UIColor *newColor = [UIColor colorWithRed:(commonPixel.r/255.0f) green:(commonPixel.g/255.0f) blue:(commonPixel.b/255.0f) alpha:(commonPixel.a/255.0f)];
+                CGContextSetFillColorWithColor(context, newColor.CGColor);
+                CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
+                commonColor = [UIColor colorWithRed:(rgba[0]/255.0f) green:(rgba[1]/255.0f) blue:(rgba[2]/255.0f) alpha:(rgba[3]/255.0f)];
+                commonPixel.r = rgba[0];
+                commonPixel.g = rgba[1];
+                commonPixel.b = rgba[2];
+                commonPixel.a = 1;
+            }
+            CGFloat brightness = sqrt(0.299*commonPixel.r*commonPixel.r + 0.587*commonPixel.g*commonPixel.g + 0.114*commonPixel.b*commonPixel.b);
+            if(brightness<230) {
+                commonColor = [UIColor colorWithRed:(commonPixel.r/255.0f) green:(commonPixel.g/255.0f) blue:(commonPixel.b/255.0f) alpha:(commonPixel.a/255.0f)];
+            }
+            else {
+                commonColor = [UIColor UPDLightGreyColor];
+            }
         }
-        free(pixels);
+        free(pixelsOrig);
+    }
+    if(commonColor) {
+        return commonColor;
     }
     return [UIColor whiteColor];
 }

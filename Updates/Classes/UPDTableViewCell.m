@@ -77,13 +77,14 @@
     CGFloat mappedTime = -2.5*(elapsedTime*2)*(elapsedTime*2)+3.5*(elapsedTime*2);
     [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH*mappedTime, 0, self.bounds.size.width, self.bounds.size.height)];
     
+    if(elapsedTime>=0.1&&self.contactBlock) {
+        void (^contactBlock)() = self.contactBlock;
+        self.contactBlock = nil;
+        contactBlock();
+    }
     if(elapsedTime>=0.2) {
         [self.displayLink invalidate];
         [self setBounds:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
-        
-        if(self.contactBlock) {
-            self.contactBlock();
-        }
     }
 }
 
