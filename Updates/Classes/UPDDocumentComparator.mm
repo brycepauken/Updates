@@ -158,6 +158,7 @@ struct ElementCount {
                         }
                         if(!stringIsWhiteSpace2) {
                             if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0) {
+                                printf("%s vs. %s\n",(char *)currentNode1->content,(char *)currentNode2->content);
                                 return NO;
                             }
                             breakNotContinue = true;

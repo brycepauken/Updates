@@ -178,9 +178,10 @@
     [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions]];
     [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
     [update setFavicon:UIImagePNGRepresentation(favicon)];
-    [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
+    [update setOrigResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
     [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
-    [update setTimerResult:timerResult];
+    [update setTimerResult:@(timerResult)];
+    [update setStatus:@(0)];
     [update setParent:updateList];
     
     NSMutableOrderedSet *updates = [updateList.updates mutableCopy];

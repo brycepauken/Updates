@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong) UIView *bar;
 @property (nonatomic) BOOL canHide;
+@property (nonatomic, strong) UIView *circleView;
 @property (nonatomic, strong) UIView *divider;
 @property (nonatomic, strong) UIImageView *faviconView;
 @property (nonatomic) BOOL hideMessageReceived;
@@ -49,6 +50,14 @@
         [self.spinner setHidesWhenStopped:YES];
         [self addSubview:self.spinner];
         
+        self.circleView = [[UIView alloc] init];
+        [self.circleView.layer setCornerRadius:UPD_TABLEVIEW_CIRCLE_SIZE/2];
+        [self.circleView.layer setShadowOffset:CGSizeZero];
+        [self.circleView.layer setShadowOpacity:1];
+        [self.circleView.layer setShadowRadius:1];
+        [self.circleView setHidden:YES];
+        [self addSubview:self.circleView];
+        
         self.faviconView = [[UIImageView alloc] init];
         [self addSubview:self.faviconView];
         
@@ -63,6 +72,18 @@
         [self addSubview:self.updatedLabel];
     }
     return self;
+}
+
+- (void)setCircleColor:(UIColor *)color {
+    if(color) {
+        [self.circleView setBackgroundColor:color];
+        [self.circleView.layer setShadowColor:color.CGColor];
+        [self.circleView setHidden:NO];
+    }
+    else {
+        [self.circleView setHidden:YES];
+    }
+    [self setNeedsLayout];
 }
 
 - (void)hideSpinnerWithContactBlock:(void (^)())contactBlock {
@@ -101,9 +122,15 @@
     updatedLabelSize.height = ceilf(updatedLabelSize.height);
     updatedLabelSize.width = ceilf(updatedLabelSize.width);
     
-    [self.faviconView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_FAVICON_SIZE)/2, (self.bounds.size.height-UPD_TABLEVIEW_FAVICON_SIZE)/2, UPD_TABLEVIEW_FAVICON_SIZE, UPD_TABLEVIEW_FAVICON_SIZE)];
     [self.nameLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2-nameLabelSize.height/2-10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, nameLabelSize.height)];
     [self.updatedLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2+10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, updatedLabelSize.height)];
+    if(self.circleView.hidden) {
+        [self.faviconView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_FAVICON_SIZE)/2, (self.bounds.size.height-UPD_TABLEVIEW_FAVICON_SIZE)/2, UPD_TABLEVIEW_FAVICON_SIZE, UPD_TABLEVIEW_FAVICON_SIZE)];
+    }
+    else {
+        [self.faviconView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_FAVICON_SIZE)/2, self.bounds.size.height/2-10-UPD_TABLEVIEW_FAVICON_SIZE/2, UPD_TABLEVIEW_FAVICON_SIZE, UPD_TABLEVIEW_FAVICON_SIZE)];
+        [self.circleView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_CIRCLE_SIZE)/2, self.bounds.size.height/2+10+updatedLabelSize.height/2-UPD_TABLEVIEW_CIRCLE_SIZE/2, UPD_TABLEVIEW_CIRCLE_SIZE, UPD_TABLEVIEW_CIRCLE_SIZE)];
+    }
     
     [self.spinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.bar setFrame:CGRectMake(0, -10, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height+20)];

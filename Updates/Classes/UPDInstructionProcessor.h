@@ -10,7 +10,7 @@
 
 @interface UPDInstructionProcessor : NSObject
 
-@property (nonatomic, copy) void(^completionBlock)(NSArray *instructions, UIImage *favicon, NSString *lastReponse);
+@property (nonatomic, copy) void(^completionBlock)(NSArray *instructions, UIImage *favicon, NSString *lastResponse);
 @property (nonatomic, strong) NSArray *instructions;
 @property (nonatomic, strong) NSString *url;
 

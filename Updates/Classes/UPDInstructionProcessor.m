@@ -15,7 +15,7 @@
  1) Check if final page is reachable by single GET request—if it is, just use that. If not...
  2) Figure out where a request URL came from
     a) First URL is given, no need for processing
-    b) If exact URL shows up on previous reponse page, use that one in the future
+    b) If exact URL shows up on previous response page, use that one in the future
     c) If exact URL doesn't show up, check if base url shows up as GET form action, and use that
  3) Figure out where parameters came from (GET and POST)
     a) Check input forms in prevoius response page for data—use field in the future if possible

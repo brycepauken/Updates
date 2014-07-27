@@ -11,6 +11,7 @@
 @interface UPDTableViewCell : UITableViewCell <UIScrollViewDelegate>
 
 - (void)hideSpinnerWithContactBlock:(void (^)())contactBlock;
+- (void)setCircleColor:(UIColor *)color;
 - (void)setDividerHidden:(BOOL)hidden;
 - (void)setFavicon:(UIImage *)favicon;
 - (void)setLastUpdated:(NSDate *)lastUpdated;

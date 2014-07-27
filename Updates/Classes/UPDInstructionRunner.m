@@ -13,7 +13,7 @@
 
 @implementation UPDInstructionRunner
 
-+ (void)pageFromInstructions:(NSArray *)instructions differsFromPage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result))completionBlock {
++ (void)pageFromInstructions:(NSArray *)instructions differsFromPage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse))completionBlock {
     [self clearPersistentData];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [queue setMaxConcurrentOperationCount:5];
@@ -21,12 +21,13 @@
     if(instructions.count==1) {
         UPDInternalInstruction *instruction = [instructions lastObject];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:instruction.request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            completionBlock([self page:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] differsFromPage:page differenceOptions:differenceOptions]);
+            NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            completionBlock([self page:newResponse differsFromPage:page differenceOptions:differenceOptions], newResponse);
         }];
         [task resume];
     }
     else {
-        completionBlock(UPDInstructionRunnerResultNoChange);
+        completionBlock(UPDInstructionRunnerResultNoChange, nil);
     }
 }
 

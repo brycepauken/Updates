@@ -105,25 +105,25 @@
         }
         UPDInternalUpdate *update = [self.updates objectAtIndex:row];
         NSDate *startDate = [NSDate date];
-        [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastReponse] differenceOptions:update.differenceOptions completionBlock:^(UPDInstructionRunnerResult result) {
+        [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] differenceOptions:update.differenceOptions completionBlock:^(UPDInstructionRunnerResult result, NSString *newResponse) {
             NSLog(@"%i: %lu",row,result);
-            if(row<[self numberOfRowsInSection:0]-1) {
-                UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row+1 inSection:0]];
-                [cell hideSpinnerWithContactBlock:^{
-                    [cell setLastUpdated:[NSDate date]];
-                    [self saveUpdateWithObjectID:update.objectID updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
+            [cell hideSpinnerWithContactBlock:^{
+                [cell setLastUpdated:[NSDate date]];
+                if(result>update.status.intValue) {
+                    if(result==1) {
+                        [cell setCircleColor:[UIColor UPDBrightBlueColor]];
+                    }
+                }
+                [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
+                if(row<[self numberOfRowsInSection:0]-1) {
+                    UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row+1 inSection:0]];
                     [nextCell showSpinner];
                     [self refreshRow:row+1];
-                }];
-            }
-            else {
-                /*last one!*/
-                [cell hideSpinnerWithContactBlock:^{
-                    [cell setLastUpdated:[NSDate date]];
-                    [self saveUpdateWithObjectID:update.objectID updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
-                    [self endRefresh];
-                }];
-            }
+                }
+                else {
+                   [self endRefresh];
+                }
+            }];
         }];
     }
 }
@@ -146,7 +146,7 @@
     }
     else {
         self.timeSaved = 0;
-        [self saveUpdateWithObjectID:nil updateDuration:0];
+        [self saveUpdateWithObjectID:nil newResponse:nil newStatus:0 updateDuration:0];
     }
     
     NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
@@ -158,9 +158,11 @@
             newUpdate.name = update.name;
             newUpdate.differenceOptions = [NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions];
             newUpdate.favicon = [[UIImage alloc] initWithData:update.favicon];
-            newUpdate.lastReponse = update.lastResponse;
+            newUpdate.lastResponse = update.lastResponse;
             newUpdate.lastUpdated = update.lastUpdated;
+            newUpdate.origResponse = update.origResponse;
             newUpdate.instructions = update.instructions;
+            newUpdate.status = update.status;
             newUpdate.timerResult = update.timerResult;
             newUpdate.objectID = update.objectID;
             [self.updates insertObject:newUpdate atIndex:0];
@@ -177,12 +179,16 @@
  Updates the given object's "last updated" field, along with
  updating the total amount of time saved
  */
-- (void)saveUpdateWithObjectID:(NSManagedObjectID *)objectID updateDuration:(NSTimeInterval)duration {
+- (void)saveUpdateWithObjectID:(NSManagedObjectID *)objectID newResponse:(NSString *)newResponse newStatus:(int)status updateDuration:(NSTimeInterval)duration {
     NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
     NSDate *updatedDate = [NSDate date];
     if(objectID) {
         for(UPDInternalUpdate *update in self.updates) {
             if([update.objectID isEqual:objectID]) {
+                if(status>update.status.intValue) {
+                    [update setStatus:@(status)];
+                }
+                [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
                 [update setLastUpdated:updatedDate];
             }
         }
@@ -193,8 +199,12 @@
         if(updateList) {
             for(CoreDataModelUpdate *update in updateList.updates) {
                 if([update.objectID isEqual:objectID]) {
+                    if(status>update.status.intValue) {
+                        [update setStatus:@(status)];
+                    }
+                    [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
                     [update setLastUpdated:updatedDate];
-                    CGFloat timeJustSaved = update.timerResult - duration;
+                    CGFloat timeJustSaved = update.timerResult.doubleValue - duration;
                     self.timeSaved += timeJustSaved>0?timeJustSaved:0;
                 }
             }
@@ -304,6 +314,14 @@
         cell = [[UPDTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"UPDTableViewCell"];
     }
     UPDInternalUpdate *update = [self.updates objectAtIndex:indexPath.row];
+    switch(update.status.intValue) {
+        case 1:
+            [cell setCircleColor:[UIColor UPDBrightBlueColor]];
+            break;
+        default:
+            [cell setCircleColor:nil];
+            break;
+    }
     [cell setName:update.name];
     [cell setFavicon:update.favicon];
     [cell setLastUpdated:update.lastUpdated];

@@ -13,10 +13,12 @@
 @property (nonatomic, strong) UIImage *favicon;
 @property (nonatomic, strong) NSDictionary *differenceOptions;
 @property (nonatomic, strong) NSData *instructions;
-@property (nonatomic, strong) NSData *lastReponse;
+@property (nonatomic, strong) NSData *lastResponse;
 @property (nonatomic, strong) NSDate *lastUpdated;
+@property (nonatomic, strong) NSData *origResponse;
 @property (nonatomic, strong) NSString *name;
-@property (nonatomic) double timerResult;
+@property (nonatomic, strong) NSNumber *status;
+@property (nonatomic, strong) NSNumber *timerResult;
 @property (nonatomic, strong) NSManagedObjectID *objectID;
 
 @end

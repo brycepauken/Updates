@@ -427,10 +427,10 @@
     [self.instructionProcessor setUrl:url];
     [self setTimerResult:timerResult];
     __unsafe_unretained UPDProcessingView *weakSelf = self;
-    [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastReponse){
+    [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastResponse){
         weakSelf.instructions = instructions;
         weakSelf.favicon = favicon;
-        weakSelf.lastResponse = lastReponse;
+        weakSelf.lastResponse = lastResponse;
         [weakSelf tryCompletion];
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
