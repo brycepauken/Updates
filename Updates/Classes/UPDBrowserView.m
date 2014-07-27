@@ -215,6 +215,11 @@
  */
 - (void)confirmButtonTapped {
     if(self.confirmBlock) {
+        NSString *currentURL = [self.webView stringByEvaluatingJavaScriptFromString:@"window.location.href"];
+        if(!currentURL) {
+            currentURL = self.webView.request.URL.absoluteString;
+        }
+        
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, YES, 0.0);
         CGContextRef context = UIGraphicsGetCurrentContext();
         
@@ -253,7 +258,7 @@
                 [self.completeOverlay setTransform:CGAffineTransformScale(CGAffineTransformIdentity, UPD_BROWSER_IMAGE_SCALE, UPD_BROWSER_IMAGE_SCALE)];
                 [self.completeOverlay setAlpha:UPD_BROWSER_IMAGE_OPACITY];
             } completion:^(BOOL finished) {
-                self.confirmBlock(browserImage, self.instructionAccumulator.instructions);
+                self.confirmBlock(browserImage, self.instructionAccumulator.instructions, currentURL);
             }];
         }];
     }

@@ -13,6 +13,6 @@
 @property (nonatomic, copy) void(^completionBlock)(NSString *name, NSArray *instructions, UIImage *favicon, NSString *lastReponse, NSDictionary *differenceOptions);
 
 - (void)beginProcessingAnimation;
-- (void)processInstructions:(NSArray *)instructions;
+- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url;
 
 @end

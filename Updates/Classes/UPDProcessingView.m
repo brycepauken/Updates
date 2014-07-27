@@ -420,9 +420,10 @@
     }
 }
 
-- (void)processInstructions:(NSArray *)instructions {
+- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url {
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
     [self.instructionProcessor setInstructions:instructions];
+    [self.instructionProcessor setUrl:url];
     __unsafe_unretained UPDProcessingView *weakSelf = self;
     [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastReponse){
         weakSelf.instructions = instructions;

@@ -12,6 +12,7 @@
 
 @property (nonatomic, copy) void(^completionBlock)(NSArray *instructions, UIImage *favicon, NSString *lastReponse);
 @property (nonatomic, strong) NSArray *instructions;
+@property (nonatomic, strong) NSString *url;
 
 - (void)beginProcessing;
 

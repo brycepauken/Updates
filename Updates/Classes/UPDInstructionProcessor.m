@@ -37,13 +37,23 @@
  */
 - (void)beginProcessing {
     NSMutableArray *workingInstructions = [self.instructions mutableCopy];
+    NSURL *workingURL = [NSURL URLWithString:self.url];
     
     /*step 1*/
     UPDInternalInstruction *lastInstruction;
     for(int i=(int)workingInstructions.count-1;i>=0;i--) {
-        if(((UPDInternalInstruction *)[workingInstructions objectAtIndex:i]).response.length) {
+        NSURL *instructionURL = [NSURL URLWithString:((UPDInternalInstruction *)[workingInstructions objectAtIndex:i]).fullURL];
+        if(([instructionURL.scheme isEqualToString:workingURL.scheme]||(!instructionURL.scheme&&!workingURL.scheme)) && ([instructionURL.host isEqualToString:workingURL.host]||(!instructionURL.host&&!workingURL.host)) && ([instructionURL.path isEqualToString:workingURL.path]||(!instructionURL.path&&!workingURL.path)) && ([instructionURL.parameterString isEqualToString:workingURL.parameterString]||(!instructionURL.parameterString&&!workingURL.parameterString))) {
             lastInstruction = [workingInstructions objectAtIndex:i];
             break;
+        }
+    }
+    if(!lastInstruction) {
+        for(int i=(int)workingInstructions.count-1;i>=0;i--) {
+            if(((UPDInternalInstruction *)[workingInstructions objectAtIndex:i]).response.length) {
+                lastInstruction = [workingInstructions objectAtIndex:i];
+                break;
+            }
         }
     }
     if(lastInstruction) {
@@ -63,7 +73,7 @@
             }
             else {
                 /*step 2*/
-                
+                NSLog(@"Error: pages not equivalent");
             }
         }];
         [task resume];
