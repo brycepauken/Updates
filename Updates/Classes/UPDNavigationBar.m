@@ -17,6 +17,7 @@
 @interface UPDNavigationBar ()
 
 @property (nonatomic, strong) UIButton *addButton;
+@property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, strong) UILabel *label;
 
 @end
@@ -39,7 +40,15 @@
         [self.addButton addTarget:self action:@selector(addButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.addButton setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin];
         [self.addButton setImage:[UIImage imageNamed:@"Add"] forState:UIControlStateNormal];
+        [self.addButton setHidden:YES];
         [self addSubview:self.addButton];
+        
+        self.backButton = [[UIButton alloc] initWithFrame:CGRectMake(UPD_NAVIGATION_BAR_BUTTON_PADDING, 20+((self.bounds.size.height-20)-UPD_NAVIGATION_BAR_BUTTON_SIZE)/2, UPD_NAVIGATION_BAR_BUTTON_SIZE, UPD_NAVIGATION_BAR_BUTTON_SIZE)];
+        [self.backButton addTarget:self action:@selector(backButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.backButton setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
+        [self.backButton setImage:[UIImage imageNamed:@"Back"] forState:UIControlStateNormal];
+        [self.backButton setHidden:YES];
+        [self addSubview:self.backButton];
     }
     return self;
 }
@@ -47,6 +56,12 @@
 - (void)addButtonTapped {
     if(self.addButtonBlock) {
         self.addButtonBlock();
+    }
+}
+
+- (void)backButtonTapped {
+    if(self.backButtonBlock) {
+        self.backButtonBlock();
     }
 }
 
@@ -63,7 +78,20 @@
     if(CGRectContainsPoint(CGRectInset(self.addButton.frame, -self.addButton.frame.size.width, -self.addButton.frame.size.height), point)) {
         return self.addButton;
     }
+    else if(CGRectContainsPoint(CGRectInset(self.backButton.frame, -self.backButton.frame.size.width, -self.backButton.frame.size.height), point)) {
+        return self.backButton;
+    }
     return [super hitTest:point withEvent:event];
+}
+
+- (void)setAddButtonBlock:(void (^)())addButtonBlock {
+    _addButtonBlock = addButtonBlock;
+    [self.addButton setHidden:!addButtonBlock];
+}
+
+- (void)setBackButtonBlock:(void (^)())backButtonBlock {
+    _backButtonBlock = backButtonBlock;
+    [self.backButton setHidden:!backButtonBlock];
 }
 
 - (void)setText:(NSString *)text {

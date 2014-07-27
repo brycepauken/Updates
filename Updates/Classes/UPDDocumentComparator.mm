@@ -129,7 +129,12 @@ struct ElementCount {
 #pragma mark - Visible Text Equal
 
 + (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2 {
-    xmlNode *currentNode1 = (xmlNode *)htmlReadDoc((xmlChar *)[doc1 UTF8String], NULL, _enc, _options);
+    return [self document:doc1 visibleTextIsEqualToDocument:doc2 highlightChanges:NO];
+}
+
++ (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight {
+    htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[doc1 UTF8String], NULL, _enc, _options);;
+    xmlNode *currentNode1 = (xmlNode *)origDoc;
     xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[doc2 UTF8String], NULL, _enc, _options);
     
     while(true) {
@@ -158,8 +163,12 @@ struct ElementCount {
                         }
                         if(!stringIsWhiteSpace2) {
                             if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0) {
-                                printf("%s vs. %s\n",(char *)currentNode1->content,(char *)currentNode2->content);
-                                return NO;
+                                if(highlight) {
+                                    xmlNodeSetContent(currentNode1, (xmlChar *)"hello world");
+                                }
+                                else {
+                                    return NO;
+                                }
                             }
                             breakNotContinue = true;
                         }
@@ -217,6 +226,12 @@ struct ElementCount {
         }
         break;
     }
+    
+    if(highlight) {
+        xmlSaveFileEnc("-", origDoc, "UTF-8");
+        
+    }
+    
     return YES;
 }
 

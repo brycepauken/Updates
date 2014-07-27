@@ -106,7 +106,6 @@
         UPDInternalUpdate *update = [self.updates objectAtIndex:row];
         NSDate *startDate = [NSDate date];
         [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] differenceOptions:update.differenceOptions completionBlock:^(UPDInstructionRunnerResult result, NSString *newResponse) {
-            NSLog(@"%i: %lu",row,result);
             [cell hideSpinnerWithContactBlock:^{
                 [cell setLastUpdated:[NSDate date]];
                 if(result>update.status.intValue) {
@@ -164,6 +163,7 @@
             newUpdate.instructions = update.instructions;
             newUpdate.status = update.status;
             newUpdate.timerResult = update.timerResult;
+            newUpdate.url = update.url;
             newUpdate.objectID = update.objectID;
             [self.updates insertObject:newUpdate atIndex:0];
         }
@@ -362,6 +362,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if(self.updateSelected) {
+        self.updateSelected([self.updates objectAtIndex:indexPath.row]);
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

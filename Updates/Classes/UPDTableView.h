@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class UPDInternalUpdate;
+
 @interface UPDTableView : UITableView <UITableViewDataSource, UITableViewDelegate>
+
+@property (nonatomic, copy) void(^updateSelected)(UPDInternalUpdate *update);
 
 @end

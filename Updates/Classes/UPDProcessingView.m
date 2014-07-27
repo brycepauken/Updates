@@ -48,6 +48,7 @@
 @property (nonatomic, strong) UPDButton *protectButtonYes;
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic) NSTimeInterval timerResult;
+@property (nonatomic, strong) NSURL *url;
 
 @end
 
@@ -427,10 +428,11 @@
     [self.instructionProcessor setUrl:url];
     [self setTimerResult:timerResult];
     __unsafe_unretained UPDProcessingView *weakSelf = self;
-    [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastResponse){
+    [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSURL *url) {
         weakSelf.instructions = instructions;
         weakSelf.favicon = favicon;
         weakSelf.lastResponse = lastResponse;
+        weakSelf.url = url;
         [weakSelf tryCompletion];
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
@@ -518,7 +520,7 @@
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*4*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             if(self.completionBlock) {
-                self.completionBlock(self.nameTextField.text, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult);
+                self.completionBlock(self.nameTextField.text, self.url, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult);
             }
         });
     }

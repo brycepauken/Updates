@@ -19,6 +19,8 @@
 #import "QuartzCore/CALayer.h"
 #import "UPDAppDelegate.h"
 #import "UPDBrowserView.h"
+#import "UPDChangesView.h"
+#import "UPDInternalInstruction.h"
 #import "UPDNavigationBar.h"
 #import "UPDPreBrowserView.h"
 #import "UPDPreProcessingView.h"
@@ -28,11 +30,12 @@
 @interface UPDInterface ()
 
 @property (nonatomic, strong) UPDBrowserView *browserView;
-@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UPDChangesView *changesView;
 @property (nonatomic, strong) UPDNavigationBar *navigationBar;
 @property (nonatomic, strong) UPDPreBrowserView *preBrowserView;
 @property (nonatomic, strong) UPDPreProcessingView *preProcessingView;
 @property (nonatomic, strong) UPDProcessingView *processingView;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UPDTableView *tableView;
 
 @end
@@ -66,6 +69,17 @@
         
         self.tableView = [[UPDTableView alloc] initWithFrame:CGRectMake(0, self.navigationBar.frame.size.height, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height-UPD_NAVIGATION_BAR_HEIGHT)];
         [self.tableView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.tableView setUpdateSelected:^(UPDInternalUpdate *update){
+            [weakSelf.changesView showUpdate:update];
+            [weakSelf.tableView setUserInteractionEnabled:NO];
+            [weakSelf.changesView setHidden:NO];
+            [weakSelf.scrollView setTag:1];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
+            } completion:^(BOOL finished) {
+                [weakSelf.tableView setUserInteractionEnabled:YES];
+            }];
+        }];
         [self.scrollView addSubview:self.tableView];
         
         self.preBrowserView = [[UPDPreBrowserView alloc] initWithFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
@@ -121,8 +135,8 @@
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
-        [self.processingView setCompletionBlock:^(NSString *name, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult) {
-            [weakSelf saveUpdateWithName:name instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult];
+        [self.processingView setCompletionBlock:^(NSString *name, NSURL *url, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult) {
+            [weakSelf saveUpdateWithName:name url:url instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult];
             [weakSelf.tableView reloadData];
             
             /*move browser view over for a more seamless animation*/
@@ -143,6 +157,20 @@
         }];
         [self.scrollView addSubview:self.processingView];
         
+        self.changesView = [[UPDChangesView alloc] initWithFrame:self.bounds];
+        [self.changesView setHidden:YES];
+        [self.changesView setBackButtonBlock:^{
+            [weakSelf.changesView setUserInteractionEnabled:NO];
+            [weakSelf.scrollView setTag:0];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.scrollView setContentOffset:CGPointZero];
+            } completion:^(BOOL finished) {
+                [weakSelf.changesView setHidden:NO];
+                [weakSelf.changesView setUserInteractionEnabled:YES];
+            }];
+        }];
+        [self.scrollView addSubview:self.changesView];
+        
         [self setNeedsDisplay];
     }
     return self;
@@ -159,9 +187,10 @@
     [self.browserView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.preProcessingView setFrame:CGRectMake(self.scrollView.bounds.size.width*2, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
     [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
+    [self.changesView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
-- (void)saveUpdateWithName:(NSString *)name instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult {
+- (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult {
     NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
     
     /*get existing updates list*/
@@ -175,6 +204,7 @@
     
     CoreDataModelUpdate *update = [NSEntityDescription insertNewObjectForEntityForName:@"Update" inManagedObjectContext:context];
     [update setName:name];
+    [update setUrl:[NSKeyedArchiver archivedDataWithRootObject:url]];
     [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions]];
     [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
     [update setFavicon:UIImagePNGRepresentation(favicon)];

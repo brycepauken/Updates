@@ -68,7 +68,7 @@
             if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
                 /*the final request works on its own, use it!*/
                 if(self.completionBlock) {
-                    self.completionBlock([NSArray arrayWithObject:lastInstruction], favicon, lastInstruction.response);
+                    self.completionBlock([NSArray arrayWithObject:lastInstruction], favicon, lastInstruction.response, lastInstruction.request.URL);
                 }
             }
             else {

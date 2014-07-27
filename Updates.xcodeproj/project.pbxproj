@@ -36,6 +36,7 @@
 		02901A371984B38100274AAE /* UPDTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 02901A361984B38100274AAE /* UPDTimer.m */; };
 		02901A3A1984BE7D00274AAE /* CoreDataModelOption.m in Sources */ = {isa = PBXBuildFile; fileRef = 02901A391984BE7D00274AAE /* CoreDataModelOption.m */; };
 		02901A3D1984CB0A00274AAE /* NSDate+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02901A3C1984CB0A00274AAE /* NSDate+UPDExtensions.m */; };
+		02901A491985AF4500274AAE /* UPDChangesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02901A481985AF4500274AAE /* UPDChangesView.m */; };
 		02934A3119830E3100FEBB03 /* UPDButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3019830E3100FEBB03 /* UPDButton.m */; };
 		02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */; };
 		02934A371983FE3F00FEBB03 /* CoreDataModelUpdateList.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */; };
@@ -124,6 +125,8 @@
 		02901A391984BE7D00274AAE /* CoreDataModelOption.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreDataModelOption.m; path = Classes/CoreDataModelOption.m; sourceTree = "<group>"; };
 		02901A3B1984CB0A00274AAE /* NSDate+UPDExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDate+UPDExtensions.h"; path = "Classes/NSDate+UPDExtensions.h"; sourceTree = "<group>"; };
 		02901A3C1984CB0A00274AAE /* NSDate+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+UPDExtensions.m"; path = "Classes/NSDate+UPDExtensions.m"; sourceTree = "<group>"; };
+		02901A471985AF4500274AAE /* UPDChangesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDChangesView.h; path = Classes/UPDChangesView.h; sourceTree = "<group>"; };
+		02901A481985AF4500274AAE /* UPDChangesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDChangesView.m; path = Classes/UPDChangesView.m; sourceTree = "<group>"; };
 		02934A2F19830E3100FEBB03 /* UPDButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDButton.h; path = Classes/UPDButton.h; sourceTree = "<group>"; };
 		02934A3019830E3100FEBB03 /* UPDButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDButton.m; path = Classes/UPDButton.m; sourceTree = "<group>"; };
 		02934A3219832ACD00FEBB03 /* UPDProcessingTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDProcessingTextField.h; path = Classes/UPDProcessingTextField.h; sourceTree = "<group>"; };
@@ -322,6 +325,8 @@
 				02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */,
 				02934A2F19830E3100FEBB03 /* UPDButton.h */,
 				02934A3019830E3100FEBB03 /* UPDButton.m */,
+				02901A471985AF4500274AAE /* UPDChangesView.h */,
+				02901A481985AF4500274AAE /* UPDChangesView.m */,
 				02A73D1A1975C501000A7C48 /* UPDCommon.h */,
 				02A73D1B1975C501000A7C48 /* UPDCommon.m */,
 				021F93791980999700F77395 /* UPDDocumentComparator.h */,
@@ -479,6 +484,7 @@
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
 				02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */,
 				02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */,
+				02901A491985AF4500274AAE /* UPDChangesView.m in Sources */,
 				02C238841976D594009327F8 /* UPDTableView.m in Sources */,
 				0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */,
 				02A733EC19770AB6002A86F3 /* UPDPreBrowserURLBar.m in Sources */,

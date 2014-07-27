@@ -20,5 +20,6 @@
 @property (nonatomic, strong) NSNumber *status;
 @property (nonatomic, strong) NSNumber *timerResult;
 @property (nonatomic, strong) NSManagedObjectID *objectID;
+@property (nonatomic, strong) NSData *url;
 
 @end

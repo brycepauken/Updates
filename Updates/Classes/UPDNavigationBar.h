@@ -11,6 +11,7 @@
 @interface UPDNavigationBar : UIView
 
 @property (nonatomic, copy) void(^addButtonBlock)();
+@property (nonatomic, copy) void(^backButtonBlock)();
 
 - (void)setText:(NSString *)text;
 

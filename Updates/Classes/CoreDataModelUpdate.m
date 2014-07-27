@@ -20,6 +20,7 @@
 @dynamic origResponse;
 @dynamic timerResult;
 @dynamic status;
+@dynamic url;
 @dynamic parent;
 
 @end

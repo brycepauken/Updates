@@ -22,6 +22,7 @@
 @property (nonatomic, retain) NSData *origResponse;
 @property (nonatomic, retain) NSNumber *timerResult;
 @property (nonatomic, retain) NSNumber *status;
+@property (nonatomic, retain) NSData *url;
 @property (nonatomic, retain) CoreDataModelUpdateList *parent;
 
 @end

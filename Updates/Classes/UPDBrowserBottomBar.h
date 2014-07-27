@@ -10,6 +10,8 @@
 
 @interface UPDBrowserBottomBar : UIView
 
+- (instancetype)initWithFrame:(CGRect)frame buttonNames:(NSArray *)buttonNames;
+
 - (void)setBlockForButtonWithName:(NSString *)name block:(void (^)())block;
 - (void)setButtonEnabledWithName:(NSString *)name enabled:(BOOL)enabled;
 

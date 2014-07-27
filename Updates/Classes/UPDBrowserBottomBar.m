@@ -20,11 +20,11 @@
 
 @implementation UPDBrowserBottomBar
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame buttonNames:(NSArray *)buttonNames {
     self = [super initWithFrame:frame];
     if(self) {
         [self setBackgroundColor:[UIColor UPDLightBlueColor]];
-        self.buttonNames = @[@"Cancel",@"Back",@"Forward",@"Accept"];
+        self.buttonNames = buttonNames;
         self.buttons = [[NSMutableArray alloc] initWithCapacity:self.buttonNames.count];
         self.buttonBlocks = [[NSMutableArray alloc] initWithCapacity:self.buttonNames.count];
         
@@ -33,7 +33,7 @@
             UPDBrowserBottomButton *button = [[UPDBrowserBottomButton alloc] initWithFrame:CGRectMake(buttonWidth*i, 0, buttonWidth, self.bounds.size.height)];
             [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
             [button setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth];
-            if(i==1||i==2) {
+            if([[self.buttonNames objectAtIndex:i] isEqualToString:@"Back"] || [[self.buttonNames objectAtIndex:i] isEqualToString:@"Forward"]) {
                 /*Back and Forward buttons disabled at start*/
                 [button setEnabled:NO];
             }

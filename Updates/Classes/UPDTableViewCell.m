@@ -53,7 +53,7 @@
         self.circleView = [[UIView alloc] init];
         [self.circleView.layer setCornerRadius:UPD_TABLEVIEW_CIRCLE_SIZE/2];
         [self.circleView.layer setShadowOffset:CGSizeZero];
-        [self.circleView.layer setShadowOpacity:1];
+        [self.circleView.layer setShadowOpacity:0.5];
         [self.circleView.layer setShadowRadius:1];
         [self.circleView setHidden:YES];
         [self addSubview:self.circleView];

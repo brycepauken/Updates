@@ -16,13 +16,14 @@
         <attribute name="origResponse" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="Integer 16" syncable="YES"/>
         <attribute name="timerResult" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="Binary" syncable="YES"/>
         <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UpdateList" inverseName="updates" inverseEntity="UpdateList" syncable="YES"/>
     </entity>
     <entity name="UpdateList" representedClassName="CoreDataModelUpdateList" syncable="YES">
         <relationship name="updates" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Update" inverseName="parent" inverseEntity="Update" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Update" positionX="-63" positionY="-18" width="128" height="193"/>
+        <element name="Update" positionX="-63" positionY="-18" width="128" height="208"/>
         <element name="UpdateList" positionX="-54" positionY="18" width="128" height="58"/>
         <element name="Option" positionX="-54" positionY="54" width="128" height="103"/>
     </elements>
