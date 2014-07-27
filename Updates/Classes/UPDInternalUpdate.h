@@ -16,6 +16,7 @@
 @property (nonatomic, strong) NSData *lastReponse;
 @property (nonatomic, strong) NSDate *lastUpdated;
 @property (nonatomic, strong) NSString *name;
+@property (nonatomic) double timerResult;
 @property (nonatomic, strong) NSManagedObjectID *objectID;
 
 @end

@@ -12,6 +12,7 @@
 
 + (UIColor *)colorFromImage:(UIImage *)image;
 + (UIColor *)UPDBrightBlueColor;
++ (UIColor *)UPDLessLightGreyColor;
 + (UIColor *)UPDLightBlueColor;
 + (UIColor *)UPDLighterBlueColor;
 + (UIColor *)UPDLightGreyBlueColor;

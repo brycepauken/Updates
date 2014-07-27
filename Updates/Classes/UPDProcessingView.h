@@ -10,9 +10,9 @@
 
 @interface UPDProcessingView : UIView <UITextFieldDelegate>
 
-@property (nonatomic, copy) void(^completionBlock)(NSString *name, NSArray *instructions, UIImage *favicon, NSString *lastReponse, NSDictionary *differenceOptions);
+@property (nonatomic, copy) void(^completionBlock)(NSString *name, NSArray *instructions, UIImage *favicon, NSString *lastReponse, NSDictionary *differenceOptions, NSTimeInterval timerResult);
 
 - (void)beginProcessingAnimation;
-- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url;
+- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult;
 
 @end

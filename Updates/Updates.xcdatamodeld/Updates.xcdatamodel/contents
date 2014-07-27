@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6172.12" systemVersion="14A298i" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Option" representedClassName="CoreDataModelOption" syncable="YES">
+        <attribute name="boolValue" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="doubleValue" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="intValue" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="name" attributeType="String" indexed="YES" syncable="YES"/>
+    </entity>
     <entity name="Update" representedClassName="CoreDataModelUpdate" syncable="YES">
         <attribute name="differenceOptions" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="favicon" optional="YES" attributeType="Binary" syncable="YES"/>
@@ -7,13 +13,15 @@
         <attribute name="lastResponse" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="lastUpdated" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timerResult" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UpdateList" inverseName="updates" inverseEntity="UpdateList" syncable="YES"/>
     </entity>
     <entity name="UpdateList" representedClassName="CoreDataModelUpdateList" syncable="YES">
         <relationship name="updates" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Update" inverseName="parent" inverseEntity="Update" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Update" positionX="-63" positionY="-18" width="128" height="150"/>
+        <element name="Update" positionX="-63" positionY="-18" width="128" height="165"/>
         <element name="UpdateList" positionX="-54" positionY="18" width="128" height="58"/>
+        <element name="Option" positionX="-54" positionY="54" width="128" height="103"/>
     </elements>
 </model>

@@ -33,6 +33,9 @@
 		028D7EB0197DB41700BE0643 /* ButtonOutlineQuarter.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EAC197DB41700BE0643 /* ButtonOutlineQuarter.png */; };
 		028D7EB1197DB41700BE0643 /* ButtonOutlineQuarter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EAD197DB41700BE0643 /* ButtonOutlineQuarter@2x.png */; };
 		028D7EB4197DB62B00BE0643 /* UPDBrowserConfirmButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 028D7EB3197DB62B00BE0643 /* UPDBrowserConfirmButton.m */; };
+		02901A371984B38100274AAE /* UPDTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 02901A361984B38100274AAE /* UPDTimer.m */; };
+		02901A3A1984BE7D00274AAE /* CoreDataModelOption.m in Sources */ = {isa = PBXBuildFile; fileRef = 02901A391984BE7D00274AAE /* CoreDataModelOption.m */; };
+		02901A3D1984CB0A00274AAE /* NSDate+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02901A3C1984CB0A00274AAE /* NSDate+UPDExtensions.m */; };
 		02934A3119830E3100FEBB03 /* UPDButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3019830E3100FEBB03 /* UPDButton.m */; };
 		02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */; };
 		02934A371983FE3F00FEBB03 /* CoreDataModelUpdateList.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */; };
@@ -115,6 +118,12 @@
 		028D7EAD197DB41700BE0643 /* ButtonOutlineQuarter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ButtonOutlineQuarter@2x.png"; path = "Resources/Images/ButtonOutlineQuarter@2x.png"; sourceTree = "<group>"; };
 		028D7EB2197DB62B00BE0643 /* UPDBrowserConfirmButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserConfirmButton.h; path = Classes/UPDBrowserConfirmButton.h; sourceTree = "<group>"; };
 		028D7EB3197DB62B00BE0643 /* UPDBrowserConfirmButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserConfirmButton.m; path = Classes/UPDBrowserConfirmButton.m; sourceTree = "<group>"; };
+		02901A351984B38100274AAE /* UPDTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDTimer.h; path = Classes/UPDTimer.h; sourceTree = "<group>"; };
+		02901A361984B38100274AAE /* UPDTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTimer.m; path = Classes/UPDTimer.m; sourceTree = "<group>"; };
+		02901A381984BE7D00274AAE /* CoreDataModelOption.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreDataModelOption.h; path = Classes/CoreDataModelOption.h; sourceTree = "<group>"; };
+		02901A391984BE7D00274AAE /* CoreDataModelOption.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreDataModelOption.m; path = Classes/CoreDataModelOption.m; sourceTree = "<group>"; };
+		02901A3B1984CB0A00274AAE /* NSDate+UPDExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDate+UPDExtensions.h"; path = "Classes/NSDate+UPDExtensions.h"; sourceTree = "<group>"; };
+		02901A3C1984CB0A00274AAE /* NSDate+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+UPDExtensions.m"; path = "Classes/NSDate+UPDExtensions.m"; sourceTree = "<group>"; };
 		02934A2F19830E3100FEBB03 /* UPDButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDButton.h; path = Classes/UPDButton.h; sourceTree = "<group>"; };
 		02934A3019830E3100FEBB03 /* UPDButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDButton.m; path = Classes/UPDButton.m; sourceTree = "<group>"; };
 		02934A3219832ACD00FEBB03 /* UPDProcessingTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDProcessingTextField.h; path = Classes/UPDProcessingTextField.h; sourceTree = "<group>"; };
@@ -281,10 +290,14 @@
 		02A73D191975C269000A7C48 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				02901A381984BE7D00274AAE /* CoreDataModelOption.h */,
+				02901A391984BE7D00274AAE /* CoreDataModelOption.m */,
 				02934A381983FE4000FEBB03 /* CoreDataModelUpdate.h */,
 				02934A391983FE4000FEBB03 /* CoreDataModelUpdate.m */,
 				02934A351983FE3F00FEBB03 /* CoreDataModelUpdateList.h */,
 				02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */,
+				02901A3B1984CB0A00274AAE /* NSDate+UPDExtensions.h */,
+				02901A3C1984CB0A00274AAE /* NSDate+UPDExtensions.m */,
 				024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */,
 				024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */,
 				02AF8766197B9DC0007D06C5 /* UPDAlertView.h */,
@@ -343,6 +356,8 @@
 				02C238831976D594009327F8 /* UPDTableView.m */,
 				02934A3E19840EBB00FEBB03 /* UPDTableViewCell.h */,
 				02934A3F19840EBB00FEBB03 /* UPDTableViewCell.m */,
+				02901A351984B38100274AAE /* UPDTimer.h */,
+				02901A361984B38100274AAE /* UPDTimer.m */,
 				02AF8752197A2F9C007D06C5 /* UPDURLProtocol.h */,
 				02AF8753197A2F9C007D06C5 /* UPDURLProtocol.m */,
 				02A73D131975C24B000A7C48 /* UPDViewController.h */,
@@ -457,8 +472,10 @@
 				02AF8757197A3124007D06C5 /* UPDInstructionAccumulator.m in Sources */,
 				02934A3A1983FE4000FEBB03 /* CoreDataModelUpdate.m in Sources */,
 				02934A371983FE3F00FEBB03 /* CoreDataModelUpdateList.m in Sources */,
+				02901A3A1984BE7D00274AAE /* CoreDataModelOption.m in Sources */,
 				024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */,
 				02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */,
+				02901A371984B38100274AAE /* UPDTimer.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
 				02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */,
 				02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */,
@@ -482,6 +499,7 @@
 				02934A4319842F5900FEBB03 /* UPDInstructionRunner.m in Sources */,
 				02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */,
 				0213C23A1974FE0C006BC204 /* main.m in Sources */,
+				02901A3D1984CB0A00274AAE /* NSDate+UPDExtensions.m in Sources */,
 				02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

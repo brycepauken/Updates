@@ -22,6 +22,7 @@
 #import "UPDBrowserConfirmButton.h"
 #import "UPDBrowserURLBar.h"
 #import "UPDInstructionAccumulator.h"
+#import "UPDTimer.h"
 #import "UPDURLProtocol.h"
 
 @interface UPDBrowserView()
@@ -75,20 +76,24 @@
             }
         }];
         [self.bottomBar setBlockForButtonWithName:@"Cancel" block:^{
+            [UPDTimer pauseTimer];
             UPDAlertView *alertView = [[UPDAlertView alloc] init];
             __unsafe_unretained UPDAlertView *weakAlertView = alertView;
             [alertView setTitle:@"Cancel"];
             [alertView setMessage:@"Are you sure you want to cancel the current update?\n\nNo progress will be saved."];
             [alertView setNoButtonBlock:^{
+                [UPDTimer resumeTimer];
                 [weakAlertView dismiss];
             }];
             [alertView setYesButtonBlock:^{
+                [UPDTimer stopTimer];
                 [weakAlertView dismiss];
                 [weakSelf cancelSession];
             }];
             [alertView show];
         }];
         [self.bottomBar setBlockForButtonWithName:@"Accept" block:^{
+            [UPDTimer pauseTimer];
             [weakSelf.completeOverlay setUserInteractionEnabled:YES];
             [weakSelf bringSubviewToFront:weakSelf.completeOverlay];
             [weakSelf bringSubviewToFront:weakSelf.confirmLabel];
@@ -155,6 +160,8 @@
  to our accumulator
  */
 - (void)beginSession {
+    [UPDTimer startTimer];
+    
     [self clearPersistentData];
     self.instructionAccumulator = [[UPDInstructionAccumulator alloc] init];
     [UPDURLProtocol setInstructionAccumulator:self.instructionAccumulator];
@@ -199,6 +206,7 @@
 }
 
 - (void)confirmationCancelButtonTapped {
+    [UPDTimer resumeTimer];
     [self.confirmButton setUserInteractionEnabled:NO];
     [self.cancelButton setUserInteractionEnabled:NO];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
@@ -215,6 +223,8 @@
  */
 - (void)confirmButtonTapped {
     if(self.confirmBlock) {
+        NSTimeInterval timerResult = [UPDTimer stopTimer];
+        
         NSString *currentURL = [self.webView stringByEvaluatingJavaScriptFromString:@"window.location.href"];
         if(!currentURL) {
             currentURL = self.webView.request.URL.absoluteString;
@@ -258,7 +268,7 @@
                 [self.completeOverlay setTransform:CGAffineTransformScale(CGAffineTransformIdentity, UPD_BROWSER_IMAGE_SCALE, UPD_BROWSER_IMAGE_SCALE)];
                 [self.completeOverlay setAlpha:UPD_BROWSER_IMAGE_OPACITY];
             } completion:^(BOOL finished) {
-                self.confirmBlock(browserImage, self.instructionAccumulator.instructions, currentURL);
+                self.confirmBlock(browserImage, self.instructionAccumulator.instructions, currentURL, timerResult);
             }];
         }];
     }

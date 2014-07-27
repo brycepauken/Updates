@@ -8,6 +8,8 @@
 
 #import "UPDTableViewCell.h"
 
+#import "NSDate+UPDExtensions.h"
+
 @interface UPDTableViewCell()
 
 @property (nonatomic, strong) UIView *bar;
@@ -15,9 +17,11 @@
 @property (nonatomic, strong) UIView *divider;
 @property (nonatomic, strong) UIImageView *faviconView;
 @property (nonatomic) BOOL hideMessageReceived;
+@property (nonatomic, strong) NSDate *lastUpdated;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UIActivityIndicatorView *spinner;
 @property (nonatomic, strong) UILabel *updatedLabel;
+@property (nonatomic, strong) NSTimer *updatedLabelTimer;
 
 @property (nonatomic, copy) void((^contactBlock)());
 @property (nonatomic, strong) CADisplayLink *displayLink;
@@ -122,7 +126,14 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {}
 
 - (void)setLastUpdated:(NSDate *)lastUpdated {
-    [self.updatedLabel setText:@"Last updated 5 minutes ago"];
+    if(![_lastUpdated isEqualToDate:lastUpdated]) {
+        _lastUpdated = lastUpdated;
+        if(self.updatedLabelTimer) {
+            [self.updatedLabelTimer invalidate];
+        }
+        [self setUpdatedLabelTimer:[NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(updateDateText) userInfo:nil repeats:YES]];
+        [self updateDateText];
+    }
 }
 
 - (void)setName:(NSString *)name {
@@ -173,6 +184,15 @@
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(hideSpinnerAnimation)];
         [self.displayLink setFrameInterval:1];
         [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    }
+}
+
+- (void)updateDateText {
+    if(self.lastUpdated) {
+        [self.updatedLabel setText:[NSString stringWithFormat:@"Last updated %@",[self.lastUpdated relativeDateFromDate:[NSDate date]]]];
+    }
+    else {
+        [self.updatedLabel setText:@""];
     }
 }
 

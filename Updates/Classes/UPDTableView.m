@@ -13,6 +13,7 @@
 
 #import "UPDTableView.h"
 
+#import "CoreDataModelOption.h"
 #import "CoreDataModelUpdate.h"
 #import "CoreDataModelUpdateList.h"
 #import "UPDAppDelegate.h"
@@ -27,6 +28,7 @@
 @property (nonatomic, strong) NSString *refreshLabelFormat;
 @property (nonatomic, strong) UIView *refreshView;
 @property (nonatomic, strong) UILabel *startLabel;
+@property (nonatomic) double timeSaved;
 @property (nonatomic, strong) NSMutableArray *updates;
 
 @end
@@ -68,7 +70,7 @@
         [self.refreshLabel setTextAlignment:NSTextAlignmentCenter];
         [self.refreshLabel setTextColor:[UIColor lightGrayColor]];
         [self.refreshView addSubview:self.refreshLabel];
-        [self setRefreshLabelFormat:@"You've saved %@ so far\nPull to save more!"];
+        [self setRefreshLabelFormat:@"You've saved %@ so far.\nPull to save more!"];
         [self updateRefreshLabel];
         
         [self registerClass:[UPDTableViewCell class] forCellReuseIdentifier:@"UPDTableViewCell"];
@@ -81,12 +83,14 @@
 }
 
 - (void)beginRefresh {
-    [self refreshRow:0];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+       [self refreshRow:0];
+    });
 }
 
 - (void)endRefresh {
     [self.refreshView setTag:0];
-    [self setRefreshLabelFormat:@"You've saved %@ so far\nPull to save more!"];
+    [self setRefreshLabelFormat:@"You've saved %@ so far.\nPull to save more!"];
     [self updateRefreshLabel];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
        [self setContentInset:UIEdgeInsetsZero]; 
@@ -100,11 +104,14 @@
             [cell showSpinner];
         }
         UPDInternalUpdate *update = [self.updates objectAtIndex:row];
+        NSDate *startDate = [NSDate date];
         [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastReponse] differenceOptions:update.differenceOptions completionBlock:^(UPDInstructionRunnerResult result) {
             NSLog(@"%i: %lu",row,result);
             if(row<[self numberOfRowsInSection:0]-1) {
                 UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row+1 inSection:0]];
                 [cell hideSpinnerWithContactBlock:^{
+                    [cell setLastUpdated:[NSDate date]];
+                    [self saveUpdateWithObjectID:update.objectID updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
                     [nextCell showSpinner];
                     [self refreshRow:row+1];
                 }];
@@ -112,6 +119,8 @@
             else {
                 /*last one!*/
                 [cell hideSpinnerWithContactBlock:^{
+                    [cell setLastUpdated:[NSDate date]];
+                    [self saveUpdateWithObjectID:update.objectID updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
                     [self endRefresh];
                 }];
             }
@@ -126,6 +135,20 @@
 - (void)reloadData {
     self.updates = [[NSMutableArray alloc] init];
     NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
+    
+    NSFetchRequest *optionTimeSavedRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
+    [optionTimeSavedRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"TimeSaved"]];
+    NSError *optionTimeSavedRequestError;
+    CoreDataModelOption *optionTimeSaved = [[context executeFetchRequest:optionTimeSavedRequest error:&optionTimeSavedRequestError] firstObject];
+    if(optionTimeSaved) {
+        self.timeSaved = optionTimeSaved.doubleValue.doubleValue;
+        [self updateRefreshLabel];
+    }
+    else {
+        self.timeSaved = 0;
+        [self saveUpdateWithObjectID:nil updateDuration:0];
+    }
+    
     NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
     NSError *updateListFetchRequestError;
     CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
@@ -138,6 +161,7 @@
             newUpdate.lastReponse = update.lastResponse;
             newUpdate.lastUpdated = update.lastUpdated;
             newUpdate.instructions = update.instructions;
+            newUpdate.timerResult = update.timerResult;
             newUpdate.objectID = update.objectID;
             [self.updates insertObject:newUpdate atIndex:0];
         }
@@ -149,10 +173,56 @@
     [self.startLabel setHidden:tableFilled];
 }
 
+/*
+ Updates the given object's "last updated" field, along with
+ updating the total amount of time saved
+ */
+- (void)saveUpdateWithObjectID:(NSManagedObjectID *)objectID updateDuration:(NSTimeInterval)duration {
+    NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
+    NSDate *updatedDate = [NSDate date];
+    if(objectID) {
+        for(UPDInternalUpdate *update in self.updates) {
+            if([update.objectID isEqual:objectID]) {
+                [update setLastUpdated:updatedDate];
+            }
+        }
+        
+        NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+        NSError *updateListFetchRequestError;
+        CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+        if(updateList) {
+            for(CoreDataModelUpdate *update in updateList.updates) {
+                if([update.objectID isEqual:objectID]) {
+                    [update setLastUpdated:updatedDate];
+                    CGFloat timeJustSaved = update.timerResult - duration;
+                    self.timeSaved += timeJustSaved>0?timeJustSaved:0;
+                }
+            }
+        }
+    }
+    
+    NSFetchRequest *optionTimeSavedRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
+    [optionTimeSavedRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"TimeSaved"]];
+    NSError *optionTimeSavedRequestError;
+    CoreDataModelOption *optionTimeSaved = [[context executeFetchRequest:optionTimeSavedRequest error:&optionTimeSavedRequestError] firstObject];
+    if(optionTimeSaved) {
+        [optionTimeSaved setDoubleValue:@(self.timeSaved)];
+    }
+    else {
+        optionTimeSaved = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
+        [optionTimeSaved setName:@"TimeSaved"];
+        [optionTimeSaved setDoubleValue:@(0)];
+    }
+    
+    NSError *saveError;
+    [context save:&saveError];
+    [self updateRefreshLabel];
+}
+
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if(scrollView.contentOffset.y<=-UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT && self.refreshView.tag<2) {
         [self.refreshView setTag:2];
-        [self setRefreshLabelFormat:@"You've saved %@ so far"];
+        [self setRefreshLabelFormat:@"You've saved %@ so far."];
         [self updateRefreshLabel];
         [self beginRefresh];
         [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST delay:UPD_TRANSITION_DELAY options:0 animations:^{
@@ -173,27 +243,53 @@
     else {
         if(scrollView.contentOffset.y<=-UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT && self.refreshView.tag==0) {
             [self.refreshView setTag:1];
-            [self setRefreshLabelFormat:@"You've saved %@ so far\nRelease to save more!"];
+            [self setRefreshLabelFormat:@"You've saved %@ so far.\nRelease to save more!"];
             [self updateRefreshLabel];
         }
         else if(scrollView.contentOffset.y>-UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT && self.refreshView.tag==1) {
             [self.refreshView setTag:0];
-            [self setRefreshLabelFormat:@"You've saved %@ so far\nPull to save more!"];
+            [self setRefreshLabelFormat:@"You've saved %@ so far.\nPull to save more!"];
             [self updateRefreshLabel];
         }
     }
 }
 
 - (void)updateRefreshLabel {
-    NSString *timeText = @"0 seconds";
+    NSString *timeText;
+    int timeSaved = (int)floor(self.timeSaved);
+    if(timeSaved<=0) {
+        timeText = [NSString stringWithFormat:@"0 seconds"];
+    }
+    else if(timeSaved<60) {
+        timeText = [NSString stringWithFormat:@"%i second%@",timeSaved,timeSaved==1?@"":@"s"];
+    }
+    else if(timeSaved<60*60) {
+        timeSaved/=60;
+        timeText = [NSString stringWithFormat:@"%i minute%@",timeSaved,timeSaved==1?@"":@"s"];
+    }
+    else if(timeSaved<60*60*24) {
+        timeSaved/=(60*60);
+        timeText = [NSString stringWithFormat:@"%i hour%@",timeSaved,timeSaved==1?@"":@"s"];
+    }
+    else if(timeSaved<60*60*24*31) {
+        timeSaved/=(60*60*24);
+        timeText = [NSString stringWithFormat:@"%i day%@",timeSaved,timeSaved==1?@"":@"s"];
+    }
+    else if(timeSaved<60*60*24*31*365) {
+        timeSaved/=(60*60*24*31);
+        timeText = [NSString stringWithFormat:@"%i month%@",timeSaved,timeSaved==1?@"":@"s"];
+    }
+    else {
+        timeSaved/=(60*60*24*31*365);
+        timeText = [NSString stringWithFormat:@"%i year%@",timeSaved,timeSaved==1?@"":@"s"];
+    }
     NSMutableAttributedString *newText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:self.refreshLabelFormat,timeText]];
     NSUInteger timeTextLocation = [self.refreshLabelFormat rangeOfString:@"%@"].location;
     [newText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:18] range:NSMakeRange(0, timeTextLocation)];
     [newText addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:18] range:NSMakeRange(timeTextLocation, timeText.length)];
-    [newText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:18] range:NSMakeRange(timeTextLocation+timeText.length, self.refreshLabelFormat.length-(timeTextLocation+timeText.length))];
+    [newText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:18] range:NSMakeRange(timeTextLocation+timeText.length, self.refreshLabelFormat.length-2-timeTextLocation)];
     [self.refreshLabel setAttributedText:newText];
-    [self.refreshLabel sizeToFit];
-    [self.refreshLabel setFrame:CGRectMake((self.refreshView.bounds.size.width-self.refreshLabel.bounds.size.width)/2, (self.refreshView.bounds.size.height-self.refreshLabel.bounds.size.height)/2, self.refreshLabel.bounds.size.width, self.refreshLabel.bounds.size.height)];
+    [self.refreshLabel setFrame:self.refreshView.bounds];
 }
 
 #pragma mark - Data Source Methods

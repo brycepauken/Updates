@@ -14,6 +14,7 @@
 
 #import "UPDAppDelegate.h"
 
+#import "UPDTimer.h"
 #import "UPDViewController.h"
 
 @implementation UPDAppDelegate
@@ -43,6 +44,27 @@
     
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+/*
+ Pause the browser's timer (if it's running)
+ */
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    [UPDTimer stopTimer];
+}
+
+/*
+ Pause the browser's timer (if it's running)
+ */
+- (void)applicationWillEnterBackground:(UIApplication *)application {
+    [UPDTimer pauseTimer];
+}
+
+/*
+ Resume the browser's timer (if it's running)
+ */
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    [UPDTimer resumeTimer];
 }
 
 #pragma mark - Core Data Related Methods

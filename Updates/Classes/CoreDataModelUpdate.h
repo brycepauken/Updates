@@ -19,6 +19,7 @@
 @property (nonatomic, retain) NSData *instructions;
 @property (nonatomic, retain) NSData *lastResponse;
 @property (nonatomic, retain) NSDate *lastUpdated;
+@property (nonatomic) double timerResult;
 @property (nonatomic, retain) CoreDataModelUpdateList *parent;
 
 @end

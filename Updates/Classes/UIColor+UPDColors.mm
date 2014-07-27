@@ -72,11 +72,11 @@
                 commonPixel.a = 1;
             }
             CGFloat brightness = sqrt(0.299*commonPixel.r*commonPixel.r + 0.587*commonPixel.g*commonPixel.g + 0.114*commonPixel.b*commonPixel.b);
-            if(brightness<230) {
+            if(brightness<204) {
                 commonColor = [UIColor colorWithRed:(commonPixel.r/255.0f) green:(commonPixel.g/255.0f) blue:(commonPixel.b/255.0f) alpha:(commonPixel.a/255.0f)];
             }
             else {
-                commonColor = [UIColor UPDLightGreyColor];
+                commonColor = [UIColor UPDLessLightGreyColor];
             }
         }
         free(pixelsOrig);
@@ -96,6 +96,17 @@
     });
     
     return brightBlueColor;
+}
+
++ (UIColor *)UPDLessLightGreyColor {
+    static UIColor *lessLightGrayColor = nil;
+    static dispatch_once_t dispatchOnceToken;
+    
+    dispatch_once(&dispatchOnceToken, ^{
+        lessLightGrayColor = [UIColor colorWithWhite:0.80 alpha:1];
+    });
+    
+    return lessLightGrayColor;
 }
 
 + (UIColor *)UPDLightBlueColor {

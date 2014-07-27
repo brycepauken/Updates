@@ -102,10 +102,10 @@
                 [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
             }];
         }];
-        [self.browserView setConfirmBlock:^(UIImage *browserImage, NSArray *instructions, NSString *url){
+        [self.browserView setConfirmBlock:^(UIImage *browserImage, NSArray *instructions, NSString *url, NSTimeInterval timerResult) {
             [weakSelf.preProcessingView setHidden:NO];
             [weakSelf.preProcessingView beginPreProcessingWithBrowserImage:browserImage];
-            [weakSelf.processingView processInstructions:instructions forURL:url];
+            [weakSelf.processingView processInstructions:instructions forURL:url withTimerResult:timerResult];
         }];
         [self.scrollView addSubview:self.browserView];
         
@@ -121,8 +121,8 @@
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
-        [self.processingView setCompletionBlock:^(NSString *name, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions) {
-            [weakSelf saveUpdateWithName:name instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions];
+        [self.processingView setCompletionBlock:^(NSString *name, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult) {
+            [weakSelf saveUpdateWithName:name instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult];
             [weakSelf.tableView reloadData];
             
             /*move browser view over for a more seamless animation*/
@@ -161,7 +161,7 @@
     [self.processingView setFrame:CGRectMake(self.scrollView.bounds.size.width*self.browserView.tag, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
-- (void)saveUpdateWithName:(NSString *)name instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions {
+- (void)saveUpdateWithName:(NSString *)name instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult {
     NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
     
     /*get existing updates list*/
@@ -180,6 +180,7 @@
     [update setFavicon:UIImagePNGRepresentation(favicon)];
     [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
     [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
+    [update setTimerResult:timerResult];
     [update setParent:updateList];
     
     NSMutableOrderedSet *updates = [updateList.updates mutableCopy];

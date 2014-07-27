@@ -17,6 +17,7 @@
 @dynamic instructions;
 @dynamic lastResponse;
 @dynamic lastUpdated;
+@dynamic timerResult;
 @dynamic parent;
 
 @end

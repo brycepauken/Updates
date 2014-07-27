@@ -47,6 +47,7 @@
 @property (nonatomic, strong) UPDButton *protectButtonWhy;
 @property (nonatomic, strong) UPDButton *protectButtonYes;
 @property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic) NSTimeInterval timerResult;
 
 @end
 
@@ -420,10 +421,11 @@
     }
 }
 
-- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url {
+- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult {
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
     [self.instructionProcessor setInstructions:instructions];
     [self.instructionProcessor setUrl:url];
+    [self setTimerResult:timerResult];
     __unsafe_unretained UPDProcessingView *weakSelf = self;
     [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastReponse){
         weakSelf.instructions = instructions;
@@ -516,7 +518,7 @@
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*4*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             if(self.completionBlock) {
-                self.completionBlock(self.nameTextField.text, self.instructions, self.favicon, self.lastResponse, self.differenceOptions);
+                self.completionBlock(self.nameTextField.text, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult);
             }
         });
     }
