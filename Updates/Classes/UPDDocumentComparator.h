@@ -12,6 +12,6 @@
 
 + (BOOL)document:(NSString *)doc1 isEquivalentToDocument:(NSString *)doc2;
 + (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2;
-+ (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight;
++ (id)document:(NSString *)doc1 compareTextWithDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight;
 
 @end

@@ -17,9 +17,11 @@
 #import "UPDDocumentComparator.h"
 
 #import <libxml/HTMLparser.h>
+#import <libxml/xmlsave.h>
 
 #include <algorithm>
 #include <numeric>
+#include <string>
 #include <vector>
 
 @implementation UPDDocumentComparator
@@ -129,18 +131,74 @@ struct ElementCount {
 #pragma mark - Visible Text Equal
 
 + (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2 {
-    return [self document:doc1 visibleTextIsEqualToDocument:doc2 highlightChanges:NO];
+    return [[self document:doc1 compareTextWithDocument:doc2 highlightChanges:NO] boolValue];
 }
 
-+ (BOOL)document:(NSString *)doc1 visibleTextIsEqualToDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight {
+/*
+ Returns an NSString object representing the page with differences
+ highlighted if 'highlight' is true; otherwise returns an NSNumber BOOL
+ representing whether or not the pages are equal
+ */
++ (id)document:(NSString *)doc1 compareTextWithDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight {
     htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[doc1 UTF8String], NULL, _enc, _options);;
     xmlNode *currentNode1 = (xmlNode *)origDoc;
     xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[doc2 UTF8String], NULL, _enc, _options);
     
+    while(currentNode1 != NULL && currentNode2 != NULL) {
+        [self iterateToNextTextNode:&currentNode1];
+        [self iterateToNextTextNode:&currentNode2];
+        if(currentNode1 != NULL && currentNode2 != NULL) {
+            if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0) {
+                if(!highlight) {
+                    return @(NO);
+                }
+                else {
+                    std::string prevContent((const char *)currentNode1->content);
+                    xmlNodeSetContent(currentNode1, (xmlChar *)"");
+                    xmlNodePtr spanNode = xmlNewNode(0, (xmlChar*)"span");
+                    xmlNewProp(spanNode, (xmlChar*)"style", (xmlChar*)"margin: -2px !important; padding: 2px !important; background: #f8f388 !important; border-radius: 2px !important; -moz-border-radius: 2px !important; -webkit-border-radius: 2px !important;");
+                    xmlNodeSetContent(spanNode, (xmlChar*)prevContent.c_str());
+                    xmlAddChild(currentNode1->parent, spanNode);
+                    
+                    /*add a node to the second doc, just to keep iteration the same*/
+                    xmlNodePtr spanNode2 = xmlNewNode(0, (xmlChar*)"span");
+                    xmlNodeSetContent(spanNode2, (xmlChar*)"");
+                    xmlAddChild(currentNode2->parent, spanNode2);
+                    
+                    currentNode1 = currentNode1->parent;
+                    currentNode2 = currentNode2->parent;
+                    [self stepNode:&currentNode1 skipChildren:YES];
+                    [self stepNode:&currentNode2 skipChildren:YES];
+                }
+            }
+            [self stepNode:&currentNode1 skipChildren:NO];
+            [self stepNode:&currentNode2 skipChildren:NO];
+        }
+    }
+    if(!highlight) {
+        return @(YES);
+    }
+    else {
+        xmlBufferPtr buffer = xmlBufferCreate();
+        xmlSaveCtxtPtr savePointer = xmlSaveToBuffer(buffer, "UTF-8", 0);
+        xmlSaveDoc(savePointer, origDoc);
+        xmlSaveFlush(savePointer);
+        xmlSaveClose(savePointer);
+        return [[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding];
+    }
+}
+
+/*
+ Takes a given node and uses it to iterate through the document
+ (check children, then sibling node, then parent's next sibling, etc.)
+ until the node represents a non-empty piece of text. 'node' will be NULL
+ if the document has completed.
+ */
++ (void)iterateToNextTextNode:(xmlNode **)node {
     while(true) {
-        if(currentNode1->name && strcmp((char *)currentNode1->name, "text")==0) {
+        if((*node)->name && strcmp((char *)(*node)->name, "text")==0) {
             bool stringIsWhiteSpace = true;
-            char *s = (char *)currentNode1->content;
+            char *s = (char *)(*node)->content;
             while(*s != '\0') {
                 if(!isspace(*s)) {
                     stringIsWhiteSpace = false;
@@ -149,90 +207,37 @@ struct ElementCount {
                 s++;
             }
             if(!stringIsWhiteSpace) {
-                while(true) {
-                    BOOL breakNotContinue = false;
-                    if(currentNode2->name && strcmp((char *)currentNode2->name, "text")==0) {
-                        bool stringIsWhiteSpace2 = true;
-                        char *s2 = (char *)currentNode2->content;
-                        while(*s2 != '\0') {
-                            if(!isspace(*s2)) {
-                                stringIsWhiteSpace2 = false;
-                                break;
-                            }
-                            s2++;
-                        }
-                        if(!stringIsWhiteSpace2) {
-                            if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0) {
-                                if(highlight) {
-                                    xmlNodeSetContent(currentNode1, (xmlChar *)"hello world");
-                                }
-                                else {
-                                    return NO;
-                                }
-                            }
-                            breakNotContinue = true;
-                        }
-                    }
-                    
-                    if(currentNode2->children != NULL) {
-                        currentNode2 = currentNode2->children;
-                        if(breakNotContinue) {
-                            break;
-                        }
-                        else {
-                            continue;
-                        }
-                    }
-                    if(currentNode2->next != NULL) {
-                        currentNode2 = currentNode2->next;
-                        if(breakNotContinue) {
-                            break;
-                        }
-                        else {
-                            continue;
-                        }
-                    }
-                    while(currentNode2->parent != NULL && currentNode2->parent->next == NULL) {
-                        currentNode2 = currentNode2->parent;
-                    }
-                    if(currentNode2->parent != NULL && currentNode2->parent->next != NULL) {
-                        currentNode2 = currentNode2->parent->next;
-                        if(breakNotContinue) {
-                            break;
-                        }
-                        else {
-                            continue;
-                        }
-                    }
-                    break;
-                }
+                break;
             }
         }
-        
-        if(currentNode1->children != NULL) {
-            currentNode1 = currentNode1->children;
-            continue;
+        if(![self stepNode:node skipChildren:NO]) {
+            break;
         }
-        if(currentNode1->next != NULL) {
-            currentNode1 = currentNode1->next;
-            continue;
-        }
-        while(currentNode1->parent != NULL && currentNode1->parent->next == NULL) {
-            currentNode1 = currentNode1->parent;
-        }
-        if(currentNode1->parent != NULL && currentNode1->parent->next != NULL) {
-            currentNode1 = currentNode1->parent->next;
-            continue;
-        }
-        break;
     }
-    
-    if(highlight) {
-        xmlSaveFileEnc("-", origDoc, "UTF-8");
-        
+}
+
+/*
+ Advances the iteration described in iterateToNextTextNode by one step.
+ Returns NO if there is nothing left to iterate.
+ */
++ (BOOL)stepNode:(xmlNode **)node skipChildren:(BOOL)skipChildren {
+    if(!skipChildren && (*node)->children != NULL) {
+        (*node) = (*node)->children;
+        return YES;
     }
-    
-    return YES;
+    if((*node)->next != NULL) {
+        (*node) = (*node)->next;
+        return YES;
+    }
+    while((*node)->parent != NULL && (*node)->parent->next == NULL) {
+        (*node) = (*node)->parent;
+    }
+    if((*node)->parent != NULL && (*node)->parent->next != NULL) {
+        (*node) = (*node)->parent->next;
+        return YES;
+    }
+    (*node) = NULL;
+    return NO;
 }
 
 @end

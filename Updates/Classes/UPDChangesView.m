@@ -6,11 +6,14 @@
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
-#import "UPDBrowserBottomBar.h"
 #import "UPDChangesView.h"
+
+#import "UPDBrowserBottomBar.h"
 #import "UPDDocumentComparator.h"
 #import "UPDInternalUpdate.h"
 #import "UPDNavigationBar.h"
+
+#import "UPDURLProtocol.h"
 
 @interface UPDChangesView()
 
@@ -72,12 +75,13 @@
 
 - (void)showUpdate:(UPDInternalUpdate *)update {
     self.update = update;
-    
+    [NSURLProtocol registerClass:[UPDURLProtocol class]];
     if(update.lastResponse == nil) {
-        [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastResponse] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
+        [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
     }
     else {
-        [UPDDocumentComparator document:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastResponse] visibleTextIsEqualToDocument:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] highlightChanges:YES];
+        NSString *highlightedPage = [UPDDocumentComparator document:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastResponse] compareTextWithDocument:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] highlightChanges:YES];
+        [self.webView loadHTMLString:highlightedPage baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
     }
 }
 
