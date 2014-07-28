@@ -137,39 +137,24 @@ struct ElementCount {
 /*
  Returns an NSString object representing the page with differences
  highlighted if 'highlight' is true; otherwise returns an NSNumber BOOL
- representing whether or not the pages are equal
+ representing whether or not the pages are equal. Uses a Longest
+ Common Sequence type implementation to account for offset differenes.
  */
 + (id)document:(NSString *)doc1 compareTextWithDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight {
     htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[doc1 UTF8String], NULL, _enc, _options);;
     xmlNode *currentNode1 = (xmlNode *)origDoc;
     xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[doc2 UTF8String], NULL, _enc, _options);
+    std::vector<xmlNodePtr>textElements1;
+    std::vector<xmlNodePtr>textElements2;
     
     while(currentNode1 != NULL && currentNode2 != NULL) {
         [self iterateToNextTextNode:&currentNode1];
         [self iterateToNextTextNode:&currentNode2];
         if(currentNode1 != NULL && currentNode2 != NULL) {
-            if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0) {
-                if(!highlight) {
-                    return @(NO);
-                }
-                else {
-                    std::string prevContent((const char *)currentNode1->content);
-                    xmlNodeSetContent(currentNode1, (xmlChar *)"");
-                    xmlNodePtr spanNode = xmlNewNode(0, (xmlChar*)"span");
-                    xmlNewProp(spanNode, (xmlChar*)"style", (xmlChar*)"margin: -2px !important; padding: 2px !important; background: #f8f388 !important; border-radius: 2px !important; -moz-border-radius: 2px !important; -webkit-border-radius: 2px !important;");
-                    xmlNodeAddContent(spanNode, (xmlChar*)prevContent.c_str());
-                    xmlAddChild(currentNode1->parent, spanNode);
-                    
-                    /*add a node to the second doc, just to keep iteration the same*/
-                    xmlNodePtr spanNode2 = xmlNewNode(0, (xmlChar*)"span");
-                    xmlNodeSetContent(spanNode2, (xmlChar*)"");
-                    xmlAddChild(currentNode2->parent, spanNode2);
-                    
-                    currentNode1 = currentNode1->parent;
-                    currentNode2 = currentNode2->parent;
-                    [self stepNode:&currentNode1 skipChildren:YES];
-                    [self stepNode:&currentNode2 skipChildren:YES];
-                }
+            textElements1.push_back(currentNode1);
+            textElements2.push_back(currentNode2);
+            if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0 && !highlight) {
+                return @(NO);
             }
             [self stepNode:&currentNode1 skipChildren:NO];
             [self stepNode:&currentNode2 skipChildren:NO];
@@ -178,15 +163,76 @@ struct ElementCount {
     if(!highlight) {
         return @(YES);
     }
-    else {
-        xmlBufferPtr buffer = xmlBufferCreate();
-        xmlSaveCtxtPtr savePointer = xmlSaveToBuffer(buffer, "UTF-8", 0);
-        xmlSaveDoc(savePointer, origDoc);
-        xmlSaveFlush(savePointer);
-        xmlSaveClose(savePointer);
-        return [[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding];
+    
+    /*remove equivilant elements from each text vector*/
+    while(!textElements1.empty() && !textElements2.empty() && strcmp((char *)(*textElements1.begin())->content, (char *)(*textElements2.begin())->content)==0) {
+        textElements1.erase(textElements1.begin());
+        textElements2.erase(textElements2.begin());
+    }
+    while(!textElements1.empty() && !textElements2.empty() && strcmp((char *)(*textElements1.rbegin())->content, (char *)(*textElements2.rbegin())->content)==0) {
+        textElements1.pop_back();
+        textElements2.pop_back();
+    }
+    
+    /*wouldn't want to recheck this everytime*/
+    int s1 = (int)textElements1.size()+1;
+    int s2 = (int)textElements2.size()+1;
+    int **lcsTable = (int **)malloc(s1*sizeof(int *));
+    for(int i=0;i<s1;i++) {
+        lcsTable[i] = (int *)malloc(s2*sizeof(int));
+    }
+    
+    for(int i=0;i<s1;i++) {
+        lcsTable[i][0] = 0;
+    }
+    for(int i=0;i<s2;i++) {
+        lcsTable[0][i] = 0;
+    }
+    for(int i=1;i<s1;i++) {
+        for(int j=1;j<s2;j++) {
+            if(strcmp((char *)textElements1.at(i-1)->content, (char *)textElements2.at(j-1)->content)==0) {
+                lcsTable[i][j] = lcsTable[i-1][j-1]+1;
+            }
+            else {
+                lcsTable[i][j] = MAX(lcsTable[i][j-1],lcsTable[i-1][j]);
+            }
+        }
+    }
+    [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:s1-1 row:s2-1];
+    
+    xmlBufferPtr buffer = xmlBufferCreate();
+    xmlSaveCtxtPtr savePointer = xmlSaveToBuffer(buffer, "UTF-8", 0);
+    xmlSaveDoc(savePointer, origDoc);
+    xmlSaveFlush(savePointer);
+    xmlSaveClose(savePointer);
+    
+    free(lcsTable);
+    textElements1.clear();
+    textElements2.clear();
+    xmlCleanupParser();
+    xmlFreeDoc(origDoc);
+    
+    return [[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding];
+}
++ (void)highlightChangesWithLCStable:(int **)lcsTable firstTextVector:(std::vector<xmlNodePtr>)textElements1 secondTextVector:(std::vector<xmlNodePtr>)textElements2 column:(int)i row:(int)j {
+    if(i>0 && j>0 && strcmp((char *)textElements1.at(i-1)->content, (char *)textElements2.at(j-1)->content)==0) {
+        [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:i-1 row:j-1];
+    }
+    else if(j>0 && (i==0 || lcsTable[i][j-1] >= lcsTable[i-1][j])) {
+        [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:i row:j-1];
+    }
+    else if(i>0 && (j==0 || lcsTable[i][j-1] < lcsTable[i-1][j])) {
+        [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:i-1 row:j];
+        
+        std::string prevContent((const char *)textElements1.at(i-1)->content);
+        xmlNodeSetContent(textElements1.at(i-1), (xmlChar *)"");
+        xmlNodePtr spanNode = xmlNewNode(0, (xmlChar*)"span");
+        xmlNewProp(spanNode, (xmlChar*)"style", (xmlChar*)"margin: -2px !important; padding: 2px !important; background: #f8f388 !important; border-radius: 2px !important; -moz-border-radius: 2px !important; -webkit-border-radius: 2px !important;");
+        xmlNodeAddContent(spanNode, (xmlChar*)prevContent.c_str());
+        xmlAddChild(textElements1.at(i-1)->parent, spanNode);
     }
 }
+
 
 /*
  Takes a given node and uses it to iterate through the document
