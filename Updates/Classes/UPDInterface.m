@@ -165,7 +165,7 @@
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
                 [weakSelf.scrollView setContentOffset:CGPointZero];
             } completion:^(BOOL finished) {
-                [weakSelf.changesView setHidden:NO];
+                [weakSelf.changesView setHidden:YES];
                 [weakSelf.changesView setUserInteractionEnabled:YES];
             }];
         }];
