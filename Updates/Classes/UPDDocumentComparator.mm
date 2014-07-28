@@ -157,7 +157,7 @@ struct ElementCount {
                     xmlNodeSetContent(currentNode1, (xmlChar *)"");
                     xmlNodePtr spanNode = xmlNewNode(0, (xmlChar*)"span");
                     xmlNewProp(spanNode, (xmlChar*)"style", (xmlChar*)"margin: -2px !important; padding: 2px !important; background: #f8f388 !important; border-radius: 2px !important; -moz-border-radius: 2px !important; -webkit-border-radius: 2px !important;");
-                    xmlNodeSetContent(spanNode, (xmlChar*)prevContent.c_str());
+                    xmlNodeAddContent(spanNode, (xmlChar*)prevContent.c_str());
                     xmlAddChild(currentNode1->parent, spanNode);
                     
                     /*add a node to the second doc, just to keep iteration the same*/
