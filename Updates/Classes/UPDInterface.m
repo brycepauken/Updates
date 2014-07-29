@@ -116,10 +116,10 @@
                 [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
             }];
         }];
-        [self.browserView setConfirmBlock:^(UIImage *browserImage, NSArray *instructions, NSString *url, NSTimeInterval timerResult) {
+        [self.browserView setConfirmBlock:^(UIImage *browserImage, NSArray *instructions, NSString *url, NSTimeInterval timerResult, NSDate *origDate) {
             [weakSelf.preProcessingView setHidden:NO];
             [weakSelf.preProcessingView beginPreProcessingWithBrowserImage:browserImage];
-            [weakSelf.processingView processInstructions:instructions forURL:url withTimerResult:timerResult];
+            [weakSelf.processingView processInstructions:instructions forURL:url withTimerResult:timerResult withOrigDate:origDate];
         }];
         [self.scrollView addSubview:self.browserView];
         
@@ -135,8 +135,8 @@
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
-        [self.processingView setCompletionBlock:^(NSString *name, NSURL *url, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult) {
-            [weakSelf saveUpdateWithName:name url:url instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult];
+        [self.processingView setCompletionBlock:^(NSString *name, NSURL *url, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult, NSDate *origDate) {
+            [weakSelf saveUpdateWithName:name url:url instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult origDate:origDate];
             [weakSelf.tableView reloadData];
             
             /*move browser view over for a more seamless animation*/
@@ -190,7 +190,7 @@
     [self.changesView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
-- (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult {
+- (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult origDate:(NSDate *)origDate {
     NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
     
     /*get existing updates list*/
@@ -209,6 +209,7 @@
     [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
     [update setFavicon:UIImagePNGRepresentation(favicon)];
     [update setOrigResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
+    [update setOrigUpdated:origDate];
     [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
     [update setTimerResult:@(timerResult)];
     [update setStatus:@(0)];

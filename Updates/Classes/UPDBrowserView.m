@@ -224,6 +224,7 @@
 - (void)confirmButtonTapped {
     if(self.confirmBlock) {
         NSTimeInterval timerResult = [UPDTimer stopTimer];
+        NSDate *origDate = [NSDate date];
         
         NSString *currentURL = [self.webView stringByEvaluatingJavaScriptFromString:@"window.location.href"];
         if(!currentURL) {
@@ -268,7 +269,7 @@
                 [self.completeOverlay setTransform:CGAffineTransformScale(CGAffineTransformIdentity, UPD_BROWSER_IMAGE_SCALE, UPD_BROWSER_IMAGE_SCALE)];
                 [self.completeOverlay setAlpha:UPD_BROWSER_IMAGE_OPACITY];
             } completion:^(BOOL finished) {
-                self.confirmBlock(browserImage, self.instructionAccumulator.instructions, currentURL, timerResult);
+                self.confirmBlock(browserImage, self.instructionAccumulator.instructions, currentURL, timerResult, origDate);
             }];
         }];
     }

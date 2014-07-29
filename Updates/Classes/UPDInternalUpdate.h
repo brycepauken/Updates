@@ -16,6 +16,7 @@
 @property (nonatomic, strong) NSData *lastResponse;
 @property (nonatomic, strong) NSDate *lastUpdated;
 @property (nonatomic, strong) NSData *origResponse;
+@property (nonatomic, strong) NSDate *origUpdated;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSNumber *status;
 @property (nonatomic, strong) NSNumber *timerResult;

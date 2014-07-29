@@ -12,9 +12,9 @@
 
 @interface CoreDataModelOption : NSManagedObject
 
-@property (nonatomic, retain) NSString * name;
-@property (nonatomic, retain) NSNumber * boolValue;
-@property (nonatomic, retain) NSNumber * doubleValue;
-@property (nonatomic, retain) NSNumber * intValue;
+@property (nonatomic, retain) NSString *name;
+@property (nonatomic, retain) NSNumber *boolValue;
+@property (nonatomic, retain) NSNumber *doubleValue;
+@property (nonatomic, retain) NSNumber *intValue;
 
 @end

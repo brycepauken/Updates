@@ -160,6 +160,7 @@
             newUpdate.lastResponse = update.lastResponse;
             newUpdate.lastUpdated = update.lastUpdated;
             newUpdate.origResponse = update.origResponse;
+            newUpdate.origUpdated = update.origUpdated;
             newUpdate.instructions = update.instructions;
             newUpdate.status = update.status;
             newUpdate.timerResult = update.timerResult;

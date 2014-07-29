@@ -13,6 +13,7 @@
 @property (nonatomic, copy) void(^addButtonBlock)();
 @property (nonatomic, copy) void(^backButtonBlock)();
 
+- (void)setLabelFont:(UIFont *)font;
 - (void)setText:(NSString *)text;
 
 @end

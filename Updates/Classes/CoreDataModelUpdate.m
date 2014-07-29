@@ -18,6 +18,7 @@
 @dynamic lastResponse;
 @dynamic lastUpdated;
 @dynamic origResponse;
+@dynamic origUpdated;
 @dynamic timerResult;
 @dynamic status;
 @dynamic url;

@@ -38,6 +38,7 @@
 @property (nonatomic, strong) UPDButton *nameButton;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UPDProcessingTextField *nameTextField;
+@property (nonatomic, strong) NSDate *origDate;
 @property (nonatomic, strong) UIImageView *outline;
 @property (nonatomic, strong) UIImageView *outlineQuarter;
 @property (nonatomic, strong) UPDButton *processingButton;
@@ -422,11 +423,12 @@
     }
 }
 
-- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult {
+- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate {
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
     [self.instructionProcessor setInstructions:instructions];
     [self.instructionProcessor setUrl:url];
     [self setTimerResult:timerResult];
+    [self setOrigDate:origDate];
     __unsafe_unretained UPDProcessingView *weakSelf = self;
     [self.instructionProcessor setCompletionBlock:^(NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSURL *url) {
         weakSelf.instructions = instructions;
@@ -520,7 +522,7 @@
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*4*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             if(self.completionBlock) {
-                self.completionBlock(self.nameTextField.text, self.url, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult);
+                self.completionBlock(self.nameTextField.text, self.url, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult, self.origDate);
             }
         });
     }

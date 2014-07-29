@@ -94,10 +94,19 @@
     [self.backButton setHidden:!backButtonBlock];
 }
 
+- (void)setLabelFont:(UIFont *)font {
+    [self.label setFont:font];
+}
+
 - (void)setText:(NSString *)text {
-    NSMutableAttributedString *labelText = [[NSMutableAttributedString alloc] initWithString:[text uppercaseString]];
-    [labelText addAttribute:NSKernAttributeName value:@(8.0) range:NSMakeRange(0, labelText.length)];
-    [self.label setAttributedText:labelText];
+    if([self.label.font isEqual:[UIFont fontWithName:@"Futura-Medium" size:20]]) {
+        NSMutableAttributedString *labelText = [[NSMutableAttributedString alloc] initWithString:[text uppercaseString]];
+        [labelText addAttribute:NSKernAttributeName value:@(8.0) range:NSMakeRange(0, labelText.length)];
+        [self.label setAttributedText:labelText];
+    }
+    else {
+        [self.label setText:text];
+    }
 }
 
 @end
