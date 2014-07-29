@@ -19,6 +19,8 @@
 @implementation UPDViewController
 
 - (void)viewDidLoad {
+    [super viewDidLoad];
+    
     [self setNeedsStatusBarAppearanceUpdate];
     
     dispatch_async(dispatch_get_main_queue(), ^{

@@ -61,6 +61,7 @@
 }
 
 - (BOOL)resignFirstResponder {
+    [super resignFirstResponder];
     [self.textField resignFirstResponder];
     return YES;
 }

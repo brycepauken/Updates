@@ -276,11 +276,13 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
     [backgroundLayer setName:@"backgroundLayer"];
     [backgroundLayer setFrame:self.browserImageView.bounds];
     
-    CGImageRef foldingImage = CGImageCreateWithImageInRect([self scaledCGImage:fullImage.CGImage], foldingHalfFrame);
-    CGImageRef stationaryImage = CGImageCreateWithImageInRect([self scaledCGImage:fullImage.CGImage], stationaryHalfFrame);
+    CGImageRef fullImageScaled = [self newScaledCGImage:fullImage.CGImage];
+    CGImageRef foldingImage = CGImageCreateWithImageInRect(fullImageScaled, foldingHalfFrame);
+    CGImageRef stationaryImage = CGImageCreateWithImageInRect(fullImageScaled, stationaryHalfFrame);
+    CGImageRelease(fullImageScaled);
     
-    [foldingLayer setContents:(__bridge id)(foldingImage)];
-    [stationaryLayer setContents:(__bridge id)(stationaryImage)];
+    [foldingLayer setContents:CFBridgingRelease(foldingImage)];
+    [stationaryLayer setContents:CFBridgingRelease(stationaryImage)];
     [stationaryLayerShadowOverlay setBackgroundColor:[UIColor blackColor].CGColor];
     [stationaryLayerShadowOverlay setOpacity:0];
     [backgroundLayer addSublayer:stationaryLayerShadowOverlay];
@@ -340,6 +342,10 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
                         horizontalFold = !weakSelf.lastFoldWasHorizontal;
                         weakSelf.lastFoldWasHorizontal = horizontalFold;
                     }
+                    else {
+                        horizontalFold = weakSelf.lastFoldWasHorizontal;
+                        weakSelf.lastFoldWasHorizontal = horizontalFold;
+                    }
                 }
             }
             else if(canFoldWidth) {
@@ -375,7 +381,7 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
     self.individualAnimationCompletionBlock();
 }
 
-- (CGImageRef)scaledCGImage:(CGImageRef)image {
+- (CGImageRef)newScaledCGImage:(CGImageRef)image {
     CGContextRef context = NULL;
     void *bitmapData;
     int bitmapByteCount;
@@ -394,7 +400,6 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
     
     CGColorSpaceRef colorspace = CGImageGetColorSpace(image);
     context = CGBitmapContextCreate(bitmapData,width,height,8,bitmapBytesPerRow, colorspace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
-    CGColorSpaceRelease(colorspace);
     
     if (context == NULL) {
         return nil;

@@ -60,16 +60,17 @@
                 CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
                 unsigned char rgba[4];
                 CGContextRef context = CGBitmapContextCreate(rgba, 1, 1, 8, 4, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+                CGColorSpaceRelease(colorSpace);
                 CGContextSetFillColorWithColor(context, [UIColor UPDOffWhiteColor].CGColor);
                 CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
                 UIColor *newColor = [UIColor colorWithRed:(commonPixel.r/255.0f) green:(commonPixel.g/255.0f) blue:(commonPixel.b/255.0f) alpha:(commonPixel.a/255.0f)];
                 CGContextSetFillColorWithColor(context, newColor.CGColor);
                 CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
-                commonColor = [UIColor colorWithRed:(rgba[0]/255.0f) green:(rgba[1]/255.0f) blue:(rgba[2]/255.0f) alpha:(rgba[3]/255.0f)];
                 commonPixel.r = rgba[0];
                 commonPixel.g = rgba[1];
                 commonPixel.b = rgba[2];
                 commonPixel.a = 1;
+                CGContextRelease(context);
             }
             CGFloat brightness = sqrt(0.299*commonPixel.r*commonPixel.r + 0.587*commonPixel.g*commonPixel.g + 0.114*commonPixel.b*commonPixel.b);
             if(brightness<204) {

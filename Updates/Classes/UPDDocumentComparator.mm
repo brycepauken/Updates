@@ -62,7 +62,7 @@ struct ElementCount {
     }
     [self addElementsFromNode:(xmlNode *)htmlReadDoc((xmlChar *)[doc2 UTF8String], NULL, _enc, _options) toCountVector:&htmlElementCountsDoc2 previousCountVector:&htmlElementCountsDoc1];
     
-    double dotProduct;
+    double dotProduct = 0;
     auto dotProductIt1 = htmlElementCountsDoc1.begin();
     auto dotProductIt2 = htmlElementCountsDoc2.begin();
     while(dotProductIt1!=htmlElementCountsDoc1.end()) {
@@ -185,8 +185,11 @@ struct ElementCount {
     for(int i=0;i<s1;i++) {
         lcsTable[i][0] = 0;
     }
+    #ifndef __clang_analyzer__
     for(int i=0;i<s2;i++) {
-        lcsTable[0][i] = 0;
+        if(lcsTable[0] != NULL) {
+            lcsTable[0][i] = 0;
+        }
     }
     for(int i=1;i<s1;i++) {
         for(int j=1;j<s2;j++) {
@@ -198,6 +201,7 @@ struct ElementCount {
             }
         }
     }
+    #endif
     [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:s1-1 row:s2-1];
     
     xmlBufferPtr buffer = xmlBufferCreate();
