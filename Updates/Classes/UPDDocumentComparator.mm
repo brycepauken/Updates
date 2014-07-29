@@ -228,24 +228,31 @@ struct ElementCount {
     return [[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding];
 }
 + (void)highlightChangesWithLCStable:(int **)lcsTable firstTextVector:(std::vector<xmlNodePtr>)textElements1 secondTextVector:(std::vector<xmlNodePtr>)textElements2 column:(int)i row:(int)j {
-    if(i>0 && j>0 && strcmp((char *)textElements1.at(i-1)->content, (char *)textElements2.at(j-1)->content)==0) {
-        [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:i-1 row:j-1];
-    }
-    else if(j>0 && (i==0 || lcsTable[i][j-1] >= lcsTable[i-1][j])) {
-        [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:i row:j-1];
-    }
-    else if(i>0 && (j==0 || lcsTable[i][j-1] < lcsTable[i-1][j])) {
-        [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:i-1 row:j];
-        
-        const char *newStyle = "background: #f8f388 !important;";
-        const char *existingStyle = (const char *)xmlGetProp(textElements1.at(i-1)->parent, (xmlChar*)"style");
-        if(existingStyle != NULL) {
-            std::string combinedStyle(existingStyle);
-            combinedStyle.append(";");
-            combinedStyle.append(newStyle);
-            newStyle = combinedStyle.c_str();
+    while(true) {
+        if(i>0 && j>0 && strcmp((char *)textElements1.at(i-1)->content, (char *)textElements2.at(j-1)->content)==0) {
+            i--;
+            j--;
+            continue;
         }
-        xmlNewProp(textElements1.at(i-1)->parent, (xmlChar*)"style", (xmlChar*)newStyle);
+        else if(j>0 && (i==0 || lcsTable[i][j-1] >= lcsTable[i-1][j])) {
+            j--;
+            continue;
+        }
+        else if(i>0 && (j==0 || lcsTable[i][j-1] < lcsTable[i-1][j])) {
+            const char *newStyle = "background: #f8f388 !important;";
+            const char *existingStyle = (const char *)xmlGetProp(textElements1.at(i-1)->parent, (xmlChar*)"style");
+            if(existingStyle != NULL) {
+                std::string combinedStyle(existingStyle);
+                combinedStyle.append(";");
+                combinedStyle.append(newStyle);
+                newStyle = combinedStyle.c_str();
+            }
+            xmlNewProp(textElements1.at(i-1)->parent, (xmlChar*)"style", (xmlChar*)newStyle);
+            
+            i--;
+            continue;
+        }
+        break;
     }
 }
 
