@@ -228,12 +228,15 @@ struct ElementCount {
     else if(i>0 && (j==0 || lcsTable[i][j-1] < lcsTable[i-1][j])) {
         [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:i-1 row:j];
         
-        std::string prevContent((const char *)textElements1.at(i-1)->content);
-        xmlNodeSetContent(textElements1.at(i-1), (xmlChar *)"");
-        xmlNodePtr spanNode = xmlNewNode(0, (xmlChar*)"span");
-        xmlNewProp(spanNode, (xmlChar*)"style", (xmlChar*)"margin: -2px !important; padding: 2px !important; background: #f8f388 !important; border-radius: 2px !important; -moz-border-radius: 2px !important; -webkit-border-radius: 2px !important;");
-        xmlNodeAddContent(spanNode, (xmlChar*)prevContent.c_str());
-        xmlAddChild(textElements1.at(i-1)->parent, spanNode);
+        const char *newStyle = "background: #f8f388 !important;";
+        const char *existingStyle = (const char *)xmlGetProp(textElements1.at(i-1)->parent, (xmlChar*)"style");
+        if(existingStyle != NULL) {
+            std::string combinedStyle(existingStyle);
+            combinedStyle.append(";");
+            combinedStyle.append(newStyle);
+            newStyle = combinedStyle.c_str();
+        }
+        xmlNewProp(textElements1.at(i-1)->parent, (xmlChar*)"style", (xmlChar*)newStyle);
     }
 }
 

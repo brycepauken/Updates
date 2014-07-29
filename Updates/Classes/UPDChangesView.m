@@ -75,7 +75,6 @@
 
 - (void)showUpdate:(UPDInternalUpdate *)update {
     self.update = update;
-    [NSURLProtocol registerClass:[UPDURLProtocol class]];
     if(update.lastResponse == nil) {
         [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
     }
