@@ -156,14 +156,23 @@ struct ElementCount {
             if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0 && !highlight) {
                 return @(NO);
             }
-            [self stepNode:&currentNode1 skipChildren:NO];
-            [self stepNode:&currentNode2 skipChildren:NO];
+            [self stepNode:&currentNode1];
+            [self stepNode:&currentNode2];
         }
     }
     if(!highlight) {
-        return @(YES);
+        return @(currentNode1 != NULL && currentNode2 != NULL);
     }
-    
+    while(currentNode1 != NULL) {
+        textElements1.push_back(currentNode1);
+        [self stepNode:&currentNode1];
+        [self iterateToNextTextNode:&currentNode1];
+    }
+    while(currentNode2 != NULL) {
+        textElements2.push_back(currentNode2);
+        [self stepNode:&currentNode2];
+        [self iterateToNextTextNode:&currentNode2];
+    }
     /*remove equivilant elements from each text vector*/
     while(!textElements1.empty() && !textElements2.empty() && strcmp((char *)(*textElements1.begin())->content, (char *)(*textElements2.begin())->content)==0) {
         textElements1.erase(textElements1.begin());
@@ -263,7 +272,7 @@ struct ElementCount {
                 break;
             }
         }
-        if(![self stepNode:node skipChildren:NO]) {
+        if(![self stepNode:node]) {
             break;
         }
     }
@@ -273,8 +282,8 @@ struct ElementCount {
  Advances the iteration described in iterateToNextTextNode by one step.
  Returns NO if there is nothing left to iterate.
  */
-+ (BOOL)stepNode:(xmlNode **)node skipChildren:(BOOL)skipChildren {
-    if(!skipChildren && (*node)->children != NULL) {
++ (BOOL)stepNode:(xmlNode **)node {
+    if((*node)->children != NULL) {
         (*node) = (*node)->children;
         return YES;
     }
