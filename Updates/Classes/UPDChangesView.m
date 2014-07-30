@@ -70,6 +70,7 @@
         self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, UPD_NAVIGATION_BAR_HEIGHT+20, self.bounds.size.width, self.bounds.size.height-UPD_NAVIGATION_BAR_HEIGHT-20-self.bottomBar.bounds.size.height)];
         [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
         [self.webView setDelegate:self];
+        [self.webView setScalesPageToFit:YES];
         [self addSubview:self.webView];
     }
     return self;

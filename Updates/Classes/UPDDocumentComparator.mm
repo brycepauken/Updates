@@ -141,9 +141,9 @@ struct ElementCount {
  Common Sequence type implementation to account for offset differenes.
  */
 + (id)document:(NSString *)doc1 compareTextWithDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight {
-    htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[doc1 UTF8String], NULL, _enc, _options);;
+    htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[[doc1 stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);;
     xmlNode *currentNode1 = (xmlNode *)origDoc;
-    xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[doc2 UTF8String], NULL, _enc, _options);
+    xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[[doc2 stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);
     std::vector<xmlNodePtr>textElements1;
     std::vector<xmlNodePtr>textElements2;
     
@@ -151,17 +151,17 @@ struct ElementCount {
         [self iterateToNextTextNode:&currentNode1];
         [self iterateToNextTextNode:&currentNode2];
         if(currentNode1 != NULL && currentNode2 != NULL) {
-            textElements1.push_back(currentNode1);
-            textElements2.push_back(currentNode2);
             if(strcmp((char *)currentNode1->content, (char *)currentNode2->content)!=0 && !highlight) {
                 return @(NO);
             }
+            textElements1.push_back(currentNode1);
+            textElements2.push_back(currentNode2);
             [self stepNode:&currentNode1];
             [self stepNode:&currentNode2];
         }
     }
     if(!highlight) {
-        return @(currentNode1 != NULL && currentNode2 != NULL);
+        return @(currentNode1 == NULL && currentNode2 == NULL);
     }
     while(currentNode1 != NULL) {
         textElements1.push_back(currentNode1);
@@ -225,7 +225,7 @@ struct ElementCount {
     xmlCleanupParser();
     xmlFreeDoc(origDoc);
     
-    return [[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding];
+    return [[[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
 }
 + (void)highlightChangesWithLCStable:(int **)lcsTable firstTextVector:(std::vector<xmlNodePtr>)textElements1 secondTextVector:(std::vector<xmlNodePtr>)textElements2 column:(int)i row:(int)j {
     while(true) {

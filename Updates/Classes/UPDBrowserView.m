@@ -186,6 +186,7 @@
     self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.urlBar.frame.size.height, self.bounds.size.width, self.bounds.size.height-self.urlBar.frame.size.height-self.bottomBar.frame.size.height)];
     [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
     [self.webView setDelegate:self];
+    [self.webView setScalesPageToFit:YES];
     [self addSubview:self.webView];
     [self setUserInteractionEnabled:YES];
 }
