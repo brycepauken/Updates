@@ -52,7 +52,7 @@
         
         self.circleView = [[UIView alloc] init];
         [self.circleView setAlpha:0];
-        [self.circleView setTag:0];
+        [self.circleView setTag:-1];
         [self.circleView.layer setCornerRadius:UPD_TABLEVIEW_CIRCLE_SIZE/2];
         [self.circleView.layer setShadowOffset:CGSizeZero];
         [self.circleView.layer setShadowOpacity:0.5];
@@ -75,8 +75,7 @@
     return self;
 }
 
-- (void)setCircleColor:(UIColor *)color {
-    int prevTag = (int)self.circleView.tag;
+- (void)setCircleColor:(UIColor *)color animate:(BOOL)animate {
     if(color) {
         [self.circleView setBackgroundColor:color];
         [self.circleView.layer setShadowColor:color.CGColor];
@@ -85,7 +84,7 @@
     else {
         [self.circleView setTag:0];
     }
-    if(prevTag!=self.circleView.tag) {
+    if(animate) {
         CGRect prevFaviconFrame = self.faviconView.frame;
         [self positionLeftSide];
         [self.faviconView setFrame:prevFaviconFrame];
@@ -93,6 +92,10 @@
             [self.circleView setAlpha:self.circleView.tag];
             [self positionLeftSide];
         }];
+    }
+    else {
+        [self.circleView setAlpha:self.circleView.tag];
+        [self positionLeftSide];
     }
 }
 

@@ -110,7 +110,7 @@
                 [cell setLastUpdated:[NSDate date]];
                 if(result>update.status.intValue) {
                     if(result==1) {
-                        [cell setCircleColor:[UIColor UPDBrightBlueColor]];
+                        [cell setCircleColor:[UIColor UPDBrightBlueColor] animate:YES];
                     }
                 }
                 [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
@@ -320,7 +320,7 @@
                 [update setOrigUpdated:update.lastUpdated];
                 [update setLastResponse:nil];
                 [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
-                [(UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:updateIndex inSection:0]] setCircleColor:nil];
+                [(UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:updateIndex inSection:0]] setCircleColor:nil animate:NO];
             }
             updateIndex++;
         }
@@ -361,10 +361,10 @@
     UPDInternalUpdate *update = [self.updates objectAtIndex:indexPath.row];
     switch(update.status.intValue) {
         case 1:
-            [cell setCircleColor:[UIColor UPDBrightBlueColor]];
+            [cell setCircleColor:[UIColor UPDBrightBlueColor] animate:NO];
             break;
         default:
-            [cell setCircleColor:nil];
+            [cell setCircleColor:nil animate:NO];
             break;
     }
     [cell setName:update.name];
