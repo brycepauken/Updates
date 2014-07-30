@@ -36,6 +36,15 @@
     [field resignFirstResponder];
     [field removeFromSuperview];
     
+    [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:nil queue:nil usingBlock:^(NSNotification* notification){
+        NSManagedObjectContext *context = self.managedObjectContext;
+        if(notification.object != context) {
+            [context performBlock:^(){
+                [context mergeChangesFromContextDidSaveNotification:notification];
+            }];
+        };
+    }];
+
     _window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [_window setBackgroundColor:[UIColor blackColor]];
     
@@ -77,7 +86,7 @@
 }
 
 /*
- Return (or create and return) the app-wide managed object context
+ Return (or create and return) the main managed object context
  */
 - (NSManagedObjectContext *)managedObjectContext {
     if(_managedObjectContext != nil) {
@@ -122,6 +131,22 @@
     }    
     
     return _persistentStoreCoordinator;
+}
+
+/*
+ Return (or create and return) the main managed object context
+ */
+- (NSManagedObjectContext *)privateObjectContext {
+    if(_managedObjectContext != nil) {
+        return _managedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if(coordinator != nil) {
+        _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+    }
+    return _managedObjectContext;
 }
 
 /*

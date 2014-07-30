@@ -20,6 +20,7 @@
 @property (nonatomic, strong) UIWindow *window;
 
 - (NSURL *)applicationDocumentsDirectory;
+- (NSManagedObjectContext *)privateObjectContext;
 - (void)saveContext;
 
 @end

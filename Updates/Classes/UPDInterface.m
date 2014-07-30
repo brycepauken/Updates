@@ -191,35 +191,37 @@
 }
 
 - (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult origDate:(NSDate *)origDate {
-    NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
+    NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
     
-    /*get existing updates list*/
-    NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
-    NSError *updateListFetchRequestError;
-    CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
-    if(!updateList) {
-        updateList = [NSEntityDescription insertNewObjectForEntityForName:@"UpdateList" inManagedObjectContext:context];
-        [updateList setUpdates:[[NSOrderedSet alloc] init]];
-    }
-    
-    CoreDataModelUpdate *update = [NSEntityDescription insertNewObjectForEntityForName:@"Update" inManagedObjectContext:context];
-    [update setName:name];
-    [update setUrl:[NSKeyedArchiver archivedDataWithRootObject:url]];
-    [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions]];
-    [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
-    [update setFavicon:UIImagePNGRepresentation(favicon)];
-    [update setOrigResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
-    [update setOrigUpdated:origDate];
-    [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
-    [update setTimerResult:@(timerResult)];
-    [update setStatus:@(0)];
-    [update setParent:updateList];
-    
-    NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
-    [updates addObject:update];
-    
-    NSError *saveError;
-    [context save:&saveError];
+    [context performBlock:^{
+        /*get existing updates list*/
+        NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+        NSError *updateListFetchRequestError;
+        CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+        if(!updateList) {
+            updateList = [NSEntityDescription insertNewObjectForEntityForName:@"UpdateList" inManagedObjectContext:context];
+            [updateList setUpdates:[[NSOrderedSet alloc] init]];
+        }
+        
+        CoreDataModelUpdate *update = [NSEntityDescription insertNewObjectForEntityForName:@"Update" inManagedObjectContext:context];
+        [update setName:name];
+        [update setUrl:[NSKeyedArchiver archivedDataWithRootObject:url]];
+        [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions]];
+        [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
+        [update setFavicon:UIImagePNGRepresentation(favicon)];
+        [update setOrigResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
+        [update setOrigUpdated:origDate];
+        [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
+        [update setTimerResult:@(timerResult)];
+        [update setStatus:@(0)];
+        [update setParent:updateList];
+        
+        NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
+        [updates addObject:update];
+        
+        NSError *saveError;
+        [context save:&saveError];
+    }];
 }
 
 @end

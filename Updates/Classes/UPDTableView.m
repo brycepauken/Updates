@@ -133,42 +133,44 @@
  */
 - (void)reloadData {
     self.updates = [[NSMutableArray alloc] init];
-    NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
+    NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
     
-    NSFetchRequest *optionTimeSavedRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
-    [optionTimeSavedRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"TimeSaved"]];
-    NSError *optionTimeSavedRequestError;
-    CoreDataModelOption *optionTimeSaved = [[context executeFetchRequest:optionTimeSavedRequest error:&optionTimeSavedRequestError] firstObject];
-    if(optionTimeSaved) {
-        self.timeSaved = optionTimeSaved.doubleValue.doubleValue;
-        [self updateRefreshLabel];
-    }
-    else {
-        self.timeSaved = 0;
-        [self saveUpdateWithObjectID:nil newResponse:nil newStatus:0 updateDuration:0];
-    }
-    
-    NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
-    NSError *updateListFetchRequestError;
-    CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
-    if(updateList) {
-        for(CoreDataModelUpdate *update in updateList.updates) {
-            UPDInternalUpdate *newUpdate = [[UPDInternalUpdate alloc] init];
-            newUpdate.name = update.name;
-            newUpdate.differenceOptions = [NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions];
-            newUpdate.favicon = [[UIImage alloc] initWithData:update.favicon];
-            newUpdate.lastResponse = update.lastResponse;
-            newUpdate.lastUpdated = update.lastUpdated;
-            newUpdate.origResponse = update.origResponse;
-            newUpdate.origUpdated = update.origUpdated;
-            newUpdate.instructions = update.instructions;
-            newUpdate.status = update.status;
-            newUpdate.timerResult = update.timerResult;
-            newUpdate.url = update.url;
-            newUpdate.objectID = update.objectID;
-            [self.updates insertObject:newUpdate atIndex:0];
+    [context performBlockAndWait:^{
+        NSFetchRequest *optionTimeSavedRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
+        [optionTimeSavedRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"TimeSaved"]];
+        NSError *optionTimeSavedRequestError;
+        CoreDataModelOption *optionTimeSaved = [[context executeFetchRequest:optionTimeSavedRequest error:&optionTimeSavedRequestError] firstObject];
+        if(optionTimeSaved) {
+            self.timeSaved = optionTimeSaved.doubleValue.doubleValue;
+            [self updateRefreshLabel];
         }
-    }
+        else {
+            self.timeSaved = 0;
+            [self saveUpdateWithObjectID:nil newResponse:nil newStatus:0 updateDuration:0];
+        }
+        
+        NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+        NSError *updateListFetchRequestError;
+        CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+        if(updateList) {
+            for(CoreDataModelUpdate *update in updateList.updates) {
+                UPDInternalUpdate *newUpdate = [[UPDInternalUpdate alloc] init];
+                newUpdate.name = update.name;
+                newUpdate.differenceOptions = [NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions];
+                newUpdate.favicon = [[UIImage alloc] initWithData:update.favicon];
+                newUpdate.lastResponse = update.lastResponse;
+                newUpdate.lastUpdated = update.lastUpdated;
+                newUpdate.origResponse = update.origResponse;
+                newUpdate.origUpdated = update.origUpdated;
+                newUpdate.instructions = update.instructions;
+                newUpdate.status = update.status;
+                newUpdate.timerResult = update.timerResult;
+                newUpdate.url = update.url;
+                newUpdate.objectID = update.objectID;
+                [self.updates insertObject:newUpdate atIndex:0];
+            }
+        }
+    }];
     
     [super reloadData];
     BOOL tableFilled = [self numberOfRowsInSection:0]>0;
@@ -181,53 +183,56 @@
  updating the total amount of time saved
  */
 - (void)saveUpdateWithObjectID:(NSManagedObjectID *)objectID newResponse:(NSString *)newResponse newStatus:(int)status updateDuration:(NSTimeInterval)duration {
-    NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
-    NSDate *updatedDate = [NSDate date];
-    if(objectID) {
-        for(UPDInternalUpdate *update in self.updates) {
-            if([update.objectID isEqual:objectID]) {
-                if(status>update.status.intValue) {
-                    [update setStatus:@(status)];
-                }
-                [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
-                [update setLastUpdated:updatedDate];
-            }
-        }
-        
-        NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
-        NSError *updateListFetchRequestError;
-        CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
-        if(updateList) {
-            for(CoreDataModelUpdate *update in updateList.updates) {
+    NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
+    
+    [context performBlock:^{
+        NSDate *updatedDate = [NSDate date];
+        if(objectID) {
+            for(UPDInternalUpdate *update in self.updates) {
                 if([update.objectID isEqual:objectID]) {
                     if(status>update.status.intValue) {
                         [update setStatus:@(status)];
                     }
                     [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
                     [update setLastUpdated:updatedDate];
-                    CGFloat timeJustSaved = update.timerResult.doubleValue - duration;
-                    self.timeSaved += timeJustSaved>0?timeJustSaved:0;
+                }
+            }
+            
+            NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+            NSError *updateListFetchRequestError;
+            CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+            if(updateList) {
+                for(CoreDataModelUpdate *update in updateList.updates) {
+                    if([update.objectID isEqual:objectID]) {
+                        if(status>update.status.intValue) {
+                            [update setStatus:@(status)];
+                        }
+                        [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
+                        [update setLastUpdated:updatedDate];
+                        CGFloat timeJustSaved = update.timerResult.doubleValue - duration;
+                        self.timeSaved += timeJustSaved>0?timeJustSaved:0;
+                    }
                 }
             }
         }
-    }
-    
-    NSFetchRequest *optionTimeSavedRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
-    [optionTimeSavedRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"TimeSaved"]];
-    NSError *optionTimeSavedRequestError;
-    CoreDataModelOption *optionTimeSaved = [[context executeFetchRequest:optionTimeSavedRequest error:&optionTimeSavedRequestError] firstObject];
-    if(optionTimeSaved) {
-        [optionTimeSaved setDoubleValue:@(self.timeSaved)];
-    }
-    else {
-        optionTimeSaved = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
-        [optionTimeSaved setName:@"TimeSaved"];
-        [optionTimeSaved setDoubleValue:@(0)];
-    }
-    
-    NSError *saveError;
-    [context save:&saveError];
-    [self updateRefreshLabel];
+        
+        NSFetchRequest *optionTimeSavedRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
+        [optionTimeSavedRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"TimeSaved"]];
+        NSError *optionTimeSavedRequestError;
+        CoreDataModelOption *optionTimeSaved = [[context executeFetchRequest:optionTimeSavedRequest error:&optionTimeSavedRequestError] firstObject];
+        if(optionTimeSaved) {
+            [optionTimeSaved setDoubleValue:@(self.timeSaved)];
+        }
+        else {
+            optionTimeSaved = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
+            [optionTimeSaved setName:@"TimeSaved"];
+            [optionTimeSaved setDoubleValue:@(0)];
+        }
+        
+        NSError *saveError;
+        [context save:&saveError];
+        [self updateRefreshLabel];
+    }];
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
@@ -333,31 +338,34 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSManagedObjectContext *context = [[self appDelegate] managedObjectContext];
-        NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
-        NSError *updateListFetchRequestError;
-        CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
-        if(updateList) {
-            NSManagedObjectID *objectID = ((UPDInternalUpdate *)[self.updates objectAtIndex:indexPath.row]).objectID;
-            NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
-            for(int i=0;i<(int)updates.count;i++) {
-                if([((UPDInternalUpdate *)[updates objectAtIndex:i]).objectID isEqual:objectID]) {
-                    [updates removeObjectAtIndex:i];
-                    break;
+        NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
+        
+        [context performBlock:^{
+            NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+            NSError *updateListFetchRequestError;
+            CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+            if(updateList) {
+                NSManagedObjectID *objectID = ((UPDInternalUpdate *)[self.updates objectAtIndex:indexPath.row]).objectID;
+                NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
+                for(int i=0;i<(int)updates.count;i++) {
+                    if([((UPDInternalUpdate *)[updates objectAtIndex:i]).objectID isEqual:objectID]) {
+                        [updates removeObjectAtIndex:i];
+                        break;
+                    }
                 }
+                [self.updates removeObjectAtIndex:indexPath.row];
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                if(!self.updates.count) {
+                    [self setScrollEnabled:NO];
+                    [self.startLabel setHidden:NO];
+                }
+                
+                [updateList setUpdates:updates];
+                
+                NSError *saveError;
+                [context save:&saveError];
             }
-            [self.updates removeObjectAtIndex:indexPath.row];
-            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            if(!self.updates.count) {
-                [self setScrollEnabled:NO];
-                [self.startLabel setHidden:NO];
-            }
-            
-            [updateList setUpdates:updates];
-            
-            NSError *saveError;
-            [context save:&saveError];
-        }
+        }];
     }
 }
 
