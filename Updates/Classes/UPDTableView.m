@@ -336,7 +336,6 @@
                         [update setOrigResponse:update.lastResponse];
                         [update setOrigUpdated:update.lastUpdated];
                         [update setLastResponse:nil];
-                        [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
                     }
                 }
             }
