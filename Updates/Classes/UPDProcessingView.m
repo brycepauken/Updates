@@ -279,13 +279,13 @@
 
 - (void)checkTypeButtonTapped:(UIButton *)button {
     if(button==self.checkTypeButtonAll) {
-        [self scrollToPage:4];
+        [self scrollToPage:4 animated:YES];
     }
 }
 
 - (void)confirmationButtonTapped:(UIButton *)button {
     if(button==self.confirmationButtonNo) {
-        [self scrollToPage:3];
+        [self scrollToPage:3 animated:YES];
     }
     else if(button==self.confirmationButtonYes) {
         self.differenceOptions = @{@"DifferenceType":@"Any"};
@@ -424,6 +424,15 @@
 }
 
 - (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate {
+    self.instructions = nil;
+    self.canComplete = nil;
+    [self scrollToPage:0 animated:NO];
+    [self.processingLabel setAlpha:0];
+    [self.processingButton setAlpha:0];
+    [self.scrollView setUserInteractionEnabled:YES];
+    [self.outlineQuarter setAlpha:1];
+    [self.nameTextField setText:@""];
+    
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
     [self.instructionProcessor setInstructions:instructions];
     [self.instructionProcessor setUrl:url];
@@ -455,28 +464,36 @@
         [alertView show];
     }
     else if(button==self.protectButtonNo) {
-        [self scrollToPage:3];
+        [self scrollToPage:3 animated:YES];
     }
 }
 
 - (void)scrollToPageFromButton:(UIButton *)button {
     if(button==self.processingButton) {
-        [self scrollToPage:1];
+        [self scrollToPage:1 animated:YES];
     }
     else if(button==self.nameButton) {
         [self.nameTextField resignFirstResponder];
-        [self scrollToPage:2];
+        [self scrollToPage:2 animated:YES];
     }
 }
 
-- (void)scrollToPage:(int)page {
+- (void)scrollToPage:(int)page animated:(BOOL)animated {
     [self.scrollView setTag:page];
-    [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+    if(animated) {
+        [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+            [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*page, 0)];
+            for(UIView *view in [self.scrollView subviews]) {
+                [view setAlpha:page==view.tag?1:0];
+            }
+        }];
+    }
+    else {
         [self.scrollView setContentOffset:CGPointMake(self.scrollView.bounds.size.width*page, 0)];
         for(UIView *view in [self.scrollView subviews]) {
             [view setAlpha:page==view.tag?1:0];
         }
-    }];
+    }
 }
 
 - (void)textFieldDidChange {
@@ -485,7 +502,7 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
-    [self scrollToPage:2];
+    [self scrollToPage:2 animated:YES];
     return YES;
 }
 

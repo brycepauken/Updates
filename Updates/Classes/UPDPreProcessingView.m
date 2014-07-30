@@ -21,7 +21,6 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
 @property (nonatomic, strong) UIImageView *checkmark;
 @property (nonatomic, strong) UIView *checkmarkBackground;
 @property (nonatomic, strong) UIImageView *outline;
-@property (nonatomic, strong) UIImageView *outlineQuarter;
 
 @property (nonatomic, copy) void (^individualAnimationCompletionBlock)();
 @property (nonatomic) CGRect individualAnimationFinalFrame;
@@ -47,12 +46,6 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
         [self.browserImageView setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self addSubview:self.browserImageView];
         
-        self.outlineQuarter = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
-        [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
-        [self.outlineQuarter setImage:[UIImage imageNamed:@"ButtonOutlineQuarter"]];
-        [self.outlineQuarter setHidden:YES];
-        [self addSubview:self.outlineQuarter];
-        
         self.outline = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
         [self.outline setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outline setImage:[UIImage imageNamed:@"ButtonOutline"]];
@@ -75,9 +68,21 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
 }
 
 - (void)beginPreProcessingWithBrowserImage:(UIImage *)browserImage {
+    for(CALayer *sublayer in self.browserImageView.layer.sublayers) {
+        [sublayer removeFromSuperlayer];
+    }
+    [self.browserImageView.layer removeAllAnimations];
     [self.browserImageView setTransform:CGAffineTransformIdentity];
     [self.browserImageView setFrame:CGRectMake((self.bounds.size.width-browserImage.size.width)/2, (self.bounds.size.height-browserImage.size.height)/2, browserImage.size.width, browserImage.size.height)];
     [self.browserImageView setImage:browserImage];
+    
+    [self.outline.layer removeAllAnimations];
+    [self.checkmarkBackground.layer removeAllAnimations];
+    [self.checkmark.layer removeAllAnimations];
+    
+    [self.checkmarkBackground setHidden:YES];
+    
+    self.foldedViewVerticalAnimationTimestamp = 0;
     
     UIView *browserImageOverlay = [[UIView alloc] initWithFrame:self.browserImageView.frame];
     [browserImageOverlay setAlpha:UPD_BROWSER_IMAGE_OPACITY];
@@ -179,7 +184,7 @@ typedef NS_ENUM(NSInteger, UPDFoldingViewSide) {
         
         if(self.completionBlock) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*2*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-               self.completionBlock();
+                self.completionBlock();
             });
         }
     }

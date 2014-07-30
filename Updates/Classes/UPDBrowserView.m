@@ -157,7 +157,8 @@
 /*
  Clear the cache and cookies, then register our custom
  url protocol to handle new requests and forward them
- to our accumulator
+ to our accumulator. We also need to reset any views from
+ previous sessions.
  */
 - (void)beginSession {
     [UPDTimer startTimer];
@@ -188,6 +189,24 @@
     [self.webView setDelegate:self];
     [self.webView setScalesPageToFit:YES];
     [self addSubview:self.webView];
+    
+    [self.browserOverlay setAlpha:0];
+    [self.browserOverlay setUserInteractionEnabled:NO];
+    [self bringSubviewToFront:self.browserOverlay];
+    
+    [self.completeOverlay setAlpha:0];
+    [self.completeOverlay setTransform:CGAffineTransformIdentity];
+    [self.completeOverlay setUserInteractionEnabled:NO];
+    [self bringSubviewToFront:self.completeOverlay];
+    
+    [self.confirmButton setAlpha:0];
+    [self.confirmButton setUserInteractionEnabled:NO];
+    [self bringSubviewToFront:self.confirmButton];
+    
+    [self.cancelButton setAlpha:0];
+    [self.cancelButton setUserInteractionEnabled:NO];
+    [self bringSubviewToFront:self.cancelButton];
+    
     [self setUserInteractionEnabled:YES];
 }
 

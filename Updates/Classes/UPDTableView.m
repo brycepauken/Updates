@@ -315,6 +315,10 @@
         int updateIndex = 0;
         for(UPDInternalUpdate *update in self.updates) {
             if([update.objectID isEqual:openedUpdate.objectID]) {
+                if(!update.lastResponse) {
+                    /*this method could've been called twice (and often is). no need to do anything*/
+                    return;
+                }
                 [update setStatus:@(0)];
                 [update setOrigResponse:update.lastResponse];
                 [update setOrigUpdated:update.lastUpdated];

@@ -78,6 +78,9 @@
                 [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
             } completion:^(BOOL finished) {
                 [weakSelf.tableView setUserInteractionEnabled:YES];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [weakSelf.tableView updateWasOpened:update];
+                });
             }];
         }];
         [self.scrollView addSubview:self.tableView];
