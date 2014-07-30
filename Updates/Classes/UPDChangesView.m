@@ -98,12 +98,10 @@
     self.update = update;
     [self.navigationBar setText:update.name];
     if(update.lastResponse == nil) {
-        NSLog(@"a");
         [self setUpdatedDate:update.origUpdated];
         [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
     }
     else {
-        NSLog(@"b");
         [self setUpdatedDate:update.lastUpdated];
         NSString *highlightedPage = [UPDDocumentComparator document:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastResponse] compareTextWithDocument:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] highlightChanges:YES];
         [self.webView loadHTMLString:highlightedPage baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];

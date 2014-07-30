@@ -141,9 +141,9 @@ struct ElementCount {
  Common Sequence type implementation to account for offset differenes.
  */
 + (id)document:(NSString *)doc1 compareTextWithDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight {
-    htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[[doc1 stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);;
+    htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[[[doc1 copy] stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);;
     xmlNode *currentNode1 = (xmlNode *)origDoc;
-    xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[[doc2 stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);
+    xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[[[doc2 copy] stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);
     std::vector<xmlNodePtr>textElements1;
     std::vector<xmlNodePtr>textElements2;
     
@@ -160,6 +160,7 @@ struct ElementCount {
             [self stepNode:&currentNode2];
         }
     }
+    
     if(!highlight) {
         return @(currentNode1 == NULL && currentNode2 == NULL);
     }
@@ -219,7 +220,7 @@ struct ElementCount {
         xmlSaveDoc(savePointer, origDoc);
         xmlSaveFlush(savePointer);
         xmlSaveClose(savePointer);
-    
+        
         free(lcsTable);
         textElements1.clear();
         textElements2.clear();
@@ -245,13 +246,17 @@ struct ElementCount {
             continue;
         }
         else if(i>0 && (j==0 || lcsTable[i][j-1] < lcsTable[i-1][j])) {
-            const char *newStyle = "background: #f8f388 !important;";
+            const char *newStyle;
             const char *existingStyle = (const char *)xmlGetProp(textElements1.at(i-1)->parent, (xmlChar*)"style");
             if(existingStyle != NULL) {
-                std::string combinedStyle(existingStyle);
-                combinedStyle.append(";");
-                combinedStyle.append(newStyle);
-                newStyle = combinedStyle.c_str();
+                const char *appendStyle = "; background: #f8f388 !important;";
+                char *mutableNewStyle = (char *)calloc(strlen(appendStyle)+strlen(existingStyle)+1, sizeof(char));
+                strcpy(mutableNewStyle,existingStyle);
+                strcat(mutableNewStyle,appendStyle);
+                newStyle = mutableNewStyle;
+            }
+            else {
+                newStyle = "background: #f8f388 !important;";
             }
             xmlNewProp(textElements1.at(i-1)->parent, (xmlChar*)"style", (xmlChar*)newStyle);
             
