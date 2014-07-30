@@ -308,6 +308,46 @@
     [self.refreshLabel setFrame:self.refreshView.bounds];
 }
 
+- (void)updateWasOpened:(UPDInternalUpdate *)openedUpdate {
+    NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
+    
+    if(openedUpdate.lastResponse) {
+        int updateIndex = 0;
+        for(UPDInternalUpdate *update in self.updates) {
+            if([update.objectID isEqual:openedUpdate.objectID]) {
+                [update setStatus:@(0)];
+                [update setOrigResponse:update.lastResponse];
+                [update setOrigUpdated:update.lastUpdated];
+                [update setLastResponse:nil];
+                [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
+                [(UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:updateIndex inSection:0]] setCircleColor:nil];
+            }
+            updateIndex++;
+        }
+        
+        [context performBlock:^{
+            NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+            NSError *updateListFetchRequestError;
+            CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+            if(updateList) {
+                for(CoreDataModelUpdate *update in updateList.updates) {
+                    if([update.objectID isEqual:openedUpdate.objectID]) {
+                        [update setStatus:@(0)];
+                        [update setOrigResponse:update.lastResponse];
+                        [update setOrigUpdated:update.lastUpdated];
+                        [update setLastResponse:nil];
+                        [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
+                    }
+                }
+            }
+            
+            NSError *saveError;
+            [context save:&saveError];
+            [self updateRefreshLabel];
+        }];
+    }
+}
+
 #pragma mark - Data Source Methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -338,6 +378,14 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSManagedObjectID *objectID = ((UPDInternalUpdate *)[self.updates objectAtIndex:indexPath.row]).objectID;
+        [self.updates removeObjectAtIndex:indexPath.row];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        if(!self.updates.count) {
+            [self setScrollEnabled:NO];
+            [self.startLabel setHidden:NO];
+        }
+        
         NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
         
         [context performBlock:^{
@@ -345,19 +393,12 @@
             NSError *updateListFetchRequestError;
             CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
             if(updateList) {
-                NSManagedObjectID *objectID = ((UPDInternalUpdate *)[self.updates objectAtIndex:indexPath.row]).objectID;
                 NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
                 for(int i=0;i<(int)updates.count;i++) {
                     if([((UPDInternalUpdate *)[updates objectAtIndex:i]).objectID isEqual:objectID]) {
                         [updates removeObjectAtIndex:i];
                         break;
                     }
-                }
-                [self.updates removeObjectAtIndex:indexPath.row];
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                if(!self.updates.count) {
-                    [self setScrollEnabled:NO];
-                    [self.startLabel setHidden:NO];
                 }
                 
                 [updateList setUpdates:updates];

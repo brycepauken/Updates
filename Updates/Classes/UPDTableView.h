@@ -14,4 +14,6 @@
 
 @property (nonatomic, copy) void(^updateSelected)(UPDInternalUpdate *update);
 
+- (void)updateWasOpened:(UPDInternalUpdate *)openedUpdate;
+
 @end

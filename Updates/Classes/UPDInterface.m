@@ -159,7 +159,8 @@
         
         self.changesView = [[UPDChangesView alloc] initWithFrame:self.bounds];
         [self.changesView setHidden:YES];
-        [self.changesView setBackButtonBlock:^{
+        [self.changesView setBackButtonBlock:^(UPDInternalUpdate *update){
+            [weakSelf.tableView updateWasOpened:update];
             [weakSelf.changesView setUserInteractionEnabled:NO];
             [weakSelf.scrollView setTag:0];
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{

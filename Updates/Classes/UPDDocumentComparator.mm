@@ -213,19 +213,25 @@ struct ElementCount {
     #endif
     [self highlightChangesWithLCStable:lcsTable firstTextVector:textElements1 secondTextVector:textElements2 column:s1-1 row:s2-1];
     
-    xmlBufferPtr buffer = xmlBufferCreate();
-    xmlSaveCtxtPtr savePointer = xmlSaveToBuffer(buffer, "UTF-8", 0);
-    xmlSaveDoc(savePointer, origDoc);
-    xmlSaveFlush(savePointer);
-    xmlSaveClose(savePointer);
+    @try {
+        xmlBufferPtr buffer = xmlBufferCreate();
+        xmlSaveCtxtPtr savePointer = xmlSaveToBuffer(buffer, "UTF-8", 0);
+        xmlSaveDoc(savePointer, origDoc);
+        xmlSaveFlush(savePointer);
+        xmlSaveClose(savePointer);
     
-    free(lcsTable);
-    textElements1.clear();
-    textElements2.clear();
-    xmlCleanupParser();
-    xmlFreeDoc(origDoc);
-    
-    return [[[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
+        free(lcsTable);
+        textElements1.clear();
+        textElements2.clear();
+        xmlCleanupParser();
+        xmlFreeDoc(origDoc);
+        
+        return [[[NSString alloc] initWithCString:(const char *)buffer->content encoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
+    }
+    @catch(NSException *e) {
+        /*this should never happen*/
+        return nil;
+    }
 }
 + (void)highlightChangesWithLCStable:(int **)lcsTable firstTextVector:(std::vector<xmlNodePtr>)textElements1 secondTextVector:(std::vector<xmlNodePtr>)textElements2 column:(int)i row:(int)j {
     while(true) {

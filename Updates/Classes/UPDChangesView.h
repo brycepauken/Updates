@@ -12,7 +12,7 @@
 
 @interface UPDChangesView : UIView <UIWebViewDelegate>
 
-@property (nonatomic, copy) void(^backButtonBlock)();
+@property (nonatomic, copy) void(^backButtonBlock)(UPDInternalUpdate *update);
 
 - (void)showUpdate:(UPDInternalUpdate *)update;
 
