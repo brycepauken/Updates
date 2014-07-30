@@ -51,11 +51,12 @@
         [self addSubview:self.spinner];
         
         self.circleView = [[UIView alloc] init];
+        [self.circleView setAlpha:0];
+        [self.circleView setTag:0];
         [self.circleView.layer setCornerRadius:UPD_TABLEVIEW_CIRCLE_SIZE/2];
         [self.circleView.layer setShadowOffset:CGSizeZero];
         [self.circleView.layer setShadowOpacity:0.5];
         [self.circleView.layer setShadowRadius:1];
-        [self.circleView setHidden:YES];
         [self addSubview:self.circleView];
         
         self.faviconView = [[UIImageView alloc] init];
@@ -75,15 +76,24 @@
 }
 
 - (void)setCircleColor:(UIColor *)color {
+    int prevTag = (int)self.circleView.tag;
     if(color) {
         [self.circleView setBackgroundColor:color];
         [self.circleView.layer setShadowColor:color.CGColor];
-        [self.circleView setHidden:NO];
+        [self.circleView setTag:1];
     }
     else {
-        [self.circleView setHidden:YES];
+        [self.circleView setTag:0];
     }
-    [self setNeedsLayout];
+    if(prevTag!=self.circleView.tag) {
+        CGRect prevFaviconFrame = self.faviconView.frame;
+        [self positionLeftSide];
+        [self.faviconView setFrame:prevFaviconFrame];
+        [UIView animateWithDuration:UPD_TRANSITION_DELAY animations:^{
+            [self.circleView setAlpha:self.circleView.tag];
+            [self positionLeftSide];
+        }];
+    }
 }
 
 - (void)hideSpinnerWithContactBlock:(void (^)())contactBlock {
@@ -124,17 +134,20 @@
     
     [self.nameLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2-nameLabelSize.height/2-10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, nameLabelSize.height)];
     [self.updatedLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2+10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, updatedLabelSize.height)];
-    if(self.circleView.hidden) {
+    [self positionLeftSide];
+    [self.spinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
+    [self.bar setFrame:CGRectMake(0, -10, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height+20)];
+    [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
+}
+
+- (void)positionLeftSide {
+    if(self.circleView.tag==0) {
         [self.faviconView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_FAVICON_SIZE)/2, (self.bounds.size.height-UPD_TABLEVIEW_FAVICON_SIZE)/2, UPD_TABLEVIEW_FAVICON_SIZE, UPD_TABLEVIEW_FAVICON_SIZE)];
     }
     else {
         [self.faviconView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_FAVICON_SIZE)/2, self.bounds.size.height/2-10-UPD_TABLEVIEW_FAVICON_SIZE/2, UPD_TABLEVIEW_FAVICON_SIZE, UPD_TABLEVIEW_FAVICON_SIZE)];
-        [self.circleView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_CIRCLE_SIZE)/2, self.bounds.size.height/2+10+updatedLabelSize.height/2-UPD_TABLEVIEW_CIRCLE_SIZE/2, UPD_TABLEVIEW_CIRCLE_SIZE, UPD_TABLEVIEW_CIRCLE_SIZE)];
+        [self.circleView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_CIRCLE_SIZE)/2, self.bounds.size.height/2+10+self.updatedLabel.bounds.size.height/2-UPD_TABLEVIEW_CIRCLE_SIZE/2, UPD_TABLEVIEW_CIRCLE_SIZE, UPD_TABLEVIEW_CIRCLE_SIZE)];
     }
-    
-    [self.spinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
-    [self.bar setFrame:CGRectMake(0, -10, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height+20)];
-    [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
 }
 
 - (void)setDividerHidden:(BOOL)hidden {
