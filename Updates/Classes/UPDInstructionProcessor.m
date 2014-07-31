@@ -27,7 +27,14 @@
 
 #import <libxml/HTMLparser.h>
 #import "UPDDocumentComparator.h"
+#import "UPDDocumentSearcher.h"
 #import "UPDInternalInstruction.h"
+
+@interface UPDInstructionProcessor()
+
+@property (nonatomic, strong) UIImage *favicon;
+
+@end
 
 @implementation UPDInstructionProcessor
 
@@ -58,22 +65,28 @@
     }
     if(lastInstruction) {
         /*find a better source than this! could be an error later on!*/
-        UIImage *favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://g.etfv.co/" stringByAppendingString:lastInstruction.request.URL.absoluteString]]]];
+        self.favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://g.etfv.co/" stringByAppendingString:lastInstruction.request.URL.absoluteString]]]];
         
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         [queue setMaxConcurrentOperationCount:5];
         [self clearPersistentData];
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:queue];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration] delegate:nil delegateQueue:queue];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
+            [session invalidateAndCancel];
+            if([lastInstruction.request.HTTPMethod isEqualToString:@"GET"]&&[UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
                 /*the final request works on its own, use it!*/
                 if(self.completionBlock) {
-                    self.completionBlock([NSArray arrayWithObject:lastInstruction], favicon, lastInstruction.response, lastInstruction.request.URL);
+                    self.completionBlock([NSArray arrayWithObject:lastInstruction], self.favicon, lastInstruction.response, lastInstruction.request.URL);
                 }
             }
             else {
                 /*step 2*/
-                NSLog(@"Error: pages not equivalent");
+                if(workingInstructions.count>1) {
+                    [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil usingSession:nil];
+                }
+                else {
+                    /*using the last instruction alone doesn't work, but there's only one instruction... error*/
+                }
             }
         }];
         [task resume];
@@ -96,6 +109,59 @@
         [storage deleteCookie:cookie];
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+/*
+ Try reaching the final page by using every instruction available.
+ Called if beginProcessing determines that just querying the last page
+ doesn't work as expected.
+ */
+- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session {
+    if(!session) {
+        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+        [queue setMaxConcurrentOperationCount:5];
+        [self clearPersistentData];
+        session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration] delegate:nil delegateQueue:queue];
+    }
+    UPDInternalInstruction *prevInstruction = nil;
+    UPDInternalInstruction *instruction = [workingInstructions objectAtIndex:index];
+    NSURLRequest *request = instruction.request;
+    if(index>0 && lastResponse) {
+        prevInstruction = [workingInstructions objectAtIndex:index-1];
+        NSArray *newPost = [UPDDocumentSearcher document:lastResponse equivilantInputFieldForArray:instruction.post orignalResponse:prevInstruction.response];
+        NSMutableString *newHTTPBody = [[NSMutableString alloc] init];
+        for(int i=0;i<newPost.count;i++) {
+            if(i>0) {
+                [newHTTPBody appendString:@"&"];
+            }
+            [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:0], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
+            [newHTTPBody appendString:@"="];
+            [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:1], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
+        }
+        NSMutableURLRequest *mutableRequest = [request mutableCopy];
+        [mutableRequest setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
+        request = mutableRequest;
+    }
+    index++;
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        if(index<workingInstructions.count) {
+            [self processAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingSession:session];
+        }
+        else {
+            [session invalidateAndCancel];
+            if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
+                /*the final request works on its own, use it!*/
+                if(self.completionBlock) {
+                    self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                }
+            }
+            else {
+                /*step 2 failed, no other options... error*/
+            }
+        }
+    }];
+    [task resume];
 }
 
 @end

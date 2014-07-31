@@ -29,11 +29,6 @@
 static const char *_enc;
 static int _options;
 
-struct ElementCount {
-    const char* name;
-    int count;
-};
-
 + (void)initialize {
     /*set options used by libxml*/
     static dispatch_once_t dispatchOnceToken;
@@ -47,6 +42,11 @@ struct ElementCount {
 }
 
 #pragma mark - Equivilant
+
+struct ElementCount {
+    const char* name;
+    int count;
+};
 
 /*
  Analyzes the structure of each document, and returns YES if the two should
@@ -141,9 +141,9 @@ struct ElementCount {
  Common Sequence type implementation to account for offset differenes.
  */
 + (id)document:(NSString *)doc1 compareTextWithDocument:(NSString *)doc2 highlightChanges:(BOOL)highlight {
-    htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[[[doc1 copy] stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);;
+    htmlDocPtr origDoc = htmlReadDoc((xmlChar *)[[doc1 stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);;
     xmlNode *currentNode1 = (xmlNode *)origDoc;
-    xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[[[doc2 copy] stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);
+    xmlNode *currentNode2 = (xmlNode *)htmlReadDoc((xmlChar *)[[doc2 stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);
     std::vector<xmlNodePtr>textElements1;
     std::vector<xmlNodePtr>textElements2;
     
@@ -272,7 +272,7 @@ struct ElementCount {
  Takes a given node and uses it to iterate through the document
  (check children, then sibling node, then parent's next sibling, etc.)
  until the node represents a non-empty piece of text. 'node' will be NULL
- if the document has completed.
+ if the document has iterated completely.
  */
 + (void)iterateToNextTextNode:(xmlNode **)node {
     while(true) {

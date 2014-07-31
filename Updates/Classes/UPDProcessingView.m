@@ -425,7 +425,7 @@
 
 - (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate {
     self.instructions = nil;
-    self.canComplete = nil;
+    self.canComplete = NO;
     [self scrollToPage:0 animated:NO];
     [self.processingLabel setAlpha:0];
     [self.processingButton setAlpha:0];

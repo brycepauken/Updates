@@ -19,8 +19,8 @@
     self = [super init];
     if(self) {
         /*don't need to initialize headers, it's added directly later on*/
-        self.get = [NSMutableDictionary dictionary];
-        self.post = [NSMutableDictionary dictionary];
+        self.get = [NSMutableArray array];
+        self.post = [NSMutableArray array];
     }
     return self;
 }

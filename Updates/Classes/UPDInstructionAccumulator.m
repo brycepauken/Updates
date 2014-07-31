@@ -42,13 +42,8 @@
                 if ([keyValuePairArray count] >= 2) {
                     NSString *key = [[[keyValuePairArray objectAtIndex:0] stringByReplacingOccurrencesOfString:@"+" withString:@" "] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                     NSString *value = [[[keyValuePairArray objectAtIndex:1] stringByReplacingOccurrencesOfString:@"+" withString:@" "] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-                    NSMutableDictionary *targetDictionary = (getOrPost?instruction.post:instruction.get);
-                    NSMutableArray *values = [targetDictionary objectForKey:key];
-                    if(!values) {
-                        values = [[NSMutableArray alloc] initWithCapacity:1];
-                        [targetDictionary setObject:values forKey:key];
-                    }
-                    [values addObject:value];
+                    NSMutableArray *targetArray = (getOrPost?instruction.post:instruction.get);
+                    [targetArray addObject:@[key, value]];
                 }
             }
         }

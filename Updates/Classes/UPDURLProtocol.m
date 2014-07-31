@@ -38,26 +38,42 @@ static UPDInstructionAccumulator *_instructionAccumulator;
     return request;
 }
 
++ (void)createSession {
+    
+}
+
++ (void)invalidateSession {
+    
+}
+
 + (void)setInstructionAccumulator:(UPDInstructionAccumulator *)instructionAccumulator {
     _instructionAccumulator = instructionAccumulator;
 }
 
 - (void)startLoading {
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    [queue setMaxConcurrentOperationCount:50];
+    _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration] delegate:self delegateQueue:queue];
     NSMutableURLRequest *newRequest = [self.request mutableCopy];
     [NSURLProtocol setProperty:@YES forKey:@"UseDefaultImplementation" inRequest:newRequest];
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    [queue setMaxConcurrentOperationCount:5];
-    self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:queue];
     self.task = [_session dataTaskWithRequest:newRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if(!error) {
             [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
             [self.client URLProtocol:self didLoadData:data];
             [self.client URLProtocolDidFinishLoading:self];
             
-            NSDictionary *headers = [(NSHTTPURLResponse *)response allHeaderFields];
-            if([[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
+            NSDictionary *headers;
+            if([response respondsToSelector:@selector(allHeaderFields)]) {
+                headers = [(NSHTTPURLResponse *)response allHeaderFields];
+            }
+            if(headers && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
                 if(_instructionAccumulator) {
-                    [_instructionAccumulator addInstructionWithRequest:self.request response:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] headers:headers];
+                    NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
+                    if(!firstRequest) {
+                        firstRequest = self.request;
+                    }
+                    
+                    [_instructionAccumulator addInstructionWithRequest:firstRequest response:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] headers:headers];
                 }
             }
         }
@@ -81,6 +97,11 @@ static UPDInstructionAccumulator *_instructionAccumulator;
     if(response!=nil) {
         NSMutableURLRequest *mutableRequest = [request mutableCopy];
         [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
+        NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
+        if(!firstRequest) {
+            firstRequest = self.request;
+        }
+        [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
         
         [self.client URLProtocol:self wasRedirectedToRequest:mutableRequest redirectResponse:response];
         [self.task cancel];
