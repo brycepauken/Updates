@@ -29,6 +29,7 @@
     self = [super init];
     if(self) {
         self.baseURL = [decoder decodeObjectForKey:@"baseURL"];
+        self.endRequest = [decoder decodeObjectForKey:@"endRequest"];
         self.get = [decoder decodeObjectForKey:@"get"];
         self.headers = [decoder decodeObjectForKey:@"headers"];
         self.fullURL = [decoder decodeObjectForKey:@"fullURL"];
@@ -41,6 +42,7 @@
 
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:self.baseURL forKey:@"baseURL"];
+    [encoder encodeObject:self.endRequest forKey:@"endRequest"];
     [encoder encodeObject:self.get forKey:@"get"];
     [encoder encodeObject:self.headers forKey:@"headers"];
     [encoder encodeObject:self.fullURL forKey:@"fullURL"];

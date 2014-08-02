@@ -56,8 +56,8 @@ static int _options;
                 if(![[mutableInput objectAtIndex:i] isEqual:[NSNull null]]) {
                     if([[[mutableInput objectAtIndex:i] objectAtIndex:0] isEqualToString:origName] && [[[mutableInput objectAtIndex:i] objectAtIndex:1] isEqualToString:origValue]) {
                         [returnInput replaceObjectAtIndex:i withObject:[NSMutableArray arrayWithObjects:[NSString stringWithUTF8String:(const char*)xmlGetProp(currentNode, (xmlChar *)"name")],[NSString stringWithUTF8String:(const char*)xmlGetProp(currentNode, (xmlChar *)"value")],nil]];
+                        [mutableInput replaceObjectAtIndex:i withObject:[NSNull null]];
                     }
-                    [mutableInput replaceObjectAtIndex:i withObject:[NSNull null]];
                 }
             }
             

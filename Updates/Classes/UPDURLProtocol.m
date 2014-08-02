@@ -142,7 +142,7 @@ static NSURLSession *_session;
                         firstRequest = instance.request;
                     }
                     
-                    [_instructionAccumulator addInstructionWithRequest:firstRequest response:[[NSString alloc] initWithData:instance.data encoding:NSUTF8StringEncoding] headers:headers];
+                    [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:instance.request response:[[NSString alloc] initWithData:instance.data encoding:NSUTF8StringEncoding] headers:headers];
                 }
             }
         }

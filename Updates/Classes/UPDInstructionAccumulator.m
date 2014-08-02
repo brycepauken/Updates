@@ -25,12 +25,13 @@
  it recieves. The post argument is an NSString, so this method must
  also parse the string into an NSDictionary.
  */
-- (void)addInstructionWithRequest:(NSURLRequest *)request response:(NSString *)response headers:(NSDictionary *)headers {
+- (void)addInstructionWithRequest:(NSURLRequest *)request endRequest:(NSURLRequest *)endRequest response:(NSString *)response headers:(NSDictionary *)headers {
     UPDInternalInstruction *instruction = [[UPDInternalInstruction alloc] init];
     [instruction setBaseURL:([request.URL.absoluteString rangeOfString:@"?" options:NSBackwardsSearch].location==NSNotFound?request.URL.absoluteString:[request.URL.absoluteString substringToIndex:[request.URL.absoluteString rangeOfString:@"?" options:NSBackwardsSearch].location])];
     [instruction setHeaders:headers];
     [instruction setFullURL:request.URL.absoluteString];
     [instruction setRequest:request];
+    [instruction setEndRequest:endRequest];
     [instruction setResponse:response];
     
     for(int getOrPost=0;getOrPost<2;getOrPost++) {

@@ -11,6 +11,7 @@
 @interface UPDInternalInstruction : NSObject <NSCoding>
 
 @property (nonatomic, strong) NSString *baseURL;
+@property (nonatomic, strong) NSURLRequest *endRequest;
 @property (nonatomic, strong) NSMutableArray *get;
 @property (nonatomic, strong) NSDictionary *headers;
 @property (nonatomic, strong) NSString *fullURL;
