@@ -205,7 +205,7 @@
         [self.confirmationLabel setFont:[UIFont systemFontOfSize:18]];
         [self.confirmationLabel setNumberOfLines:0];
         [self.confirmationLabel setTag:4];
-        [self.confirmationLabel setText:@"Watching for any change can lead to false updates due to small differences from visit to visit.\n\nAre you sure you want to continue?"];
+        [self.confirmationLabel setText:@"Watching for any change can lead\nto false updates caused by small\n(or even invisible) differences\nfrom visit to visit.\n\nAre you sure you\nwant to continue?"];
         [self.confirmationLabel setTextAlignment:NSTextAlignmentCenter];
         [self.confirmationLabel setTextColor:[UIColor UPDOffWhiteColor]];
         [self.scrollView addSubview:self.confirmationLabel];
