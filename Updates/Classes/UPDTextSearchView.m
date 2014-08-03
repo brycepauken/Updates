@@ -40,6 +40,11 @@
         __unsafe_unretained UPDTextSearchView *weakSelf = self;
         self.searchBar = [[UPDTextSearchBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-UPD_TEXT_SEARCH_BAR_HEIGHT, self.bounds.size.width, UPD_TEXT_SEARCH_BAR_HEIGHT)];
         [self.searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self.searchBar setGoButtonBlock:^(NSString *text){
+            if(weakSelf.goBlock) {
+                weakSelf.goBlock(text, [[weakSelf.webView stringByEvaluatingJavaScriptFromString:@"UPDHighlightCount"] intValue]);
+            }
+        }];
         [self.searchBar setTextChanged:^(NSString *text){
             static NSString *highlightJS;
             static dispatch_once_t dispatchOnceToken;
@@ -49,7 +54,6 @@
             [weakSelf.webView stringByEvaluatingJavaScriptFromString:highlightJS];
             
             [weakSelf.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"UPDHighlightOccurrencesOfString(\"%@\");",text]];
-            //int UPDHighlightCount = [[weakSelf.webView stringByEvaluatingJavaScriptFromString:@"UPDHighlightCount"] intValue];
         }];
         [self addSubview:self.searchBar];
         

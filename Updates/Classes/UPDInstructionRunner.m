@@ -57,6 +57,9 @@
             return UPDInstructionRunnerResultChange;
         }
     }
+    else if([[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Text"]) {
+        return UPDInstructionRunnerResultNoChange;
+    }
     return UPDInstructionRunnerResultNoChange;
 }
 

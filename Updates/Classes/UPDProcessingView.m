@@ -64,6 +64,7 @@
     if (self) {
         [self setBackgroundColor:[UIColor UPDLightBlueColor]];
         self.canComplete = NO;
+        __unsafe_unretained UPDProcessingView *weakSelf = self;
         
         self.outlineQuarter = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
         [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
@@ -99,6 +100,21 @@
         
         self.textSearchView = [[UPDTextSearchView alloc] initWithFrame:CGRectMake(20, 40, self.bounds.size.width-40, self.bounds.size.height-60)];
         [self.textSearchView setAlpha:0];
+        [self.textSearchView setGoBlock:^(NSString *text, int count){
+            weakSelf.differenceOptions = @{@"DifferenceType":@"Text", @"DifferenceText":text, @"DifferenceCount":@(count)};
+            
+            [weakSelf.completeOverlay setUserInteractionEnabled:NO];
+            [weakSelf.textSearchView setUserInteractionEnabled:NO];
+            [weakSelf.confirmationLabel setText:[NSString stringWithFormat:@"You'll be notified when the text \"%@\" no longer appears %@ on the page.\n\nIs this OK?",text,(count==1?@"once":(count==2?@"twice":[NSString stringWithFormat:@"%i times",count]))]];
+            [weakSelf setNeedsLayout];
+            
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST animations:^{
+                [weakSelf.completeOverlay setAlpha:0];
+                [weakSelf.textSearchView setAlpha:0];
+            }];
+            
+            [weakSelf scrollToPage:4 animated:YES];
+        }];
         [self.textSearchView setUserInteractionEnabled:NO];
         [self addSubview:self.textSearchView];
         
@@ -221,7 +237,6 @@
         [self.confirmationLabel setFont:[UIFont systemFontOfSize:18]];
         [self.confirmationLabel setNumberOfLines:0];
         [self.confirmationLabel setTag:4];
-        [self.confirmationLabel setText:@"Watching for any change can lead\nto false updates caused by small\n(or even invisible) differences\nfrom visit to visit.\n\nAre you sure you\nwant to continue?"];
         [self.confirmationLabel setTextAlignment:NSTextAlignmentCenter];
         [self.confirmationLabel setTextColor:[UIColor UPDOffWhiteColor]];
         [self.scrollView addSubview:self.confirmationLabel];
@@ -323,7 +338,10 @@
         }];
     }
     else if(button==self.checkTypeButtonAll) {
+        self.differenceOptions = nil;
+        [self.confirmationLabel setText:@"Watching for any change can lead\nto false updates caused by small\n(or even invisible) differences\nfrom visit to visit.\n\nAre you sure you\nwant to continue?"];
         [self scrollToPage:4 animated:YES];
+        [self setNeedsLayout];
     }
 }
 
@@ -332,7 +350,9 @@
         [self scrollToPage:3 animated:YES];
     }
     else if(button==self.confirmationButtonYes) {
-        self.differenceOptions = @{@"DifferenceType":@"Any"};
+        if(!self.differenceOptions) {
+            self.differenceOptions = @{@"DifferenceType":@"Any"};
+        }
         
         [self.checkmark setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outline setAutoresizingMask:UIViewAutoresizingFlexibleMargins];

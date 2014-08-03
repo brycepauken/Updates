@@ -2,7 +2,9 @@ var UPDHighlightCount = 0;
 
 function UPDHighlightOccurrencesOfString(str) {
     UPDRemoveHighlights();
-    UPDHighlightOccurrencesOfStringFromElement(str.toLowerCase(), document.body);
+    if(str && !(/^\s*$/.test(str))) {
+        UPDHighlightOccurrencesOfStringFromElement(str.toLowerCase(), document.body);
+    }
 }
 
 function UPDHighlightOccurrencesOfStringFromElement(str, element) {
