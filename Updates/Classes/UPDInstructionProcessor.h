@@ -8,12 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+@class UPDInternalInstruction;
+
 @interface UPDInstructionProcessor : NSObject
 
 @property (nonatomic, copy) void(^completionBlock)(NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSURL *url);
 @property (nonatomic, strong) NSArray *instructions;
 @property (nonatomic, strong) NSString *url;
 
-- (void)beginProcessing;
+- (void)beginProcessingWithLastInstructionBlock:(void (^)(UPDInternalInstruction *))lastInstructionBlock;
 
 @end

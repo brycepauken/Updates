@@ -52,6 +52,8 @@ extern const int UPD_PROCESSING_SCROLLVIEW_SIZE;
 extern const int UPD_PROCESSING_TEXTFIELD_HEIGHT;
 extern const int UPD_SEARCH_ENGINE_ICON_PADDING;
 extern const int UPD_SEARCH_ENGINE_ICON_SIZE;
+extern const int UPD_TEXT_SEARCH_BAR_BUTTON_SIZE;
+extern const int UPD_TEXT_SEARCH_BAR_HEIGHT;
 extern const int UPD_URL_BAR_HEIGHT;
 extern const int UPD_URL_BAR_PADDING;
 extern const CGFloat UPD_BROWSER_IMAGE_OPACITY;

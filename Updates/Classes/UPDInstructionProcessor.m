@@ -44,7 +44,7 @@
  Should call completionBlock with an array of UPDInternalInstructions,
  which can be used to get to the given web page, along with a favicon.
  */
-- (void)beginProcessing {
+- (void)beginProcessingWithLastInstructionBlock:(void (^)(UPDInternalInstruction *))lastInstructionBlock {
     NSMutableArray *workingInstructions = [self.instructions mutableCopy];
     NSURL *workingURL = [NSURL URLWithString:self.url];
     
@@ -66,6 +66,7 @@
         }
     }
     if(lastInstruction) {
+        lastInstructionBlock(lastInstruction);
         /*find a better source than this! could be an error later on!*/
         self.favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://g.etfv.co/" stringByAppendingString:lastInstruction.request.URL.absoluteString]]]];
         

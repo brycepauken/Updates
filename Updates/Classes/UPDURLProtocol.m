@@ -128,6 +128,7 @@ static NSURLSession *_session;
         [_instances removeObject:weakInstance];
         [_instancesLock unlock];
         if(!error) {
+            /*there's an issue here—exc_bad_access*/
             [instance.client URLProtocol:instance didLoadData:instance.data];
             [instance.client URLProtocolDidFinishLoading:instance];
             

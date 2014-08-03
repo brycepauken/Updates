@@ -17,7 +17,9 @@
 #import "UPDAlertView.h"
 #import "UPDButton.h"
 #import "UPDInstructionProcessor.h"
+#import "UPDInternalInstruction.h"
 #import "UPDProcessingTextField.h"
+#import "UPDTextSearchView.h"
 
 @interface UPDProcessingView()
 
@@ -26,6 +28,7 @@
 @property (nonatomic, strong) UILabel *checkTypeLabel;
 @property (nonatomic, strong) UPDButton *checkTypeButtonAll;
 @property (nonatomic, strong) UPDButton *checkTypeButtonText;
+@property (nonatomic, strong) UIView *completeOverlay;
 @property (nonatomic, strong) UILabel *confirmationLabel;
 @property (nonatomic, strong) UPDButton *confirmationButtonYes;
 @property (nonatomic, strong) UPDButton *confirmationButtonNo;
@@ -48,6 +51,7 @@
 @property (nonatomic, strong) UPDButton *protectButtonWhy;
 @property (nonatomic, strong) UPDButton *protectButtonYes;
 @property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UPDTextSearchView *textSearchView;
 @property (nonatomic) NSTimeInterval timerResult;
 @property (nonatomic, strong) NSURL *url;
 
@@ -85,6 +89,18 @@
         [self.scrollView setShowsHorizontalScrollIndicator:NO];
         [self.scrollView setShowsVerticalScrollIndicator:NO];
         [self addSubview:self.scrollView];
+        
+        self.completeOverlay = [[UIView alloc] initWithFrame:self.bounds];
+        [self.completeOverlay setAlpha:0];
+        [self.completeOverlay setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.completeOverlay setBackgroundColor:[UIColor UPDOffBlackColor]];
+        [self.completeOverlay setUserInteractionEnabled:NO];
+        [self addSubview:self.completeOverlay];
+        
+        self.textSearchView = [[UPDTextSearchView alloc] initWithFrame:CGRectMake(20, 40, self.bounds.size.width-40, self.bounds.size.height-60)];
+        [self.textSearchView setAlpha:0];
+        [self.textSearchView setUserInteractionEnabled:NO];
+        [self addSubview:self.textSearchView];
         
         /*page1*/
         
@@ -278,7 +294,35 @@
 }
 
 - (void)checkTypeButtonTapped:(UIButton *)button {
-    if(button==self.checkTypeButtonAll) {
+    if(button==self.checkTypeButtonText) {
+        [self.completeOverlay setUserInteractionEnabled:YES];
+        [self.textSearchView setUserInteractionEnabled:YES];
+        
+        CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+        
+        CATransform3D scale1 = CATransform3DMakeScale(0.5, 0.5, 1);
+        CATransform3D scale2 = CATransform3DMakeScale(1.1, 1.1, 1);
+        CATransform3D scale3 = CATransform3DMakeScale(0.9, 0.9, 1);
+        CATransform3D scale4 = CATransform3DMakeScale(1.0, 1.0, 1);
+        
+        NSArray *frameValues = [NSArray arrayWithObjects:[NSValue valueWithCATransform3D:scale1],[NSValue valueWithCATransform3D:scale2],[NSValue valueWithCATransform3D:scale3],[NSValue valueWithCATransform3D:scale4], nil];
+        [animation setValues:frameValues];
+        
+        NSArray *frameTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0],[NSNumber numberWithFloat:0.5],[NSNumber numberWithFloat:0.8],[NSNumber numberWithFloat:1.0], nil];
+        [animation setKeyTimes:frameTimes];
+        
+        animation.fillMode = kCAFillModeForwards;
+        animation.removedOnCompletion = YES;
+        animation.duration = UPD_TRANSITION_DURATION;
+        
+        [self.textSearchView.layer addAnimation:animation forKey:@"popup"];
+        
+        [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+            [self.completeOverlay setAlpha:0.5];
+            [self.textSearchView setAlpha:1];
+        }];
+    }
+    else if(button==self.checkTypeButtonAll) {
         [self scrollToPage:4 animated:YES];
     }
 }
@@ -322,6 +366,8 @@
  Label sizing method could probably be simplified later on.
  */
 - (void)layoutSubviews {
+    [self.textSearchView setFrame:CGRectMake(20, 40, self.bounds.size.width-40, self.bounds.size.height-60)];
+    
     /*page 1*/
     CGSize processingLabelSize = [self.processingLabel.text boundingRectWithSize:CGSizeMake(self.scrollView.bounds.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: self.processingLabel.font} context:nil].size;
     processingLabelSize.height = ceilf(processingLabelSize.height);
@@ -385,7 +431,7 @@
         
         /*raise views up to center nameTextField if keyboard visible*/
         CGFloat viewOffset=0;
-        if(self.keyboardHeight>0) {
+        if(self.keyboardHeight>0 && !self.textSearchView.userInteractionEnabled) {
             CGFloat goalY = ((self.bounds.size.height-self.keyboardHeight)-self.nameTextField.bounds.size.height)/2;
             CGFloat curY = newScrollViewFrame.origin.y+self.nameTextField.frame.origin.y;
             viewOffset = goalY-curY;
@@ -447,7 +493,9 @@
         [weakSelf tryCompletion];
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        [self.instructionProcessor beginProcessing];
+        [self.instructionProcessor beginProcessingWithLastInstructionBlock:^(UPDInternalInstruction *lastInstruction) {
+            [self.textSearchView loadDocument:lastInstruction.response withBaseURL:lastInstruction.endRequest.URL];
+        }];
     });
 }
 
