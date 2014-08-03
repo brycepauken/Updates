@@ -37,8 +37,20 @@
         [self.webView setScalesPageToFit:YES];
         [self addSubview:self.webView];
         
+        __unsafe_unretained UPDTextSearchView *weakSelf = self;
         self.searchBar = [[UPDTextSearchBar alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-UPD_TEXT_SEARCH_BAR_HEIGHT, self.bounds.size.width, UPD_TEXT_SEARCH_BAR_HEIGHT)];
         [self.searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self.searchBar setTextChanged:^(NSString *text){
+            static NSString *highlightJS;
+            static dispatch_once_t dispatchOnceToken;
+            dispatch_once(&dispatchOnceToken, ^{
+                highlightJS = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Highlight" ofType:@"js"] encoding:NSUTF8StringEncoding error:nil];
+            });
+            [weakSelf.webView stringByEvaluatingJavaScriptFromString:highlightJS];
+            
+            [weakSelf.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"UPDHighlightOccurrencesOfString(\"%@\");",text]];
+            //int UPDHighlightCount = [[weakSelf.webView stringByEvaluatingJavaScriptFromString:@"UPDHighlightCount"] intValue];
+        }];
         [self addSubview:self.searchBar];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];

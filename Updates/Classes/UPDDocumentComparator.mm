@@ -249,14 +249,14 @@ struct ElementCount {
             const char *newStyle;
             const char *existingStyle = (const char *)xmlGetProp(textElements1.at(i-1)->parent, (xmlChar*)"style");
             if(existingStyle != NULL) {
-                const char *appendStyle = "; background: #f8f388 !important;";
+                const char *appendStyle = "; background: #f8f388 !important; color: #000 !important;";
                 char *mutableNewStyle = (char *)calloc(strlen(appendStyle)+strlen(existingStyle)+1, sizeof(char));
                 strcpy(mutableNewStyle,existingStyle);
                 strcat(mutableNewStyle,appendStyle);
                 newStyle = mutableNewStyle;
             }
             else {
-                newStyle = "background: #f8f388 !important;";
+                newStyle = "background: #f8f388 !important; color: #000 !important;";
             }
             xmlNewProp(textElements1.at(i-1)->parent, (xmlChar*)"style", (xmlChar*)newStyle);
             

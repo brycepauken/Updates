@@ -82,6 +82,9 @@
 
 - (void)textFieldDidChange {
     [self setButtonEnabled:[self.searchField.text length]];
+    if(self.textChanged) {
+        self.textChanged(self.searchField.text);
+    }
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {

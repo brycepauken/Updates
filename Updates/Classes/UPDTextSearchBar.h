@@ -11,5 +11,6 @@
 @interface UPDTextSearchBar : UIView <UITextFieldDelegate>
 
 @property (nonatomic, copy) void(^goButtonBlock)(NSString *text);
+@property (nonatomic, copy) void(^textChanged)(NSString *text);
 
 @end

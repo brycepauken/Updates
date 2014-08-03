@@ -17,6 +17,7 @@
 		02260FFD198D99880086326D /* UPDTextSearchView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02260FFC198D99880086326D /* UPDTextSearchView.m */; };
 		02261000198DCACF0086326D /* UPDTextSearchBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02260FFF198DCACF0086326D /* UPDTextSearchBar.m */; };
 		02261003198DD0660086326D /* UPDTextSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02261002198DD0660086326D /* UPDTextSearchField.m */; };
+		02261006198DDAA30086326D /* Highlight.js in Resources */ = {isa = PBXBuildFile; fileRef = 02261005198DDAA30086326D /* Highlight.js */; };
 		02388DE319897A52004BB64A /* UPDDocumentSearcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */; };
 		024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */; };
 		024C45141975D269000896E4 /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45131975D269000896E4 /* UPDInterface.m */; };
@@ -105,6 +106,7 @@
 		02260FFF198DCACF0086326D /* UPDTextSearchBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTextSearchBar.m; path = Classes/UPDTextSearchBar.m; sourceTree = "<group>"; };
 		02261001198DD0660086326D /* UPDTextSearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDTextSearchField.h; path = Classes/UPDTextSearchField.h; sourceTree = "<group>"; };
 		02261002198DD0660086326D /* UPDTextSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTextSearchField.m; path = Classes/UPDTextSearchField.m; sourceTree = "<group>"; };
+		02261005198DDAA30086326D /* Highlight.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = Highlight.js; path = Resources/Scripts/Highlight.js; sourceTree = "<group>"; };
 		02388DE119897A52004BB64A /* UPDDocumentSearcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDocumentSearcher.h; path = Classes/UPDDocumentSearcher.h; sourceTree = "<group>"; };
 		02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = UPDDocumentSearcher.mm; path = Classes/UPDDocumentSearcher.mm; sourceTree = "<group>"; };
 		024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+UPDColors.h"; path = "Classes/UIColor+UPDColors.h"; sourceTree = "<group>"; };
@@ -260,10 +262,19 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		02261004198DDA640086326D /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				02261005198DDAA30086326D /* Highlight.js */,
+			);
+			name = Scripts;
+			sourceTree = "<group>";
+		};
 		024C45151975E4F1000896E4 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				024C45161975E4F8000896E4 /* Images */,
+				02261004198DDA640086326D /* Scripts */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -463,6 +474,7 @@
 				02A7340219773560002A86F3 /* SearchEngineIconDuck.png in Resources */,
 				028D7EB0197DB41700BE0643 /* ButtonOutlineQuarter.png in Resources */,
 				02AF8765197B7E7E007D06C5 /* Accept@2x.png in Resources */,
+				02261006198DDAA30086326D /* Highlight.js in Resources */,
 				02AF8761197B7E79007D06C5 /* Cancel@2x.png in Resources */,
 				02A733FB197731B9002A86F3 /* SearchEngineIconBing@2x.png in Resources */,
 				02AF8760197B7E79007D06C5 /* Cancel.png in Resources */,
