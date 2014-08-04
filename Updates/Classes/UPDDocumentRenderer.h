@@ -10,6 +10,8 @@
 
 @interface UPDDocumentRenderer : NSObject <UIWebViewDelegate>
 
+- (void)clearWebView;
+- (void)countOccurrencesOfString:(NSString *)str inDocument:(NSString *)doc withBaseURL:(NSURL *)url withCompletionBlock:(void (^)(int count))completionBlock;
 - (void)renderDocument:(NSString *)doc withBaseURL:(NSURL *)url completionBlock:(void (^)(NSString *newResponse))completionBlock;
 
 @end

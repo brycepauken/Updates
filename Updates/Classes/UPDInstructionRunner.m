@@ -9,6 +9,7 @@
 #import "UPDInstructionRunner.h"
 
 #import "UPDDocumentComparator.h"
+#import "UPDDocumentRenderer.h"
 #import "UPDDocumentSearcher.h"
 #import "UPDInternalInstruction.h"
 
@@ -24,7 +25,7 @@
         NSURLSessionDataTask *task = [session dataTaskWithRequest:instruction.request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             [session invalidateAndCancel];
             NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            completionBlock([self page:newResponse differsFromPage:page differenceOptions:differenceOptions], newResponse);
+            [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
         }];
         [task resume];
     }
@@ -48,19 +49,31 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-+ (UPDInstructionRunnerResult)page:(NSString *)page differsFromPage:(NSString *)difPage differenceOptions:(NSDictionary *)differenceOptions {
++ (void)page:(NSString *)page differsFromPage:(NSString *)difPage baseURL:(NSURL *)url differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse))completionBlock {
     if([[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Any"]) {
         if([UPDDocumentComparator document:page visibleTextIsEqualToDocument:difPage]) {
-            return UPDInstructionRunnerResultNoChange;
+            completionBlock(UPDInstructionRunnerResultNoChange, page);
         }
         else {
-            return UPDInstructionRunnerResultChange;
+            completionBlock(UPDInstructionRunnerResultChange, page);
         }
     }
     else if([[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Text"]) {
-        return UPDInstructionRunnerResultNoChange;
+        UPDDocumentRenderer *renderer = [[UPDDocumentRenderer alloc] init];
+        [renderer countOccurrencesOfString:[differenceOptions objectForKey:@"DifferenceText"] inDocument:page withBaseURL:url withCompletionBlock:^(int count){
+            [renderer clearWebView];
+            int oldCount = [[differenceOptions objectForKey:@"DifferenceCount"] intValue];
+            if(count==oldCount) {
+                completionBlock(UPDInstructionRunnerResultNoChange, page);
+            }
+            else {
+                completionBlock(UPDInstructionRunnerResultChange, page);
+            }
+        }];
     }
-    return UPDInstructionRunnerResultNoChange;
+    else {
+        completionBlock(UPDInstructionRunnerResultChange, page);
+    }
 }
 
 + (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse))completionBlock {
@@ -91,7 +104,7 @@
         }
         else {
             [session invalidateAndCancel];
-            completionBlock([self page:newResponse differsFromPage:page differenceOptions:differenceOptions], newResponse);
+            [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
         }
     }];
     [task resume];

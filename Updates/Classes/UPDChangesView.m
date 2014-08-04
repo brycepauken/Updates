@@ -97,7 +97,7 @@
 - (void)showUpdate:(UPDInternalUpdate *)update {
     self.update = update;
     [self.navigationBar setText:update.name];
-    if(update.lastResponse == nil) {
+    if(update.lastResponse == nil || [[update.differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Text"]) {
         [self setUpdatedDate:update.origUpdated];
         [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
     }
