@@ -38,8 +38,19 @@
             int pixelsRemaining = image.size.width * image.size.height;
             while(pixelsRemaining > 0) {
                 auto existingPixel = std::find_if(pixelCounts.begin(), pixelCounts.end(), PixelCountComparison(*pixels));
+                int countAdd = 5;
+                if(pixels->a<255) {
+                    if(pixels->a>127) {
+                        countAdd = 2;
+                    }
+                    else {
+                        countAdd = 1;
+                    }
+                }
+                int avg = (abs(pixels->r-pixels->g)/2+abs(pixels->r-pixels->b)/2+abs(pixels->g-pixels->b)/2)/3;
+                countAdd+=avg;
                 if(existingPixel != std::end(pixelCounts)) {
-                    existingPixel->count++;
+                    existingPixel->count+=countAdd;
                     while(existingPixel != std::begin(pixelCounts) && existingPixel->count>(existingPixel-1)->count) {
                         iter_swap(existingPixel, existingPixel-1);
                         existingPixel--;
@@ -47,7 +58,7 @@
                 }
                 else {
                     Pixel newPixel = {.r = pixels->r, .b = pixels->b, .g = pixels->g, .a = pixels->a};
-                    PixelCount newPixelCount = {.pixel = newPixel, .count = 1};
+                    PixelCount newPixelCount = {.pixel = newPixel, .count = countAdd};
                     pixelCounts.push_back(newPixelCount);
                 }
                 pixels++;
@@ -55,7 +66,6 @@
             }
             CGContextRelease(context);
             Pixel commonPixel = pixelCounts.at(0).pixel;
-            //sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
             if(commonPixel.a<255) {
                 CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
                 unsigned char rgba[4];
