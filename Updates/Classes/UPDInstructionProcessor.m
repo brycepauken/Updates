@@ -89,6 +89,7 @@
                 }
                 else {
                     /*using the last instruction alone doesn't work, but there's only one instruction... error*/
+                    NSLog(@"hi1");
                 }
             }
         }];
@@ -96,6 +97,7 @@
     }
     else {
         /*no valid instruction found... error*/
+        NSLog(@"hi2");
     }
 }
 
@@ -182,7 +184,7 @@
                     }
                     else {
                         /*step 3 failed, nothing left to try... error*/
-                        
+                        NSLog(@"hi3");
                     }
                 }
             }];

@@ -92,6 +92,7 @@ static NSURLSession *_session;
         [data enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *stop){
             [instance.data appendBytes:bytes length:byteRange.length];
         }];
+        [instance.client URLProtocol:instance didLoadData:data];
     }
 }
 
@@ -128,10 +129,6 @@ static NSURLSession *_session;
         [_instances removeObject:weakInstance];
         [_instancesLock unlock];
         if(!error) {
-            /*there's an issue here—exc_bad_access*/
-            [instance.client URLProtocol:instance didLoadData:instance.data];
-            [instance.client URLProtocolDidFinishLoading:instance];
-            
             NSDictionary *headers;
             if(instance.response && [instance.response respondsToSelector:@selector(allHeaderFields)]) {
                 headers = [(NSHTTPURLResponse *)instance.response allHeaderFields];
@@ -146,6 +143,7 @@ static NSURLSession *_session;
                     [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:instance.request response:[[NSString alloc] initWithData:instance.data encoding:NSUTF8StringEncoding] headers:headers];
                 }
             }
+            [instance.client URLProtocolDidFinishLoading:instance];
         }
         else {
             [instance.client URLProtocol:instance didFailWithError:error];
