@@ -15,6 +15,7 @@
 @property (nonatomic, strong) NSData *instructions;
 @property (nonatomic, strong) NSData *lastResponse;
 @property (nonatomic, strong) NSDate *lastUpdated;
+@property (nonatomic, strong) NSNumber *locked;
 @property (nonatomic, strong) NSData *origResponse;
 @property (nonatomic, strong) NSDate *origUpdated;
 @property (nonatomic, strong) NSString *name;

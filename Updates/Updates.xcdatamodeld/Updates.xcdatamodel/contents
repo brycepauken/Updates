@@ -12,6 +12,7 @@
         <attribute name="instructions" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="lastResponse" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="lastUpdated" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="locked" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="origResponse" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="origUpdated" optional="YES" attributeType="Date" syncable="YES"/>
@@ -25,7 +26,7 @@
     </entity>
     <elements>
         <element name="Option" positionX="-54" positionY="54" width="128" height="103"/>
-        <element name="Update" positionX="-63" positionY="-18" width="128" height="225"/>
+        <element name="Update" positionX="-63" positionY="-18" width="128" height="240"/>
         <element name="UpdateList" positionX="-54" positionY="18" width="128" height="58"/>
     </elements>
 </model>

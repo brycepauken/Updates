@@ -23,14 +23,12 @@
     
     [self setNeedsStatusBarAppearanceUpdate];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.view setBackgroundColor:[UIColor UPDLightGreyColor]];
-        [self.view setClipsToBounds:YES];
-        
-        self.interface = [[UPDInterface alloc] initWithFrame:self.view.bounds];
-        [self.interface setAutoresizingMask:UIViewAutoresizingFlexibleSize];
-        [self.view addSubview:self.interface];
-    });
+    [self.view setBackgroundColor:[UIColor UPDLightGreyColor]];
+    [self.view setClipsToBounds:YES];
+    
+    self.interface = [[UPDInterface alloc] initWithFrame:self.view.bounds];
+    [self.interface setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+    [self.view addSubview:self.interface];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {

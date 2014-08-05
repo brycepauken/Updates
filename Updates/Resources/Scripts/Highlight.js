@@ -2,20 +2,17 @@ var UPDHighlightCount = 0;
 
 function UPDHighlightOccurrencesOfString(str) {
     UPDRemoveHighlights();
+    str = str.toLowerCase();
     if(str && !(/^\s*$/.test(str))) {
-        UPDHighlightOccurrencesOfStringFromElement(str.toLowerCase(), document.body);
-    }
-}
-
-function UPDHighlightOccurrencesOfStringFromElement(str, element) {
-    if(element) {
-        if(element.nodeType==3) {
-            while (true) {
+        var elements = document.getElementsByTagName("*");
+        for(var i=0; i<elements.length; i++) {
+            var element = elements[i];
+            if(element.hasChildNodes() && element.childNodes[0].nodeType==3) {
+                element = element.childNodes[0];
                 var content = element.nodeValue;
                 var index = content.toLowerCase().indexOf(str);
-                
                 if(index<0) {
-                    break;
+                    continue;
                 }
                 
                 var spanElement = document.createElement("span");
@@ -25,6 +22,7 @@ function UPDHighlightOccurrencesOfStringFromElement(str, element) {
                 spanElement.setAttribute("class","UPDHighlighted");
                 spanElement.style.backgroundColor = "#f8f388";
                 spanElement.style.color = "black";
+                spanElement.style.fontSize = "inherit";
                 
                 UPDHighlightCount++;
                 
@@ -34,13 +32,8 @@ function UPDHighlightOccurrencesOfStringFromElement(str, element) {
                 element.parentNode.insertBefore(spanElement, nextElement);
                 element.parentNode.insertBefore(textElement, nextElement);
                 element = textElement;
-            }
-        }
-        else if(element.nodeType==1) {
-            if(element.style.display!="none"&&element.nodeName.toLowerCase()!="select") {
-                for(var i=element.childNodes.length-1;i>=0;i--) {
-                    UPDHighlightOccurrencesOfStringFromElement(str, element.childNodes[i]);
-                }
+                
+                i++;
             }
         }
     }
@@ -48,27 +41,15 @@ function UPDHighlightOccurrencesOfStringFromElement(str, element) {
 
 function UPDRemoveHighlights() {
     UPDHighlightCount = 0;
-    UPDRemoveHighlightsFromElement(document.body);
-}
-
-function UPDRemoveHighlightsFromElement(element) {
-    if(element && element.nodeType==1) {
-        if(element.getAttribute("class") && element.getAttribute("class").indexOf("UPDHighlighted")>-1) {
+    var elements = document.getElementsByTagName("*");
+    for(var i=0; i<elements.length; i++) {
+        var element = elements[i];
+        if(element.getAttribute("class") && element.getAttribute("class")=="UPDHighlighted") {
             var content = element.removeChild(element.firstChild);
-            element.parentNode.insertBefore(content,element);
-            element.parentNode.removeChild(element);
-            return true;
-        }
-        else {
-            var shouldNormalize = false;
-            for(var i=element.childNodes.length-1;i>=0;i--) {
-                if(UPDRemoveHighlightsFromElement(element.childNodes[i])) {
-                    shouldNormalize = true;
-                }
-            }
-            if(shouldNormalize) {
-                element.normalize();
-            }
+            var parent = element.parentNode;
+            parent.insertBefore(content,element);
+            parent.removeChild(element);
+            parent.normalize();
         }
     }
 }

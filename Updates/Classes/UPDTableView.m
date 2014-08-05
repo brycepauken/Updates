@@ -166,6 +166,7 @@
                 newUpdate.status = update.status;
                 newUpdate.timerResult = update.timerResult;
                 newUpdate.url = update.url;
+                newUpdate.locked = update.locked;
                 newUpdate.objectID = update.objectID;
                 [self.updates insertObject:newUpdate atIndex:0];
             }

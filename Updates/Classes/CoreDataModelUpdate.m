@@ -17,6 +17,7 @@
 @dynamic instructions;
 @dynamic lastResponse;
 @dynamic lastUpdated;
+@dynamic locked;
 @dynamic origResponse;
 @dynamic origUpdated;
 @dynamic timerResult;

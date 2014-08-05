@@ -19,6 +19,7 @@
 @property (nonatomic, retain) NSData *instructions;
 @property (nonatomic, retain) NSData *lastResponse;
 @property (nonatomic, retain) NSDate *lastUpdated;
+@property (nonatomic, retain) NSNumber *locked;
 @property (nonatomic, retain) NSData *origResponse;
 @property (nonatomic, retain) NSDate *origUpdated;
 @property (nonatomic, retain) NSNumber *timerResult;

@@ -218,6 +218,7 @@
         [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
         [update setTimerResult:@(timerResult)];
         [update setStatus:@(0)];
+        [update setLocked:@(NO)];
         [update setParent:updateList];
         
         NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
