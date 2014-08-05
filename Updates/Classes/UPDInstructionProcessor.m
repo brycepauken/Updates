@@ -27,13 +27,11 @@
 
 #import <libxml/HTMLparser.h>
 #import "UPDDocumentComparator.h"
-#import "UPDDocumentRenderer.h"
 #import "UPDDocumentSearcher.h"
 #import "UPDInternalInstruction.h"
 
 @interface UPDInstructionProcessor()
 
-@property (nonatomic, strong) UPDDocumentRenderer *renderer;
 @property (nonatomic, strong) UIImage *favicon;
 
 @end
@@ -85,11 +83,11 @@
             else {
                 /*step 2*/
                 if(workingInstructions.count>1) {
-                    [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil shouldRender:NO usingSession:nil];
+                    [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil usingSession:nil];
                 }
                 else {
                     /*using the last instruction alone doesn't work, but there's only one instruction... error*/
-                    NSLog(@"hi1");
+                    
                 }
             }
         }];
@@ -97,7 +95,7 @@
     }
     else {
         /*no valid instruction found... error*/
-        NSLog(@"hi2");
+        
     }
 }
 
@@ -121,7 +119,7 @@
  Called if beginProcessing determines that just querying the last page
  doesn't work as expected.
  */
-- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse shouldRender:(BOOL)shouldRender usingSession:(NSURLSession *)session {
+- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session {
     if(!session) {
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         [queue setMaxConcurrentOperationCount:5];
@@ -151,43 +149,21 @@
     index++;
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if(!shouldRender) {
-            if(index<workingInstructions.count) {
-                [self processAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse shouldRender:NO usingSession:session];
-            }
-            else {
-                [session invalidateAndCancel];
-                if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
-                    if(self.completionBlock) {
-                        self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                    }
-                }
-                else {
-                    /*step 2 failed, try rendering pages first*/
-                    [self clearPersistentData];
-                    self.renderer = [[UPDDocumentRenderer alloc] init];
-                    [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil shouldRender:YES usingSession:nil];
-                }
-            }
+        if(index<workingInstructions.count) {
+            [self processAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingSession:session];
         }
         else {
-            [self.renderer renderDocument:newResponse withBaseURL:instruction.endRequest.URL completionBlock:^(NSString *renderedResponse) {
-                if(index<workingInstructions.count) {
-                    [self processAllInstructions:workingInstructions fromIndex:index lastResponse:renderedResponse shouldRender:YES usingSession:session];
+            [session invalidateAndCancel];
+            if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
+                if(self.completionBlock) {
+                    self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
                 }
-                else {
-                    [session invalidateAndCancel];
-                    if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:renderedResponse]) {
-                        if(self.completionBlock) {
-                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                        }
-                    }
-                    else {
-                        /*step 3 failed, nothing left to try... error*/
-                        NSLog(@"hi3");
-                    }
-                }
-            }];
+            }
+            else {
+                /*step 2 failed, try rendering pages first*/
+                [self clearPersistentData];
+                [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil usingSession:nil];
+            }
         }
     }];
     [task resume];
