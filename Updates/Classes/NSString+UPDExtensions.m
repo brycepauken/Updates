@@ -21,6 +21,9 @@
     for(int i=0; i<CC_SHA256_DIGEST_LENGTH; i++) {
         [returnString appendFormat:@"%02x",hashResult[i]];
     }
+    if(returnString.length>32) {
+        return [returnString substringToIndex:32];
+    }
     return returnString;
 }
 

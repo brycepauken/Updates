@@ -13,7 +13,9 @@
 
 #import "UPDCommon.h"
 
+#import <Security/Security.h>
 #import "NSData+UPDExtensions.h"
+#import "NSString+UPDExtensions.h"
 #import "UPDAlertView.h"
 #import "UPDAppDelegate.h"
 #import "CoreDataModelOption.h"
@@ -99,24 +101,41 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
 }
 
 + (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock {
-    [self getMasterPassword:completionBlock attemptFailed:NO];
+    [self getEncryptedPassword:completionBlock attemptFailed:NO];
 }
 
 /*
- Returns the user's chosen password for encrypting and decrypting data,
+ Returns the user's chosen password (hashed) for encrypting and decrypting data,
  or prompts them to create one if it doesn't exist yet.
  */
-+ (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock attemptFailed:(BOOL)attemptFailed {
-    static NSString *masterPassword;
-    if(masterPassword) {
++ (void)getEncryptedPassword:(void (^)(NSString *masterPassword))completionBlock attemptFailed:(BOOL)attemptFailed {
+    static NSString *encryptedPassword;
+    if(encryptedPassword) {
         if(completionBlock) {
-            completionBlock(masterPassword);
+            completionBlock(encryptedPassword);
         }
         return;
     }
     
-    NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
+    OSStatus keychainError = noErr;
+    NSMutableDictionary *passwordQuery = [[NSMutableDictionary alloc] init];
+    [passwordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+    static NSData *keychainID;
+    static dispatch_once_t dispatchOnceToken;
+    dispatch_once(&dispatchOnceToken, ^{
+        const UInt8 KeychainItemIdentifier[] = "com.kingfish.Updates.Master\0";
+        keychainID = [NSData dataWithBytes:KeychainItemIdentifier length:strlen((const char *)KeychainItemIdentifier)];
+    });
+    [passwordQuery setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
+    [passwordQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
+    [passwordQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnAttributes];
+    CFMutableDictionaryRef queryDictionary = nil;
+    keychainError = SecItemCopyMatching((__bridge CFDictionaryRef)passwordQuery, (CFTypeRef *)&queryDictionary);
+    if(keychainError == noErr) {
+        NSLog(@"%@",(__bridge_transfer NSMutableDictionary *)queryDictionary);
+    }
     
+    NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
     [context performBlock:^{
         NSFetchRequest *optionEncryptionCheckRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
         [optionEncryptionCheckRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"EncryptionCheck"]];
@@ -124,10 +143,10 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
         CoreDataModelOption *optionEncryptionCheck = [[context executeFetchRequest:optionEncryptionCheckRequest error:&optionEncryptionCheckError] firstObject];
         
         if(optionEncryptionCheck) {
-            if(masterPassword) {
-                if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:masterPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
+            if(encryptedPassword) {
+                if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:encryptedPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
                     if(completionBlock) {
-                        completionBlock(masterPassword);
+                        completionBlock(encryptedPassword);
                     }
                     return;
                 }
@@ -141,15 +160,16 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
                 [alertView setMinTextLength:6];
                 [alertView setTextSubmitBlock:^(NSString *text){
                     [weakAlertView dismiss];
-                    if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:text] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
-                        masterPassword = text;
+                    NSString *hashedString = [text hashedString];
+                    if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:hashedString] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
+                        encryptedPassword = hashedString;
                         if(completionBlock) {
-                            completionBlock(masterPassword);
+                            completionBlock(encryptedPassword);
                         }
                         return;
                     }
                     else {
-                        [self getMasterPassword:completionBlock attemptFailed:YES];
+                        [self getEncryptedPassword:completionBlock attemptFailed:YES];
                     }
                 }];
                 [alertView setCancelButtonBlock:^{
@@ -182,18 +202,42 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
                         [weakConfirmAlertView dismiss];
                         
                         if([text isEqualToString:confirmText]) {
-                            [context performBlock:^{
-                                CoreDataModelOption *optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
-                                [optionEncryptionCheck setDataValue:[NSData encryptData:[@"success" dataUsingEncoding:NSUTF8StringEncoding] withKey:text]];
-                                [optionEncryptionCheck setName:@"EncryptionCheck"];
-                                NSError *saveError;
-                                [context save:&saveError];
-                                masterPassword = text;
-                                [self getMasterPassword:completionBlock attemptFailed:NO];
+                            UPDAlertView *savePasswordAlertView = [[UPDAlertView alloc] init];
+                            __unsafe_unretained UPDAlertView *weakSavePasswordAlertView = savePasswordAlertView;
+                            NSString *hashedText = [text hashedString];
+                            void (^finishBlock)() = ^{
+                                [weakSavePasswordAlertView dismiss];
+                                [context performBlock:^{
+                                    CoreDataModelOption *optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
+                                    [optionEncryptionCheck setDataValue:[NSData encryptData:[@"success" dataUsingEncoding:NSUTF8StringEncoding] withKey:hashedText]];
+                                    [optionEncryptionCheck setName:@"EncryptionCheck"];
+                                    NSError *saveError;
+                                    [context save:&saveError];
+                                    encryptedPassword = hashedText;
+                                    if(completionBlock) {
+                                        completionBlock(encryptedPassword);
+                                    }
+                                }];
+                            };
+                            [savePasswordAlertView setTitle:@"Save Password"];
+                            [savePasswordAlertView setMessage:@"Would you like to save your password on this device? If not, you'll have to enter your password every time you start this app."];
+                            [savePasswordAlertView setFontSize:16];
+                            [savePasswordAlertView setMinTextLength:6];
+                            [savePasswordAlertView setYesButtonBlock:^{
+                                NSMutableDictionary *keychainDictionary = [NSMutableDictionary dictionary];
+                                [keychainDictionary setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
+                                [keychainDictionary setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+                                [keychainDictionary setObject:[hashedText dataUsingEncoding:NSUTF8StringEncoding] forKey:(__bridge id)kSecValueData];
+                                SecItemAdd((__bridge CFDictionaryRef)keychainDictionary,NULL);
+                                finishBlock();
                             }];
+                            [savePasswordAlertView setNoButtonBlock:^{
+                                finishBlock();
+                            }];
+                            [savePasswordAlertView show];
                         }
                         else {
-                            [self getMasterPassword:completionBlock attemptFailed:YES];
+                            [self getEncryptedPassword:completionBlock attemptFailed:YES];
                         }
                     }];
                     [confirmAlertView setCancelButtonBlock:^{
