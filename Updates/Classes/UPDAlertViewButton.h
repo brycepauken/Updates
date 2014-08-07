@@ -10,6 +10,7 @@
 
 @interface UPDAlertViewButton : UIButton
 
+@property (nonatomic, strong) UIColor *disabledBackgroundColor;
 @property (nonatomic, strong) UIColor *highlightedBackgroundColor;
 @property (nonatomic, strong) UIColor *normalBackgroundColor;
 

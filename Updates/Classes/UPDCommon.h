@@ -8,9 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Security/Security.h>
 #import "UIColor+UPDColors.h"
 
 @interface UPDCommon : NSObject
+
++ (NSString *)masterPassword;
 
 @end
 
@@ -38,6 +41,7 @@ extern const int UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT;
 
 extern const int UPD_ALERT_BUTTON_HEIGHT;
 extern const int UPD_ALERT_BUTTON_ICON_SIZE;
+extern const int UPD_ALERT_BUTTON_PADDING;
 extern const int UPD_ALERT_PADDING;
 extern const int UPD_ALERT_WIDTH;
 extern const int UPD_BOTTOM_BAR_BUTTON_SIZE;

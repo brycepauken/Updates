@@ -84,6 +84,9 @@
 		02C238801976CED9009327F8 /* Add.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387E1976CED9009327F8 /* Add.png */; };
 		02C238811976CED9009327F8 /* Add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387F1976CED9009327F8 /* Add@2x.png */; };
 		02C238841976D594009327F8 /* UPDTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C238831976D594009327F8 /* UPDTableView.m */; };
+		02D251241992C39500BBEDBE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D251231992C39400BBEDBE /* Security.framework */; };
+		02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D251251992C3A300BBEDBE /* QuartzCore.framework */; };
+		02D2512C1993425100BBEDBE /* UPDAlertViewTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -209,6 +212,10 @@
 		02C2387F1976CED9009327F8 /* Add@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Add@2x.png"; path = "Resources/Images/Add@2x.png"; sourceTree = "<group>"; };
 		02C238821976D594009327F8 /* UPDTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDTableView.h; path = Classes/UPDTableView.h; sourceTree = "<group>"; };
 		02C238831976D594009327F8 /* UPDTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTableView.m; path = Classes/UPDTableView.m; sourceTree = "<group>"; };
+		02D251231992C39400BBEDBE /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		02D251251992C3A300BBEDBE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		02D2512A1993425100BBEDBE /* UPDAlertViewTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDAlertViewTextField.h; path = Classes/UPDAlertViewTextField.h; sourceTree = "<group>"; };
+		02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAlertViewTextField.m; path = Classes/UPDAlertViewTextField.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,6 +223,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */,
+				02D251241992C39500BBEDBE /* Security.framework in Frameworks */,
 				0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -252,6 +261,8 @@
 		0213C2371974FE0C006BC204 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				02D251251992C3A300BBEDBE /* QuartzCore.framework */,
+				02D251231992C39400BBEDBE /* Security.framework */,
 				0213C2411974FE0C006BC204 /* Images.xcassets */,
 				0213C2381974FE0C006BC204 /* Info.plist */,
 				0213C2391974FE0C006BC204 /* main.m */,
@@ -333,6 +344,8 @@
 				02AF8767197B9DC0007D06C5 /* UPDAlertView.m */,
 				02AF8769197BA831007D06C5 /* UPDAlertViewButton.h */,
 				02AF876A197BA831007D06C5 /* UPDAlertViewButton.m */,
+				02D2512A1993425100BBEDBE /* UPDAlertViewTextField.h */,
+				02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */,
 				02A73D161975C256000A7C48 /* UPDAppDelegate.h */,
 				02A73D171975C256000A7C48 /* UPDAppDelegate.m */,
 				0220020D1978B646002FF38D /* UPDBrowserBottomBar.h */,
@@ -519,6 +532,7 @@
 				024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */,
 				02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */,
 				02901A371984B38100274AAE /* UPDTimer.m in Sources */,
+				02D2512C1993425100BBEDBE /* UPDAlertViewTextField.m in Sources */,
 				02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */,
 				02AF875D197B7939007D06C5 /* UPDBrowserBottomButton.m in Sources */,
 				02934A3419832ACD00FEBB03 /* UPDProcessingTextField.m in Sources */,

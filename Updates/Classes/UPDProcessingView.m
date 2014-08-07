@@ -534,6 +534,9 @@
     else if(button==self.protectButtonNo) {
         [self scrollToPage:3 animated:YES];
     }
+    else if(button==self.protectButtonYes) {
+        
+    }
 }
 
 - (void)scrollToPageFromButton:(UIButton *)button {

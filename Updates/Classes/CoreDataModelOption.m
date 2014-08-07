@@ -13,6 +13,7 @@
 
 @dynamic name;
 @dynamic boolValue;
+@dynamic dataValue;
 @dynamic doubleValue;
 @dynamic intValue;
 

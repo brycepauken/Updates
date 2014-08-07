@@ -49,6 +49,7 @@
 
 - (void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
+    [self setBackgroundColor:enabled?self.normalBackgroundColor:self.disabledBackgroundColor];
     [self.iconImageView setAlpha:enabled?1:0.5];
 }
 

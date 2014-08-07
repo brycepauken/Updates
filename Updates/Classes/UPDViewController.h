@@ -12,6 +12,7 @@
 
 @interface UPDViewController : UIViewController
 
+@property (nonatomic) BOOL hideStatusBar;
 @property (nonatomic, strong) UPDInterface *interface;
 
 @end

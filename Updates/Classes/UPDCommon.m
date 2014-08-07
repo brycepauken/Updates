@@ -13,6 +13,10 @@
 
 #import "UPDCommon.h"
 
+#import "UPDAlertView.h"
+#import "UPDAppDelegate.h"
+#import "CoreDataModelOption.h"
+
 /*
  Two UIViewAutoresizing constants, one for all-around flexible
  sizing and one for all-around flexible margins, two common combinations.
@@ -53,6 +57,7 @@ const int UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT = 80;
  */
 const int UPD_ALERT_BUTTON_HEIGHT = 50;
 const int UPD_ALERT_BUTTON_ICON_SIZE = 24;
+const int UPD_ALERT_BUTTON_PADDING = 4;
 const int UPD_ALERT_PADDING = 20;
 const int UPD_ALERT_WIDTH = 280;
 const int UPD_BOTTOM_BAR_BUTTON_SIZE = 16;
@@ -89,6 +94,47 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
  */
 + (void)initialize {
     UPD_FOLDED_VIEW_GRAVITY = [[UIScreen mainScreen] bounds].size.height*3;
+}
+
+/*
+ Returns the user's chosen password for encrypting and decrypting data,
+ or prompts them to create one if it doesn't exist yet.
+ */
++ (NSString *)masterPassword {
+    NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
+    
+    [context performBlockAndWait:^{
+        NSFetchRequest *optionEncryptionCheckRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
+        [optionEncryptionCheckRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"EncryptionCheck"]];
+        NSError *optionEncryptionCheckError;
+        CoreDataModelOption *optionEncryptionCheck = [[context executeFetchRequest:optionEncryptionCheckRequest error:&optionEncryptionCheckError] firstObject];
+        
+        if(optionEncryptionCheck) {
+            
+        }
+        else {
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Create a Password"];
+            [alertView setMessage:@"Enter a password to encrypt\nyour locked instructions\nand keep them safe."];
+            [alertView setFontSize:16];
+            [alertView setMinTextLength:6];
+            [alertView setTextSubmitBlock:^{
+                [weakAlertView dismiss];
+            }];
+            [alertView show];
+            //optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
+            //[optionEncryptionCheck setDataValue:nil];
+            //[optionEncryptionCheck setName:@"EncryptionCheck"];
+        }
+        NSError *saveError;
+        [context save:&saveError];
+    }];
+    
+    //static const UInt8 keychainIdentifier[] = "com.kingfish.Updates.MasterPassword\0";
+    //OSStatus keychainErr = noErr;
+    
+    return nil;
 }
 
 @end

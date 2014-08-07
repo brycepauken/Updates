@@ -14,6 +14,7 @@
 
 @property (nonatomic, retain) NSString *name;
 @property (nonatomic, retain) NSNumber *boolValue;
+@property (nonatomic, retain) NSData *dataValue;
 @property (nonatomic, retain) NSNumber *doubleValue;
 @property (nonatomic, retain) NSNumber *intValue;
 

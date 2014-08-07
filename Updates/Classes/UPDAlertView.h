@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UPDAlertView : UIView
+@interface UPDAlertView : UIView <UITextFieldDelegate>
 
 @property (nonatomic, strong) NSString *message;
+@property (nonatomic) int minTextLength;
 @property (nonatomic, copy) void (^noButtonBlock)();
 @property (nonatomic, copy) void (^okButtonBlock)();
+@property (nonatomic, copy) void (^textSubmitBlock)();
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, copy) void (^yesButtonBlock)();
 

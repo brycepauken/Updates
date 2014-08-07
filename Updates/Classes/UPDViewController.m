@@ -21,6 +21,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self setHideStatusBar:NO];
     [self setNeedsStatusBarAppearanceUpdate];
     
     [self.view setBackgroundColor:[UIColor UPDLightGreyColor]];
@@ -33,6 +34,10 @@
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return self.hideStatusBar;
 }
 
 @end
