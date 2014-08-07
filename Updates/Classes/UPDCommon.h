@@ -13,7 +13,8 @@
 
 @interface UPDCommon : NSObject
 
-+ (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock;
++ (void)clearEncryptedPassword;
++ (void)getEncryptedPassword:(void (^)(NSString *masterPassword))completionBlock;
 
 @end
 

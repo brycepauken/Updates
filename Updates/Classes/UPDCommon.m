@@ -92,15 +92,30 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
 
 @implementation UPDCommon
 
+static NSData *keychainID;
+
 /*
  We'll use this to set any variables that are too tricky for a one-line
  implementation (like UPD_FOLDED_VIEW_GRAVITY)
  */
 + (void)initialize {
     UPD_FOLDED_VIEW_GRAVITY = [[UIScreen mainScreen] bounds].size.height*3;
+    
+    static dispatch_once_t dispatchOnceToken;
+    dispatch_once(&dispatchOnceToken, ^{
+        const UInt8 KeychainItemIdentifier[] = "com.kingfish.Updates.Master\0";
+        keychainID = [NSData dataWithBytes:KeychainItemIdentifier length:strlen((const char *)KeychainItemIdentifier)];
+    });
 }
 
-+ (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock {
++ (void)clearEncryptedPassword {
+    NSMutableDictionary *passwordQuery = [[NSMutableDictionary alloc] init];
+    [passwordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+    [passwordQuery setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
+    SecItemDelete((__bridge CFDictionaryRef)passwordQuery);
+}
+
++ (void)getEncryptedPassword:(void (^)(NSString *masterPassword))completionBlock {
     [self getEncryptedPassword:completionBlock attemptFailed:NO];
 }
 
@@ -119,12 +134,6 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
     
     NSMutableDictionary *passwordQuery = [[NSMutableDictionary alloc] init];
     [passwordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
-    static NSData *keychainID;
-    static dispatch_once_t dispatchOnceToken;
-    dispatch_once(&dispatchOnceToken, ^{
-        const UInt8 KeychainItemIdentifier[] = "com.kingfish.Updates.Master\0";
-        keychainID = [NSData dataWithBytes:KeychainItemIdentifier length:strlen((const char *)KeychainItemIdentifier)];
-    });
     [passwordQuery setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
     [passwordQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
     [passwordQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnAttributes];
