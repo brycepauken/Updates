@@ -117,7 +117,6 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
         return;
     }
     
-    OSStatus keychainError = noErr;
     NSMutableDictionary *passwordQuery = [[NSMutableDictionary alloc] init];
     [passwordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
     static NSData *keychainID;
@@ -130,9 +129,30 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
     [passwordQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
     [passwordQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnAttributes];
     CFMutableDictionaryRef queryDictionary = nil;
-    keychainError = SecItemCopyMatching((__bridge CFDictionaryRef)passwordQuery, (CFTypeRef *)&queryDictionary);
-    if(keychainError == noErr) {
-        NSLog(@"%@",(__bridge_transfer NSMutableDictionary *)queryDictionary);
+    if(SecItemCopyMatching((__bridge CFDictionaryRef)passwordQuery, (CFTypeRef *)&queryDictionary) == noErr) {
+        NSMutableDictionary *passwordDictionary = [NSMutableDictionary dictionaryWithDictionary:(__bridge_transfer NSMutableDictionary *)queryDictionary];
+        [passwordDictionary setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnData];
+        [passwordDictionary setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+        CFDataRef passwordData = NULL;
+        OSStatus keychainError = noErr;
+        keychainError = SecItemCopyMatching((__bridge CFDictionaryRef)passwordDictionary, (CFTypeRef *)&passwordData);
+        if(keychainError == noErr) {
+            [passwordDictionary removeObjectForKey:(__bridge id)kSecReturnData];
+            NSString *password = [[NSString alloc] initWithBytes:[(__bridge_transfer NSData *)passwordData bytes] length:[(__bridge NSData *)passwordData length] encoding:NSUTF8StringEncoding];
+            if(password.length) {
+                encryptedPassword = password;
+            }
+        }
+        else {
+            if(passwordData) {
+                CFRelease(passwordData);
+            }
+        }
+    }
+    else {
+        if(queryDictionary){
+            CFRelease(queryDictionary);
+        }
     }
     
     NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
