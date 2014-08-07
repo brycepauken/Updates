@@ -108,7 +108,7 @@ static NSData *keychainID;
     });
 }
 
-+ (void)clearEncryptedPassword {
++ (void)clearKeychainData {
     NSMutableDictionary *passwordQuery = [[NSMutableDictionary alloc] init];
     [passwordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
     [passwordQuery setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];

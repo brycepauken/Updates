@@ -138,8 +138,8 @@
         self.processingView = [[UPDProcessingView alloc] initWithFrame:self.bounds];
         [self.processingView setHidden:YES];
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
-        [self.processingView setCompletionBlock:^(NSString *name, NSURL *url, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult, NSDate *origDate) {
-            [weakSelf saveUpdateWithName:name url:url instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult origDate:origDate];
+        [self.processingView setCompletionBlock:^(NSString *name, NSURL *url, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult, NSDate *origDate, BOOL locked) {
+            [weakSelf saveUpdateWithName:name url:url instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult origDate:origDate locked:locked];
             [weakSelf.tableView reloadData];
             
             /*move browser view over for a more seamless animation*/
@@ -194,7 +194,7 @@
     [self.changesView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
-- (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult origDate:(NSDate *)origDate {
+- (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult origDate:(NSDate *)origDate locked:(BOOL)locked {
     NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
     
     [context performBlock:^{
@@ -218,7 +218,7 @@
         [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
         [update setTimerResult:@(timerResult)];
         [update setStatus:@(0)];
-        [update setLocked:@(NO)];
+        [update setLocked:@(locked)];
         [update setParent:updateList];
         
         NSMutableOrderedSet *updates = [updateList.updates mutableCopy];

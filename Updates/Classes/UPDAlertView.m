@@ -247,6 +247,7 @@
     [self.okButton setHidden:(!self.okButtonBlock&&!self.textSubmitBlock)];
     [self.cancelButton setHidden:!self.cancelButtonBlock];
     [self.textField setHidden:!self.textSubmitBlock];
+    [self.checkMark setHidden:!self.textSubmitBlock];
     if(self.textSubmitBlock) {
         [self.okButton setDisabledBackgroundColor:[UIColor lightGrayColor]];
         [self.okButton setTitle:@""];

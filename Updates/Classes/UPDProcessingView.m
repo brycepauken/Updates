@@ -38,6 +38,7 @@
 @property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
 @property (nonatomic, strong) NSArray *instructions;
 @property (nonatomic, strong) NSString *lastResponse;
+@property (nonatomic) BOOL locked;
 @property (nonatomic, strong) UPDButton *nameButton;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UPDProcessingTextField *nameTextField;
@@ -532,10 +533,16 @@
         [alertView show];
     }
     else if(button==self.protectButtonNo) {
+        self.locked = NO;
         [self scrollToPage:3 animated:YES];
     }
     else if(button==self.protectButtonYes) {
-        
+        [UPDCommon getEncryptedPassword:^(NSString *encryptedPassword) {
+            if(encryptedPassword.length) {
+                self.locked = YES;
+                [self scrollToPage:3 animated:YES];
+            }
+        }];
     }
 }
 
@@ -610,7 +617,7 @@
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DELAY*4*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             if(self.completionBlock) {
-                self.completionBlock(self.nameTextField.text, self.url, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult, self.origDate);
+                self.completionBlock(self.nameTextField.text, self.url, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult, self.origDate, self.locked);
             }
         });
     }
