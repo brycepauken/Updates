@@ -87,6 +87,7 @@
 		02D251241992C39500BBEDBE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D251231992C39400BBEDBE /* Security.framework */; };
 		02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D251251992C3A300BBEDBE /* QuartzCore.framework */; };
 		02D2512C1993425100BBEDBE /* UPDAlertViewTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */; };
+		02D2512F19935A7300BBEDBE /* NSData+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -216,6 +217,8 @@
 		02D251251992C3A300BBEDBE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		02D2512A1993425100BBEDBE /* UPDAlertViewTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDAlertViewTextField.h; path = Classes/UPDAlertViewTextField.h; sourceTree = "<group>"; };
 		02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAlertViewTextField.m; path = Classes/UPDAlertViewTextField.m; sourceTree = "<group>"; };
+		02D2512D19935A7300BBEDBE /* NSData+UPDExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+UPDExtensions.h"; path = "Classes/NSData+UPDExtensions.h"; sourceTree = "<group>"; };
+		02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+UPDExtensions.m"; path = "Classes/NSData+UPDExtensions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -336,6 +339,8 @@
 				02934A391983FE4000FEBB03 /* CoreDataModelUpdate.m */,
 				02934A351983FE3F00FEBB03 /* CoreDataModelUpdateList.h */,
 				02934A361983FE3F00FEBB03 /* CoreDataModelUpdateList.m */,
+				02D2512D19935A7300BBEDBE /* NSData+UPDExtensions.h */,
+				02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */,
 				02901A3B1984CB0A00274AAE /* NSDate+UPDExtensions.h */,
 				02901A3C1984CB0A00274AAE /* NSDate+UPDExtensions.m */,
 				024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */,
@@ -540,6 +545,7 @@
 				02C238841976D594009327F8 /* UPDTableView.m in Sources */,
 				0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */,
 				02A733EC19770AB6002A86F3 /* UPDPreBrowserURLBar.m in Sources */,
+				02D2512F19935A7300BBEDBE /* NSData+UPDExtensions.m in Sources */,
 				028D7EB4197DB62B00BE0643 /* UPDBrowserConfirmButton.m in Sources */,
 				02644077197DC636009CE430 /* UPDPreProcessingView.m in Sources */,
 				0213C2401974FE0C006BC204 /* Updates.xcdatamodeld in Sources */,

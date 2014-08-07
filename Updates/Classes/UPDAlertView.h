@@ -10,11 +10,12 @@
 
 @interface UPDAlertView : UIView <UITextFieldDelegate>
 
+@property (nonatomic, copy) void (^cancelButtonBlock)();
 @property (nonatomic, strong) NSString *message;
 @property (nonatomic) int minTextLength;
 @property (nonatomic, copy) void (^noButtonBlock)();
 @property (nonatomic, copy) void (^okButtonBlock)();
-@property (nonatomic, copy) void (^textSubmitBlock)();
+@property (nonatomic, copy) void (^textSubmitBlock)(NSString *text);
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, copy) void (^yesButtonBlock)();
 

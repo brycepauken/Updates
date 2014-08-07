@@ -13,6 +13,7 @@
 
 #import "UPDCommon.h"
 
+#import "NSData+UPDExtensions.h"
 #import "UPDAlertView.h"
 #import "UPDAppDelegate.h"
 #import "CoreDataModelOption.h"
@@ -58,6 +59,7 @@ const int UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT = 80;
 const int UPD_ALERT_BUTTON_HEIGHT = 50;
 const int UPD_ALERT_BUTTON_ICON_SIZE = 24;
 const int UPD_ALERT_BUTTON_PADDING = 4;
+const int UPD_ALERT_CANCEL_BUTTON_SIZE = 30;
 const int UPD_ALERT_PADDING = 20;
 const int UPD_ALERT_WIDTH = 280;
 const int UPD_BOTTOM_BAR_BUTTON_SIZE = 16;
@@ -96,45 +98,83 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
     UPD_FOLDED_VIEW_GRAVITY = [[UIScreen mainScreen] bounds].size.height*3;
 }
 
++ (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock {
+    [self getMasterPassword:completionBlock confirmationFailed:NO];
+}
+
 /*
  Returns the user's chosen password for encrypting and decrypting data,
  or prompts them to create one if it doesn't exist yet.
  */
-+ (NSString *)masterPassword {
++ (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock confirmationFailed:(BOOL)confirmationFailed {
+    static NSString *masterPassword;
     NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
     
-    [context performBlockAndWait:^{
+    [context performBlock:^{
         NSFetchRequest *optionEncryptionCheckRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
         [optionEncryptionCheckRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"EncryptionCheck"]];
         NSError *optionEncryptionCheckError;
         CoreDataModelOption *optionEncryptionCheck = [[context executeFetchRequest:optionEncryptionCheckRequest error:&optionEncryptionCheckError] firstObject];
         
-        if(optionEncryptionCheck) {
-            
+        if(masterPassword&&optionEncryptionCheck) {
+            if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:masterPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
+                if(completionBlock) {
+                    completionBlock(masterPassword);
+                }
+                return;
+            }
         }
-        else {
+        dispatch_async(dispatch_get_main_queue(), ^{
             UPDAlertView *alertView = [[UPDAlertView alloc] init];
             __unsafe_unretained UPDAlertView *weakAlertView = alertView;
-            [alertView setTitle:@"Create a Password"];
-            [alertView setMessage:@"Enter a password to encrypt\nyour locked instructions\nand keep them safe."];
+            [alertView setTitle:!confirmationFailed?@"Create a Password":@"Passwords Different"];
+            [alertView setMessage:!confirmationFailed?@"Enter a password to encrypt\nyour locked instructions\nand keep them safe.":@"Please enter your password again, and make sure the confirmation matches!"];
             [alertView setFontSize:16];
             [alertView setMinTextLength:6];
-            [alertView setTextSubmitBlock:^{
+            [alertView setTextSubmitBlock:^(NSString *text){
                 [weakAlertView dismiss];
+                
+                UPDAlertView *confirmAlertView = [[UPDAlertView alloc] init];
+                __unsafe_unretained UPDAlertView *weakConfirmAlertView = confirmAlertView;
+                [confirmAlertView setTitle:@"Confirm Password"];
+                [confirmAlertView setMessage:@"Please enter your password\nagain, just to make sure."];
+                [confirmAlertView setFontSize:16];
+                [confirmAlertView setMinTextLength:6];
+                [confirmAlertView setTextSubmitBlock:^(NSString *confirmText){
+                    [weakConfirmAlertView dismiss];
+                    
+                    if([text isEqualToString:confirmText]) {
+                        [context performBlock:^{
+                            CoreDataModelOption *optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
+                            [optionEncryptionCheck setDataValue:[NSData encryptData:[@"success" dataUsingEncoding:NSUTF8StringEncoding] withKey:text]];
+                            [optionEncryptionCheck setName:@"EncryptionCheck"];
+                            NSError *saveError;
+                            [context save:&saveError];
+                            masterPassword = text;
+                            [self getMasterPassword:completionBlock confirmationFailed:NO];
+                        }];
+                    }
+                    else {
+                        [self getMasterPassword:completionBlock confirmationFailed:YES];
+                    }
+                }];
+                [confirmAlertView setCancelButtonBlock:^{
+                    [weakConfirmAlertView dismiss];
+                    if(completionBlock) {
+                        completionBlock(nil);
+                    }
+                }];
+                [confirmAlertView show];
+            }];
+            [alertView setCancelButtonBlock:^{
+                [weakAlertView dismiss];
+                if(completionBlock) {
+                    completionBlock(nil);
+                }
             }];
             [alertView show];
-            //optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
-            //[optionEncryptionCheck setDataValue:nil];
-            //[optionEncryptionCheck setName:@"EncryptionCheck"];
-        }
-        NSError *saveError;
-        [context save:&saveError];
+        });
     }];
-    
-    //static const UInt8 keychainIdentifier[] = "com.kingfish.Updates.MasterPassword\0";
-    //OSStatus keychainErr = noErr;
-    
-    return nil;
 }
 
 @end

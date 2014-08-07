@@ -25,6 +25,7 @@
 
 @interface UPDAlertView()
 
+@property (nonatomic, strong) UIButton *cancelButton;
 @property (nonatomic, strong) UIImageView *checkMark;
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic, strong) UIView *interfaceOverlay;
@@ -92,13 +93,24 @@
         [self.checkMark setImage:[UIImage imageNamed:@"Accept"]];
         [self.okButton addSubview:self.checkMark];
         
+        self.cancelButton = [[UIButton alloc] init];
+        [self.cancelButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self.cancelButton setBackgroundColor:[UIColor UPDLightGreyBlueColor]];
+        [self.cancelButton setImage:[UIImage imageNamed:@"Cancel"] forState:UIControlStateNormal];
+        [self.cancelButton setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.75, 0.75)];
+        [self.cancelButton.layer setCornerRadius:UPD_ALERT_CANCEL_BUTTON_SIZE*0.75];
+        [self.cancelButton.layer setMasksToBounds:NO];
+        [self.cancelButton.layer setShadowColor:[UIColor UPDOffBlackColor].CGColor];
+        [self.cancelButton.layer setShadowOffset:CGSizeZero];
+        [self.cancelButton.layer setShadowOpacity:0.5];
+        [self.cancelButton.layer setShadowRadius:1];
+        [self addSubview:self.cancelButton];
+        
         UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundTapped)];
         UITapGestureRecognizer *tapRecognizerOverlay = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundTapped)];
         [self addGestureRecognizer:tapRecognizer];
         [self.interfaceOverlay addGestureRecognizer:tapRecognizerOverlay];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
         [self.textField addTarget:self action:@selector(textFieldDidChange) forControlEvents:UIControlEventEditingChanged];
     }
     return self;
@@ -109,7 +121,10 @@
 }
 
 - (void)buttonTapped:(UIButton *)button {
-    if(button==self.noButton&&self.noButtonBlock) {
+    if(button==self.cancelButton&&self.cancelButtonBlock) {
+        self.cancelButtonBlock();
+    }
+    else if(button==self.noButton&&self.noButtonBlock) {
         self.noButtonBlock();
     }
     else if(button==self.yesButton&&self.yesButtonBlock) {
@@ -120,12 +135,15 @@
             self.okButtonBlock();
         }
         else if(self.textSubmitBlock) {
-            self.textSubmitBlock();
+            self.textSubmitBlock(self.textField.text);
         }
     }
 }
 
 - (void)dismiss {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+    
     [self setUserInteractionEnabled:NO];
     [self.interfaceOverlay setUserInteractionEnabled:NO];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
@@ -146,6 +164,9 @@
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     if(!self.textField.hidden&&CGRectContainsPoint(CGRectInset([self convertRect:self.textField.frame fromView:self.okButton], -UPD_ALERT_BUTTON_PADDING, -UPD_ALERT_BUTTON_PADDING), point)) {
         return self.textField;
+    }
+    else if(!self.cancelButton.hidden&&CGRectContainsPoint(CGRectInset(self.cancelButton.frame, -self.cancelButton.frame.size.width, -self.cancelButton.frame.size.height), point)) {
+        return self.cancelButton;
     }
     return [super hitTest:point withEvent:event];
 }
@@ -191,6 +212,7 @@
     [self.okButton setFrame:CGRectMake(0, self.bounds.size.height+UPD_ALERT_PADDING, self.bounds.size.width, UPD_ALERT_BUTTON_HEIGHT)];
     [self.textField setFrame:CGRectMake(UPD_ALERT_BUTTON_PADDING, UPD_ALERT_BUTTON_PADDING, self.okButton.bounds.size.width-self.okButton.bounds.size.height-UPD_ALERT_BUTTON_PADDING*2, self.okButton.bounds.size.height-UPD_ALERT_BUTTON_PADDING*2)];
     [self.checkMark setFrame:CGRectMake(self.okButton.bounds.size.width-self.okButton.bounds.size.height+(self.okButton.bounds.size.height-UPD_ALERT_BUTTON_ICON_SIZE)/2-UPD_ALERT_BUTTON_PADDING/2, (self.okButton.bounds.size.height-UPD_ALERT_BUTTON_ICON_SIZE)/2, UPD_ALERT_BUTTON_ICON_SIZE, UPD_ALERT_BUTTON_ICON_SIZE)];
+    [self.cancelButton setFrame:CGRectMake(-UPD_ALERT_CANCEL_BUTTON_SIZE/2, -UPD_ALERT_CANCEL_BUTTON_SIZE/2, UPD_ALERT_CANCEL_BUTTON_SIZE, UPD_ALERT_CANCEL_BUTTON_SIZE)];
     
     [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, (self.superview.bounds.size.height-self.bounds.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
     CGFloat verticalOffset = 0;
@@ -215,11 +237,15 @@
 }
 
 - (void)show {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    
     UIView *interface = ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.interface;
     
     [self.yesButton setHidden:!self.yesButtonBlock||!self.noButtonBlock];
     [self.noButton setHidden:!self.yesButtonBlock||!self.noButtonBlock];
     [self.okButton setHidden:(!self.okButtonBlock&&!self.textSubmitBlock)];
+    [self.cancelButton setHidden:!self.cancelButtonBlock];
     [self.textField setHidden:!self.textSubmitBlock];
     if(self.textSubmitBlock) {
         [self.okButton setDisabledBackgroundColor:[UIColor lightGrayColor]];
@@ -280,6 +306,9 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
+    if(self.okButton.enabled) {
+        [self buttonTapped:self.okButton];
+    }
     return YES;
 }
 
