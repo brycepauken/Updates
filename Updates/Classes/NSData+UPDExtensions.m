@@ -9,13 +9,14 @@
 #import "NSData+UPDExtensions.h"
 
 #import <CommonCrypto/CommonCryptor.h>
+#import "NSString+UPDExtensions.h"
 
 @implementation NSData (UPDExtensions)
 
 + (NSData *)decryptData:(NSData *)data withKey:(NSString *)key {
     char keyPtr[kCCKeySizeAES256+1];
     bzero(keyPtr, sizeof(keyPtr));
-    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    [[key hashedString] getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
     
     NSUInteger dataLength = data.length;
     size_t bufferSize = dataLength + kCCBlockSizeAES128;
@@ -33,7 +34,7 @@
 + (NSData *)encryptData:(NSData *)data withKey:(NSString *)key {
     char keyPtr[kCCKeySizeAES256+1];
     bzero(keyPtr, sizeof(keyPtr));
-    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    [[key hashedString] getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
     
     NSUInteger dataLength = data.length;
     size_t bufferSize = dataLength + kCCBlockSizeAES128;

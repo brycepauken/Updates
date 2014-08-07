@@ -88,6 +88,7 @@
 		02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D251251992C3A300BBEDBE /* QuartzCore.framework */; };
 		02D2512C1993425100BBEDBE /* UPDAlertViewTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */; };
 		02D2512F19935A7300BBEDBE /* NSData+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */; };
+		02D251321993DE3100BBEDBE /* NSString+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D251311993DE3100BBEDBE /* NSString+UPDExtensions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -219,6 +220,8 @@
 		02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAlertViewTextField.m; path = Classes/UPDAlertViewTextField.m; sourceTree = "<group>"; };
 		02D2512D19935A7300BBEDBE /* NSData+UPDExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+UPDExtensions.h"; path = "Classes/NSData+UPDExtensions.h"; sourceTree = "<group>"; };
 		02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+UPDExtensions.m"; path = "Classes/NSData+UPDExtensions.m"; sourceTree = "<group>"; };
+		02D251301993DE3100BBEDBE /* NSString+UPDExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+UPDExtensions.h"; path = "Classes/NSString+UPDExtensions.h"; sourceTree = "<group>"; };
+		02D251311993DE3100BBEDBE /* NSString+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+UPDExtensions.m"; path = "Classes/NSString+UPDExtensions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -343,6 +346,8 @@
 				02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */,
 				02901A3B1984CB0A00274AAE /* NSDate+UPDExtensions.h */,
 				02901A3C1984CB0A00274AAE /* NSDate+UPDExtensions.m */,
+				02D251301993DE3100BBEDBE /* NSString+UPDExtensions.h */,
+				02D251311993DE3100BBEDBE /* NSString+UPDExtensions.m */,
 				024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */,
 				024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */,
 				02AF8766197B9DC0007D06C5 /* UPDAlertView.h */,
@@ -561,6 +566,7 @@
 				02934A4019840EBB00FEBB03 /* UPDTableViewCell.m in Sources */,
 				021F937B1980999700F77395 /* UPDDocumentComparator.mm in Sources */,
 				02261003198DD0660086326D /* UPDTextSearchField.m in Sources */,
+				02D251321993DE3100BBEDBE /* NSString+UPDExtensions.m in Sources */,
 				02260FFA198C75240086326D /* UPDDocumentRenderer.m in Sources */,
 				02A73D151975C24B000A7C48 /* UPDViewController.m in Sources */,
 				0220020F1978B646002FF38D /* UPDBrowserBottomBar.m in Sources */,

@@ -99,15 +99,22 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
 }
 
 + (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock {
-    [self getMasterPassword:completionBlock confirmationFailed:NO];
+    [self getMasterPassword:completionBlock attemptFailed:NO];
 }
 
 /*
  Returns the user's chosen password for encrypting and decrypting data,
  or prompts them to create one if it doesn't exist yet.
  */
-+ (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock confirmationFailed:(BOOL)confirmationFailed {
++ (void)getMasterPassword:(void (^)(NSString *masterPassword))completionBlock attemptFailed:(BOOL)attemptFailed {
     static NSString *masterPassword;
+    if(masterPassword) {
+        if(completionBlock) {
+            completionBlock(masterPassword);
+        }
+        return;
+    }
+    
     NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
     
     [context performBlock:^{
@@ -116,64 +123,96 @@ CGFloat UPD_FOLDED_VIEW_GRAVITY;
         NSError *optionEncryptionCheckError;
         CoreDataModelOption *optionEncryptionCheck = [[context executeFetchRequest:optionEncryptionCheckRequest error:&optionEncryptionCheckError] firstObject];
         
-        if(masterPassword&&optionEncryptionCheck) {
-            if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:masterPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
-                if(completionBlock) {
-                    completionBlock(masterPassword);
+        if(optionEncryptionCheck) {
+            if(masterPassword) {
+                if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:masterPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
+                    if(completionBlock) {
+                        completionBlock(masterPassword);
+                    }
+                    return;
                 }
-                return;
             }
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            UPDAlertView *alertView = [[UPDAlertView alloc] init];
-            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
-            [alertView setTitle:!confirmationFailed?@"Create a Password":@"Passwords Different"];
-            [alertView setMessage:!confirmationFailed?@"Enter a password to encrypt\nyour locked instructions\nand keep them safe.":@"Please enter your password again, and make sure the confirmation matches!"];
-            [alertView setFontSize:16];
-            [alertView setMinTextLength:6];
-            [alertView setTextSubmitBlock:^(NSString *text){
-                [weakAlertView dismiss];
-                
-                UPDAlertView *confirmAlertView = [[UPDAlertView alloc] init];
-                __unsafe_unretained UPDAlertView *weakConfirmAlertView = confirmAlertView;
-                [confirmAlertView setTitle:@"Confirm Password"];
-                [confirmAlertView setMessage:@"Please enter your password\nagain, just to make sure."];
-                [confirmAlertView setFontSize:16];
-                [confirmAlertView setMinTextLength:6];
-                [confirmAlertView setTextSubmitBlock:^(NSString *confirmText){
-                    [weakConfirmAlertView dismiss];
-                    
-                    if([text isEqualToString:confirmText]) {
-                        [context performBlock:^{
-                            CoreDataModelOption *optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
-                            [optionEncryptionCheck setDataValue:[NSData encryptData:[@"success" dataUsingEncoding:NSUTF8StringEncoding] withKey:text]];
-                            [optionEncryptionCheck setName:@"EncryptionCheck"];
-                            NSError *saveError;
-                            [context save:&saveError];
-                            masterPassword = text;
-                            [self getMasterPassword:completionBlock confirmationFailed:NO];
-                        }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UPDAlertView *alertView = [[UPDAlertView alloc] init];
+                __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+                [alertView setTitle:!attemptFailed?@"Enter Password":@"Incorrect Password"];
+                [alertView setMessage:!attemptFailed?@"Please enter your password to continue.":@"The password you entered was incorrect. Please try again."];
+                [alertView setFontSize:16];
+                [alertView setMinTextLength:6];
+                [alertView setTextSubmitBlock:^(NSString *text){
+                    [weakAlertView dismiss];
+                    if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:text] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
+                        masterPassword = text;
+                        if(completionBlock) {
+                            completionBlock(masterPassword);
+                        }
+                        return;
                     }
                     else {
-                        [self getMasterPassword:completionBlock confirmationFailed:YES];
+                        [self getMasterPassword:completionBlock attemptFailed:YES];
                     }
                 }];
-                [confirmAlertView setCancelButtonBlock:^{
-                    [weakConfirmAlertView dismiss];
+                [alertView setCancelButtonBlock:^{
+                    [weakAlertView dismiss];
                     if(completionBlock) {
                         completionBlock(nil);
                     }
                 }];
-                [confirmAlertView show];
-            }];
-            [alertView setCancelButtonBlock:^{
-                [weakAlertView dismiss];
-                if(completionBlock) {
-                    completionBlock(nil);
-                }
-            }];
-            [alertView show];
-        });
+                [alertView show];
+            });
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UPDAlertView *alertView = [[UPDAlertView alloc] init];
+                __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+                [alertView setTitle:!attemptFailed?@"Create a Password":@"Passwords Different"];
+                [alertView setMessage:!attemptFailed?@"Enter a password to encrypt\nyour locked instructions\nand keep them safe.":@"Please enter your password again, and make sure the confirmation matches!"];
+                [alertView setFontSize:16];
+                [alertView setMinTextLength:6];
+                [alertView setTextSubmitBlock:^(NSString *text){
+                    [weakAlertView dismiss];
+                    
+                    UPDAlertView *confirmAlertView = [[UPDAlertView alloc] init];
+                    __unsafe_unretained UPDAlertView *weakConfirmAlertView = confirmAlertView;
+                    [confirmAlertView setTitle:@"Confirm Password"];
+                    [confirmAlertView setMessage:@"Please enter your password\nagain, just to make sure."];
+                    [confirmAlertView setFontSize:16];
+                    [confirmAlertView setMinTextLength:6];
+                    [confirmAlertView setTextSubmitBlock:^(NSString *confirmText){
+                        [weakConfirmAlertView dismiss];
+                        
+                        if([text isEqualToString:confirmText]) {
+                            [context performBlock:^{
+                                CoreDataModelOption *optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
+                                [optionEncryptionCheck setDataValue:[NSData encryptData:[@"success" dataUsingEncoding:NSUTF8StringEncoding] withKey:text]];
+                                [optionEncryptionCheck setName:@"EncryptionCheck"];
+                                NSError *saveError;
+                                [context save:&saveError];
+                                masterPassword = text;
+                                [self getMasterPassword:completionBlock attemptFailed:NO];
+                            }];
+                        }
+                        else {
+                            [self getMasterPassword:completionBlock attemptFailed:YES];
+                        }
+                    }];
+                    [confirmAlertView setCancelButtonBlock:^{
+                        [weakConfirmAlertView dismiss];
+                        if(completionBlock) {
+                            completionBlock(nil);
+                        }
+                    }];
+                    [confirmAlertView show];
+                }];
+                [alertView setCancelButtonBlock:^{
+                    [weakAlertView dismiss];
+                    if(completionBlock) {
+                        completionBlock(nil);
+                    }
+                }];
+                [alertView show];
+            });
+        }
     }];
 }
 
