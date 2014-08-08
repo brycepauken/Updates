@@ -93,8 +93,8 @@
         else {
             if(requestPassword==0) {
                 __block __weak NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *text){
+                    BOOL emptyQueue = !queue.count;
                     if(!encryptedPassword.length&&text.length) {
-                        BOOL emptyQueue = !queue.count;
                         for(int j=0;j<[self numberOfRowsInSection:0];j++) {
                             if([[self.updates objectAtIndex:j] locked].boolValue) {
                                 int insertionIndex = 0;
@@ -118,6 +118,11 @@
                             });
                         }
                     }
+                    else if(emptyQueue) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self endRefresh];
+                        });
+                    }
                 }];
                 requestPassword = (encryptedPassword.length?1:2);
             }
@@ -129,11 +134,6 @@
     if(queue.count) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self refreshRowWithQueue:queue firstRequest:YES];
-        });
-    }
-    else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self endRefresh];
         });
     }
 }
