@@ -129,6 +129,11 @@
             if(encryptedPassword.length) {
                 passwordBlock(encryptedPassword);
             }
+            else {
+                if(self.backButtonBlock) {
+                    self.backButtonBlock(self.update);
+                }
+            }
         }];
         if(encryptedPass.length) {
             passwordBlock(encryptedPass);
