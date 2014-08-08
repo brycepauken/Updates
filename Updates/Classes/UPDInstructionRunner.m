@@ -15,7 +15,7 @@
 
 @implementation UPDInstructionRunner
 
-+ (void)pageFromInstructions:(NSArray *)instructions differsFromPage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse))completionBlock {
++ (void)pageFromInstructions:(NSArray *)instructions differsFromPage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
     [self clearPersistentData];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [queue setMaxConcurrentOperationCount:5];
@@ -49,13 +49,13 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-+ (void)page:(NSString *)page differsFromPage:(NSString *)difPage baseURL:(NSURL *)url differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse))completionBlock {
++ (void)page:(NSString *)page differsFromPage:(NSString *)difPage baseURL:(NSURL *)url differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
     if([[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Any"]) {
         if([UPDDocumentComparator document:page visibleTextIsEqualToDocument:difPage]) {
-            completionBlock(UPDInstructionRunnerResultNoChange, page);
+            completionBlock(UPDInstructionRunnerResultNoChange, page, nil);
         }
         else {
-            completionBlock(UPDInstructionRunnerResultChange, page);
+            completionBlock(UPDInstructionRunnerResultChange, page, nil);
         }
     }
     else if([[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Text"]) {
@@ -64,19 +64,21 @@
             [renderer clearWebView];
             int oldCount = [[differenceOptions objectForKey:@"DifferenceCount"] intValue];
             if(count==oldCount) {
-                completionBlock(UPDInstructionRunnerResultNoChange, page);
+                completionBlock(UPDInstructionRunnerResultNoChange, page, nil);
             }
             else {
-                completionBlock(UPDInstructionRunnerResultChange, page);
+                NSMutableDictionary *newDifferenceOptions = [differenceOptions mutableCopy];
+                [newDifferenceOptions setObject:@(count) forKey:@"DifferenceCount"];
+                completionBlock(UPDInstructionRunnerResultChange, page, [NSDictionary dictionaryWithDictionary:newDifferenceOptions]);
             }
         }];
     }
     else {
-        completionBlock(UPDInstructionRunnerResultChange, page);
+        completionBlock(UPDInstructionRunnerResultChange, page, nil);
     }
 }
 
-+ (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse))completionBlock {
++ (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
     UPDInternalInstruction *prevInstruction = nil;
     UPDInternalInstruction *instruction = [workingInstructions objectAtIndex:index];
     NSURLRequest *request = instruction.request;

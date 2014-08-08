@@ -100,7 +100,7 @@
     self.update = update;
     [self.navigationBar setText:update.name];
     void (^completionBlock)(NSDictionary *differenceOptions, NSString *key) = ^(NSDictionary *differenceOptions, NSString *key) {
-        if(update.lastResponse == nil || [[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Text"]) {
+        if(update.lastResponse == nil) {
             [self setUpdatedDate:update.origUpdated];
             if(key.length) {
                 [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.origResponse withKey:key]] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.url withKey:key]]];

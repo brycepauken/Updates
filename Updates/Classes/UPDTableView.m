@@ -157,7 +157,7 @@
         }
         UPDInternalUpdate *update = [self.updates objectAtIndex:row];
         NSDate *startDate = [NSDate date];
-        void (^completionBlock)(UPDInstructionRunnerResult result, NSString *newResponse) = ^(UPDInstructionRunnerResult result, NSString *newResponse) {
+        void (^completionBlock)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions) = ^(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions) {
             [cell hideSpinnerWithContactBlock:^{
                 [cell setLastUpdated:[NSDate date]];
                 if(result>update.status.intValue) {
@@ -165,7 +165,7 @@
                         [cell setCircleColor:[UIColor UPDBrightBlueColor] animate:YES];
                     }
                 }
-                [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
+                [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newDifferenceOptions:newDifferenceOptions newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
                 if(queue.count) {
                     UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row+1 inSection:0]];
                     [nextCell showSpinner];
@@ -205,7 +205,7 @@
         }
         else {
             self.timeSaved = 0;
-            [self saveUpdateWithObjectID:nil newResponse:nil newStatus:0 updateDuration:0];
+            [self saveUpdateWithObjectID:nil newResponse:nil newDifferenceOptions:nil newStatus:0 updateDuration:0];
         }
         
         NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
@@ -242,7 +242,7 @@
  Updates the given object's "last updated" field, along with
  updating the total amount of time saved
  */
-- (void)saveUpdateWithObjectID:(NSManagedObjectID *)objectID newResponse:(NSString *)newResponse newStatus:(int)status updateDuration:(NSTimeInterval)duration {
+- (void)saveUpdateWithObjectID:(NSManagedObjectID *)objectID newResponse:(NSString *)newResponse newDifferenceOptions:(NSDictionary *)newDifferenceOptions newStatus:(int)status updateDuration:(NSTimeInterval)duration {
     NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
     
     [context performBlock:^{
@@ -254,7 +254,10 @@
                         [update setStatus:@(status)];
                     }
                     if(update.locked.boolValue) {
-                        void (^passwordBlock)(NSString *pass) = ^(NSString *pass){
+                        void (^passwordBlock)(NSString *pass) = ^(NSString *pass) {
+                            if(newDifferenceOptions) {
+                                [update setDifferenceOptions:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:newDifferenceOptions] withKey:pass]];
+                            }
                             [update setLastResponse:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:newResponse] withKey:pass]];
                         };
                         NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *encryptedPass){
@@ -267,6 +270,9 @@
                         }
                     }
                     else {
+                        if(newDifferenceOptions) {
+                            [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:newDifferenceOptions]];
+                        }
                         [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
                     }
                     [update setLastUpdated:updatedDate];
@@ -284,6 +290,9 @@
                         }
                         if(update.locked.boolValue) {
                             void (^passwordBlock)(NSString *pass) = ^(NSString *pass){
+                                if(newDifferenceOptions) {
+                                    [update setDifferenceOptions:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:newDifferenceOptions] withKey:pass]];
+                                }
                                 [update setLastResponse:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:newResponse] withKey:pass]];
                             };
                             NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *encryptedPass){
@@ -296,6 +305,9 @@
                             }
                         }
                         else {
+                            if(newDifferenceOptions) {
+                                [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:newDifferenceOptions]];
+                            }
                             [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
                         }
                         [update setLastUpdated:updatedDate];
