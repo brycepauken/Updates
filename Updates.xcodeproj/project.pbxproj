@@ -91,6 +91,8 @@
 		02D251321993DE3100BBEDBE /* NSString+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D251311993DE3100BBEDBE /* NSString+UPDExtensions.m */; };
 		02D251351994492400BBEDBE /* Lock.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251331994492400BBEDBE /* Lock.png */; };
 		02D251361994492400BBEDBE /* Lock@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251341994492400BBEDBE /* Lock@2x.png */; };
+		02D251391994B7F400BBEDBE /* Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251371994B7F400BBEDBE /* Settings.png */; };
+		02D2513A1994B7F400BBEDBE /* Settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251381994B7F400BBEDBE /* Settings@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -226,6 +228,8 @@
 		02D251311993DE3100BBEDBE /* NSString+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+UPDExtensions.m"; path = "Classes/NSString+UPDExtensions.m"; sourceTree = "<group>"; };
 		02D251331994492400BBEDBE /* Lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Lock.png; path = Resources/Images/Lock.png; sourceTree = "<group>"; };
 		02D251341994492400BBEDBE /* Lock@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Lock@2x.png"; path = "Resources/Images/Lock@2x.png"; sourceTree = "<group>"; };
+		02D251371994B7F400BBEDBE /* Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Settings.png; path = Resources/Images/Settings.png; sourceTree = "<group>"; };
+		02D251381994B7F400BBEDBE /* Settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Settings@2x.png"; path = "Resources/Images/Settings@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -333,6 +337,8 @@
 				02A733F7197731B9002A86F3 /* SearchEngineIconGoogle@2x.png */,
 				02A733F8197731B9002A86F3 /* SearchEngineIconYahoo.png */,
 				02A733F9197731B9002A86F3 /* SearchEngineIconYahoo@2x.png */,
+				02D251371994B7F400BBEDBE /* Settings.png */,
+				02D251381994B7F400BBEDBE /* Settings@2x.png */,
 				024C45191975E51F000896E4 /* UpdatesIcon.png */,
 				024C451A1975E51F000896E4 /* UpdatesIcon@2x.png */,
 			);
@@ -492,6 +498,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02D251391994B7F400BBEDBE /* Settings.png in Resources */,
 				0213C2421974FE0C006BC204 /* Images.xcassets in Resources */,
 				02644071197DBBA7009CE430 /* CancelLarge@2x.png in Resources */,
 				02A733FE197731B9002A86F3 /* SearchEngineIconYahoo.png in Resources */,
@@ -516,6 +523,7 @@
 				02C238801976CED9009327F8 /* Add.png in Resources */,
 				028D7EAE197DB41700BE0643 /* ButtonOutline.png in Resources */,
 				024C451B1975E51F000896E4 /* KingfishIcon.png in Resources */,
+				02D2513A1994B7F400BBEDBE /* Settings@2x.png in Resources */,
 				02A733E9197700C4002A86F3 /* Back@2x.png in Resources */,
 				028D7EAF197DB41700BE0643 /* ButtonOutline@2x.png in Resources */,
 				028D7EB1197DB41700BE0643 /* ButtonOutlineQuarter@2x.png in Resources */,

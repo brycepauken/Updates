@@ -58,6 +58,7 @@
         
         __unsafe_unretained UPDInterface *weakSelf = self;
         self.navigationBar = [[UPDNavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT)];
+        [self.navigationBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [self.navigationBar setAddButtonBlock:^{
             [weakSelf.preBrowserView reset];
             [weakSelf.scrollView setTag:1];
@@ -65,7 +66,9 @@
                [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
             }];
         }];
-        [self.navigationBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self.navigationBar setSettingsButtonBlock:^{
+            
+        }];
         [self.scrollView addSubview:self.navigationBar];
         
         self.tableView = [[UPDTableView alloc] initWithFrame:CGRectMake(0, self.navigationBar.frame.size.height, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height-UPD_NAVIGATION_BAR_HEIGHT)];
