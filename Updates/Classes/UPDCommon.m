@@ -50,6 +50,7 @@ const int UPD_NAVIGATION_BAR_HEIGHT = 64;
 const int UPD_TABLEVIEW_CELL_HEIGHT = 80;
 const int UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH = 8;
 const int UPD_TABLEVIEW_CELL_LEFT_WIDTH = 60;
+const int UPD_TABLEVIEW_CELL_LOCK_SIZE = 16;
 const int UPD_TABLEVIEW_CIRCLE_SIZE = 12;
 const int UPD_TABLEVIEW_FAVICON_SIZE = 20;
 const int UPD_TABLEVIEW_LABEL_WIDTH = 300;
@@ -115,23 +116,23 @@ static NSData *keychainID;
     SecItemDelete((__bridge CFDictionaryRef)passwordQuery);
 }
 
-+ (void)getEncryptedPassword:(void (^)(NSString *masterPassword))completionBlock {
-    [self getEncryptedPassword:completionBlock attemptFailed:NO];
++ (NSString *)getEncryptedPassword:(void (^)(NSString *encryptedPassword))completionBlock {
+    return [self getEncryptedPassword:completionBlock attemptFailed:NO];
 }
 
 /*
- Returns the user's chosen password (hashed) for encrypting and decrypting data,
- or prompts them to create one if it doesn't exist yet.
+ Gets the user's chosen password (hashed) for encrypting and decrypting data.
+ The password is returned immediately if available (either entered already, or
+ saved in the keychain), or passed in the completion block if not.
  */
-+ (void)getEncryptedPassword:(void (^)(NSString *masterPassword))completionBlock attemptFailed:(BOOL)attemptFailed {
++ (NSString *)getEncryptedPassword:(void (^)(NSString *encryptedPassword))completionBlock attemptFailed:(BOOL)attemptFailed {
     static NSString *encryptedPassword;
     if(encryptedPassword) {
-        if(completionBlock) {
-            completionBlock(encryptedPassword);
-        }
-        return;
+        return encryptedPassword;
     }
     
+    NSString *savedPassword;
+    __block BOOL returnPassword = NO;
     NSMutableDictionary *passwordQuery = [[NSMutableDictionary alloc] init];
     [passwordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
     [passwordQuery setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
@@ -149,7 +150,7 @@ static NSData *keychainID;
             [passwordDictionary removeObjectForKey:(__bridge id)kSecReturnData];
             NSString *password = [[NSString alloc] initWithBytes:[(__bridge_transfer NSData *)passwordData bytes] length:[(__bridge NSData *)passwordData length] encoding:NSUTF8StringEncoding];
             if(password.length) {
-                encryptedPassword = password;
+                savedPassword = password;
             }
         }
         else {
@@ -172,11 +173,10 @@ static NSData *keychainID;
         CoreDataModelOption *optionEncryptionCheck = [[context executeFetchRequest:optionEncryptionCheckRequest error:&optionEncryptionCheckError] firstObject];
         
         if(optionEncryptionCheck) {
-            if(encryptedPassword) {
+            if(savedPassword) {
                 if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:encryptedPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
-                    if(completionBlock) {
-                        completionBlock(encryptedPassword);
-                    }
+                    encryptedPassword = savedPassword;
+                    returnPassword = YES;
                     return;
                 }
             }
@@ -287,6 +287,10 @@ static NSData *keychainID;
             });
         }
     }];
+    if(returnPassword) {
+        return encryptedPassword;
+    }
+    return nil;
 }
 
 @end

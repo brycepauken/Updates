@@ -11,7 +11,7 @@
 @interface UPDInternalUpdate : NSObject
 
 @property (nonatomic, strong) UIImage *favicon;
-@property (nonatomic, strong) NSDictionary *differenceOptions;
+@property (nonatomic, strong) NSData *differenceOptions;
 @property (nonatomic, strong) NSData *instructions;
 @property (nonatomic, strong) NSData *lastResponse;
 @property (nonatomic, strong) NSDate *lastUpdated;

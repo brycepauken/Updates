@@ -89,6 +89,8 @@
 		02D2512C1993425100BBEDBE /* UPDAlertViewTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */; };
 		02D2512F19935A7300BBEDBE /* NSData+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */; };
 		02D251321993DE3100BBEDBE /* NSString+UPDExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D251311993DE3100BBEDBE /* NSString+UPDExtensions.m */; };
+		02D251351994492400BBEDBE /* Lock.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251331994492400BBEDBE /* Lock.png */; };
+		02D251361994492400BBEDBE /* Lock@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251341994492400BBEDBE /* Lock@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -222,6 +224,8 @@
 		02D2512E19935A7300BBEDBE /* NSData+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+UPDExtensions.m"; path = "Classes/NSData+UPDExtensions.m"; sourceTree = "<group>"; };
 		02D251301993DE3100BBEDBE /* NSString+UPDExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+UPDExtensions.h"; path = "Classes/NSString+UPDExtensions.h"; sourceTree = "<group>"; };
 		02D251311993DE3100BBEDBE /* NSString+UPDExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+UPDExtensions.m"; path = "Classes/NSString+UPDExtensions.m"; sourceTree = "<group>"; };
+		02D251331994492400BBEDBE /* Lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Lock.png; path = Resources/Images/Lock.png; sourceTree = "<group>"; };
+		02D251341994492400BBEDBE /* Lock@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Lock@2x.png"; path = "Resources/Images/Lock@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -319,6 +323,8 @@
 				02A733EE1977226B002A86F3 /* Forward@2x.png */,
 				024C45171975E51F000896E4 /* KingfishIcon.png */,
 				024C45181975E51F000896E4 /* KingfishIcon@2x.png */,
+				02D251331994492400BBEDBE /* Lock.png */,
+				02D251341994492400BBEDBE /* Lock@2x.png */,
 				02A733F4197731B9002A86F3 /* SearchEngineIconBing.png */,
 				02A733F5197731B9002A86F3 /* SearchEngineIconBing@2x.png */,
 				02A7340019773560002A86F3 /* SearchEngineIconDuck.png */,
@@ -493,6 +499,7 @@
 				02644070197DBBA7009CE430 /* CancelLarge.png in Resources */,
 				02C238811976CED9009327F8 /* Add@2x.png in Resources */,
 				024C451D1975E51F000896E4 /* UpdatesIcon.png in Resources */,
+				02D251361994492400BBEDBE /* Lock@2x.png in Resources */,
 				028D7EA9197DB41000BE0643 /* AcceptLarge@2x.png in Resources */,
 				02A7340219773560002A86F3 /* SearchEngineIconDuck.png in Resources */,
 				028D7EB0197DB41700BE0643 /* ButtonOutlineQuarter.png in Resources */,
@@ -504,6 +511,7 @@
 				024C451E1975E51F000896E4 /* UpdatesIcon@2x.png in Resources */,
 				02A733E8197700C4002A86F3 /* Back.png in Resources */,
 				02A7340319773560002A86F3 /* SearchEngineIconDuck@2x.png in Resources */,
+				02D251351994492400BBEDBE /* Lock.png in Resources */,
 				028D7EA8197DB41000BE0643 /* AcceptLarge.png in Resources */,
 				02C238801976CED9009327F8 /* Add.png in Resources */,
 				028D7EAE197DB41700BE0643 /* ButtonOutline.png in Resources */,

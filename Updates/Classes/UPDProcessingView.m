@@ -537,12 +537,16 @@
         [self scrollToPage:3 animated:YES];
     }
     else if(button==self.protectButtonYes) {
-        [UPDCommon getEncryptedPassword:^(NSString *encryptedPassword) {
-            if(encryptedPassword.length) {
+        NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *encryptedPass) {
+            if(encryptedPass.length) {
                 self.locked = YES;
                 [self scrollToPage:3 animated:YES];
             }
         }];
+        if(encryptedPassword.length) {
+            self.locked = YES;
+            [self scrollToPage:3 animated:YES];
+        }
     }
 }
 

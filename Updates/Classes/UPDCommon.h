@@ -14,7 +14,7 @@
 @interface UPDCommon : NSObject
 
 + (void)clearKeychainData;
-+ (void)getEncryptedPassword:(void (^)(NSString *masterPassword))completionBlock;
++ (NSString *)getEncryptedPassword:(void (^)(NSString *encryptedPassword))completionBlock;
 
 @end
 
@@ -35,6 +35,7 @@ extern const int UPD_NAVIGATION_BAR_HEIGHT;
 extern const int UPD_TABLEVIEW_CELL_HEIGHT;
 extern const int UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH;
 extern const int UPD_TABLEVIEW_CELL_LEFT_WIDTH;
+extern const int UPD_TABLEVIEW_CELL_LOCK_SIZE;
 extern const int UPD_TABLEVIEW_CIRCLE_SIZE;
 extern const int UPD_TABLEVIEW_FAVICON_SIZE;
 extern const int UPD_TABLEVIEW_LABEL_WIDTH;

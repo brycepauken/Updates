@@ -16,6 +16,7 @@
 #import "CoreDataModelOption.h"
 #import "CoreDataModelUpdate.h"
 #import "CoreDataModelUpdateList.h"
+#import "NSData+UPDExtensions.h"
 #import "UPDAppDelegate.h"
 #import "UPDInstructionRunner.h"
 #import "UPDInternalUpdate.h"
@@ -83,9 +84,58 @@
 }
 
 - (void)beginRefresh {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-       [self refreshRow:0];
-    });
+    NSMutableArray *queue = [NSMutableArray array];
+    int requestPassword = 0;
+    for(int i=0;i<[self numberOfRowsInSection:0];i++) {
+        if(![[self.updates objectAtIndex:i] locked].boolValue) {
+            [queue addObject:@(i)];
+        }
+        else {
+            if(requestPassword==0) {
+                __block __weak NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *text){
+                    if(!encryptedPassword.length&&text.length) {
+                        BOOL emptyQueue = !queue.count;
+                        for(int j=0;j<[self numberOfRowsInSection:0];j++) {
+                            if([[self.updates objectAtIndex:j] locked].boolValue) {
+                                int insertionIndex = 0;
+                                while(insertionIndex<queue.count&&((NSNumber *)[queue objectAtIndex:insertionIndex]).intValue<j) {
+                                    insertionIndex++;
+                                }
+                                [queue insertObject:@(j) atIndex:insertionIndex];
+                            }
+                        }
+                        if(emptyQueue) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [self.refreshView setTag:2];
+                                [self setRefreshLabelFormat:@"You've saved %@ so far."];
+                                [self updateRefreshLabel];
+                                [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST delay:UPD_TRANSITION_DELAY options:0 animations:^{
+                                    [self setContentInset:UIEdgeInsetsMake(UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT, 0, 0, 0)];
+                                } completion:nil];
+                            });
+                            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                                [self refreshRowWithQueue:queue firstRequest:YES];
+                            });
+                        }
+                    }
+                }];
+                requestPassword = (encryptedPassword.length?1:2);
+            }
+            if(requestPassword==1) {
+                [queue addObject:@(i)];
+            }
+        }
+    }
+    if(queue.count) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self refreshRowWithQueue:queue firstRequest:YES];
+        });
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self endRefresh];
+        });
+    }
 }
 
 - (void)endRefresh {
@@ -97,15 +147,17 @@
     }];
 }
 
-- (void)refreshRow:(int)row {
+- (void)refreshRowWithQueue:(NSMutableArray *)queue firstRequest:(BOOL)firstRequest {
+    int row = ((NSNumber *)[queue firstObject]).intValue;
+    [queue removeObjectAtIndex:0];
     if(row<[self numberOfRowsInSection:0]) {
         UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
-        if(row==0) {
+        if(firstRequest) {
             [cell showSpinner];
         }
         UPDInternalUpdate *update = [self.updates objectAtIndex:row];
         NSDate *startDate = [NSDate date];
-        [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] differenceOptions:update.differenceOptions completionBlock:^(UPDInstructionRunnerResult result, NSString *newResponse) {
+        void (^completionBlock)(UPDInstructionRunnerResult result, NSString *newResponse) = ^(UPDInstructionRunnerResult result, NSString *newResponse) {
             [cell hideSpinnerWithContactBlock:^{
                 [cell setLastUpdated:[NSDate date]];
                 if(result>update.status.intValue) {
@@ -114,16 +166,23 @@
                     }
                 }
                 [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
-                if(row<[self numberOfRowsInSection:0]-1) {
+                if(queue.count) {
                     UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row+1 inSection:0]];
                     [nextCell showSpinner];
-                    [self refreshRow:row+1];
+                    [self refreshRowWithQueue:queue firstRequest:firstRequest];
                 }
                 else {
-                   [self endRefresh];
+                    [self endRefresh];
                 }
             }];
-        }];
+        };
+        if(update.locked.boolValue) {
+            NSString *key = [UPDCommon getEncryptedPassword:nil];
+            [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.instructions withKey:key]] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.origResponse withKey:key]] differenceOptions:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.differenceOptions withKey:key]] completionBlock:completionBlock];
+        }
+        else {
+            [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] differenceOptions:[NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions] completionBlock:completionBlock];
+        }
     }
 }
 
@@ -156,7 +215,7 @@
             for(CoreDataModelUpdate *update in updateList.updates) {
                 UPDInternalUpdate *newUpdate = [[UPDInternalUpdate alloc] init];
                 newUpdate.name = update.name;
-                newUpdate.differenceOptions = [NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions];
+                newUpdate.differenceOptions = update.differenceOptions;
                 newUpdate.favicon = [[UIImage alloc] initWithData:update.favicon];
                 newUpdate.lastResponse = update.lastResponse;
                 newUpdate.lastUpdated = update.lastUpdated;
@@ -194,7 +253,22 @@
                     if(status>update.status.intValue) {
                         [update setStatus:@(status)];
                     }
-                    [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
+                    if(update.locked.boolValue) {
+                        void (^passwordBlock)(NSString *pass) = ^(NSString *pass){
+                            [update setLastResponse:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:newResponse] withKey:pass]];
+                        };
+                        NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *encryptedPass){
+                            if(encryptedPass.length) {
+                                passwordBlock(encryptedPass);
+                            }
+                        }];
+                        if(encryptedPassword.length) {
+                            passwordBlock(encryptedPassword);
+                        }
+                    }
+                    else {
+                        [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
+                    }
                     [update setLastUpdated:updatedDate];
                 }
             }
@@ -208,7 +282,22 @@
                         if(status>update.status.intValue) {
                             [update setStatus:@(status)];
                         }
-                        [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
+                        if(update.locked.boolValue) {
+                            void (^passwordBlock)(NSString *pass) = ^(NSString *pass){
+                                [update setLastResponse:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:newResponse] withKey:pass]];
+                            };
+                            NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *encryptedPass){
+                                if(encryptedPass.length) {
+                                    passwordBlock(encryptedPass);
+                                }
+                            }];
+                            if(encryptedPassword.length) {
+                                passwordBlock(encryptedPassword);
+                            }
+                        }
+                        else {
+                            [update setLastResponse:[NSKeyedArchiver archivedDataWithRootObject:newResponse]];
+                        }
                         [update setLastUpdated:updatedDate];
                         CGFloat timeJustSaved = update.timerResult.doubleValue - duration;
                         self.timeSaved += timeJustSaved>0?timeJustSaved:0;
@@ -375,6 +464,7 @@
     [cell setName:update.name];
     [cell setFavicon:update.favicon];
     [cell setLastUpdated:update.lastUpdated];
+    [cell setLockIconHidden:!update.locked.boolValue];
     [cell setDividerHidden:indexPath.row==0];
     
     return cell;

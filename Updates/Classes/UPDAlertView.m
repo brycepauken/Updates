@@ -135,6 +135,7 @@
             self.okButtonBlock();
         }
         else if(self.textSubmitBlock) {
+            [self.textField resignFirstResponder];
             self.textSubmitBlock(self.textField.text);
         }
     }

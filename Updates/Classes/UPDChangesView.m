@@ -8,6 +8,7 @@
 
 #import "UPDChangesView.h"
 
+#import "NSData+UPDExtensions.h"
 #import "NSDate+UPDExtensions.h"
 #import "UPDBrowserBottomBar.h"
 #import "UPDDocumentComparator.h"
@@ -95,16 +96,46 @@
 }
 
 - (void)showUpdate:(UPDInternalUpdate *)update {
+    [self.webView stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
     self.update = update;
     [self.navigationBar setText:update.name];
-    if(update.lastResponse == nil || [[update.differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Text"]) {
-        [self setUpdatedDate:update.origUpdated];
-        [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
+    void (^completionBlock)(NSDictionary *differenceOptions, NSString *key) = ^(NSDictionary *differenceOptions, NSString *key) {
+        if(update.lastResponse == nil || [[differenceOptions objectForKey:@"DifferenceType"] isEqualToString:@"Text"]) {
+            [self setUpdatedDate:update.origUpdated];
+            if(key.length) {
+                [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.origResponse withKey:key]] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.url withKey:key]]];
+            }
+            else {
+                [self.webView loadHTMLString:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
+            }
+        }
+        else {
+            [self setUpdatedDate:update.lastUpdated];
+            if(key.length) {
+                NSString *highlightedPage = [UPDDocumentComparator document:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.lastResponse withKey:key]] compareTextWithDocument:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.origResponse withKey:key]] highlightChanges:YES];
+                [self.webView loadHTMLString:highlightedPage baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.url withKey:key]]];
+            }
+            else {
+                NSString *highlightedPage = [UPDDocumentComparator document:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastResponse] compareTextWithDocument:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] highlightChanges:YES];
+                [self.webView loadHTMLString:highlightedPage baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
+            }
+        }
+    };
+    if(update.locked.boolValue) {
+        void (^passwordBlock)(NSString *pass) = ^(NSString *pass){
+            completionBlock([NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.differenceOptions withKey:pass]], pass);
+        };
+        NSString *encryptedPass = [UPDCommon getEncryptedPassword:^(NSString *encryptedPassword){
+            if(encryptedPassword.length) {
+                passwordBlock(encryptedPassword);
+            }
+        }];
+        if(encryptedPass.length) {
+            passwordBlock(encryptedPass);
+        }
     }
     else {
-        [self setUpdatedDate:update.lastUpdated];
-        NSString *highlightedPage = [UPDDocumentComparator document:[NSKeyedUnarchiver unarchiveObjectWithData:update.lastResponse] compareTextWithDocument:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] highlightChanges:YES];
-        [self.webView loadHTMLString:highlightedPage baseURL:[NSKeyedUnarchiver unarchiveObjectWithData:update.url]];
+        completionBlock([NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions], nil);
     }
 }
 

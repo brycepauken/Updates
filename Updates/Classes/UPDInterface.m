@@ -16,6 +16,7 @@
 
 #import "CoreDataModelUpdate.h"
 #import "CoreDataModelUpdateList.h"
+#import "NSData+UPDExtensions.h"
 #import "QuartzCore/CALayer.h"
 #import "UPDAppDelegate.h"
 #import "UPDBrowserView.h"
@@ -139,7 +140,23 @@
         [self.processingView setHidden:YES];
         [self.processingView setTag:2]; /*what page of the scollview the browser should be on*/
         [self.processingView setCompletionBlock:^(NSString *name, NSURL *url, NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSDictionary *differenceOptions, NSTimeInterval timerResult, NSDate *origDate, BOOL locked) {
-            [weakSelf saveUpdateWithName:name url:url instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult origDate:origDate locked:locked];
+            void (^saveUpdate)(NSString *encryptionKey) = ^(NSString *encryptionKey){
+                [weakSelf saveUpdateWithName:name url:url instructions:instructions favicon:favicon lastResponse:lastResponse differenceOptions:differenceOptions timerResult:timerResult origDate:origDate locked:locked encryptionKey:encryptionKey];
+            };
+            if(locked) {
+                NSString *encryptedPassword = [UPDCommon getEncryptedPassword:nil];
+                if(encryptedPassword.length) {
+                    saveUpdate(encryptedPassword);
+                }
+                else {
+                    /*this should never happen, since the user entered their password earlier—but we'll be safe*/
+                    saveUpdate(nil);
+                }
+            }
+            else {
+                saveUpdate(nil);
+            }
+            
             [weakSelf.tableView reloadData];
             
             /*move browser view over for a more seamless animation*/
@@ -194,7 +211,7 @@
     [self.changesView setFrame:CGRectMake(self.scrollView.bounds.size.width, 0, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height)];
 }
 
-- (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult origDate:(NSDate *)origDate locked:(BOOL)locked {
+- (void)saveUpdateWithName:(NSString *)name url:(NSURL *)url instructions:(NSArray *)instructions favicon:(UIImage *)favicon lastResponse:(NSString *)lastResponse differenceOptions:(NSDictionary *)differenceOptions timerResult:(NSTimeInterval)timerResult origDate:(NSDate *)origDate locked:(BOOL)locked encryptionKey:(NSString *)encryptionKey {
     NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
     
     [context performBlock:^{
@@ -209,17 +226,25 @@
         
         CoreDataModelUpdate *update = [NSEntityDescription insertNewObjectForEntityForName:@"Update" inManagedObjectContext:context];
         [update setName:name];
-        [update setUrl:[NSKeyedArchiver archivedDataWithRootObject:url]];
-        [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions]];
-        [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
         [update setFavicon:UIImagePNGRepresentation(favicon)];
-        [update setOrigResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
         [update setOrigUpdated:origDate];
         [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
         [update setTimerResult:@(timerResult)];
         [update setStatus:@(0)];
-        [update setLocked:@(locked)];
         [update setParent:updateList];
+        [update setLocked:@(locked)];
+        if(locked) {
+            [update setUrl:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:url] withKey:encryptionKey]];
+            [update setDifferenceOptions:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions] withKey:encryptionKey]];
+            [update setInstructions:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:instructions] withKey:encryptionKey]];
+            [update setOrigResponse:[NSData encryptData:[NSKeyedArchiver archivedDataWithRootObject:lastResponse] withKey:encryptionKey]];
+        }
+        else {
+            [update setUrl:[NSKeyedArchiver archivedDataWithRootObject:url]];
+            [update setDifferenceOptions:[NSKeyedArchiver archivedDataWithRootObject:differenceOptions]];
+            [update setInstructions:[NSKeyedArchiver archivedDataWithRootObject:instructions]];
+            [update setOrigResponse:[NSKeyedArchiver archivedDataWithRootObject:lastResponse]];
+        }
         
         NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
         [updates addObject:update];
