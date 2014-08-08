@@ -18,9 +18,9 @@
 
 @interface UPDURLProtocol()
 
-@property (nonatomic, retain) NSMutableData *data;
-@property (nonatomic, retain) NSURLResponse *response;
-@property (nonatomic, retain) NSURLSessionDataTask *task;
+@property (nonatomic, strong) NSMutableData *data;
+@property (nonatomic, strong) NSURLResponse *response;
+@property (nonatomic, strong) NSURLSessionDataTask *task;
 
 @end
 

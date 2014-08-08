@@ -18,6 +18,8 @@
 		02261000198DCACF0086326D /* UPDTextSearchBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02260FFF198DCACF0086326D /* UPDTextSearchBar.m */; };
 		02261003198DD0660086326D /* UPDTextSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02261002198DD0660086326D /* UPDTextSearchField.m */; };
 		02261006198DDAA30086326D /* Highlight.js in Resources */ = {isa = PBXBuildFile; fileRef = 02261005198DDAA30086326D /* Highlight.js */; };
+		023346D51994C6250028DAF5 /* UPDSettingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 023346D41994C6250028DAF5 /* UPDSettingsView.m */; };
+		023346D81994D3790028DAF5 /* UPDSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = 023346D71994D3790028DAF5 /* UPDSwitch.m */; };
 		02388DE319897A52004BB64A /* UPDDocumentSearcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */; };
 		024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */; };
 		024C45141975D269000896E4 /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45131975D269000896E4 /* UPDInterface.m */; };
@@ -116,6 +118,10 @@
 		02261001198DD0660086326D /* UPDTextSearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDTextSearchField.h; path = Classes/UPDTextSearchField.h; sourceTree = "<group>"; };
 		02261002198DD0660086326D /* UPDTextSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTextSearchField.m; path = Classes/UPDTextSearchField.m; sourceTree = "<group>"; };
 		02261005198DDAA30086326D /* Highlight.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = Highlight.js; path = Resources/Scripts/Highlight.js; sourceTree = "<group>"; };
+		023346D31994C6250028DAF5 /* UPDSettingsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDSettingsView.h; path = Classes/UPDSettingsView.h; sourceTree = "<group>"; };
+		023346D41994C6250028DAF5 /* UPDSettingsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDSettingsView.m; path = Classes/UPDSettingsView.m; sourceTree = "<group>"; };
+		023346D61994D3790028DAF5 /* UPDSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDSwitch.h; path = Classes/UPDSwitch.h; sourceTree = "<group>"; };
+		023346D71994D3790028DAF5 /* UPDSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDSwitch.m; path = Classes/UPDSwitch.m; sourceTree = "<group>"; };
 		02388DE119897A52004BB64A /* UPDDocumentSearcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDocumentSearcher.h; path = Classes/UPDDocumentSearcher.h; sourceTree = "<group>"; };
 		02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = UPDDocumentSearcher.mm; path = Classes/UPDDocumentSearcher.mm; sourceTree = "<group>"; };
 		024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+UPDColors.h"; path = "Classes/UIColor+UPDColors.h"; sourceTree = "<group>"; };
@@ -422,6 +428,10 @@
 				02934A3319832ACD00FEBB03 /* UPDProcessingTextField.m */,
 				0253CD1F197F2D1E0078E90E /* UPDProcessingView.h */,
 				0253CD20197F2D1E0078E90E /* UPDProcessingView.m */,
+				023346D31994C6250028DAF5 /* UPDSettingsView.h */,
+				023346D41994C6250028DAF5 /* UPDSettingsView.m */,
+				023346D61994D3790028DAF5 /* UPDSwitch.h */,
+				023346D71994D3790028DAF5 /* UPDSwitch.m */,
 				02C238821976D594009327F8 /* UPDTableView.h */,
 				02C238831976D594009327F8 /* UPDTableView.m */,
 				02934A3E19840EBB00FEBB03 /* UPDTableViewCell.h */,
@@ -545,6 +555,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				02934A3D19840C6A00FEBB03 /* UPDInternalUpdate.m in Sources */,
+				023346D51994C6250028DAF5 /* UPDSettingsView.m in Sources */,
 				02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */,
 				02AF876B197BA831007D06C5 /* UPDAlertViewButton.m in Sources */,
 				02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */,
@@ -576,6 +587,7 @@
 				02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */,
 				02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */,
 				02934A3119830E3100FEBB03 /* UPDButton.m in Sources */,
+				023346D81994D3790028DAF5 /* UPDSwitch.m in Sources */,
 				02261000198DCACF0086326D /* UPDTextSearchBar.m in Sources */,
 				02388DE319897A52004BB64A /* UPDDocumentSearcher.mm in Sources */,
 				02A73D1C1975C501000A7C48 /* UPDCommon.m in Sources */,

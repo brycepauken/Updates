@@ -26,6 +26,7 @@
 #import "UPDPreBrowserView.h"
 #import "UPDPreProcessingView.h"
 #import "UPDProcessingView.h"
+#import "UPDSettingsView.h"
 #import "UPDTableView.h"
 
 @interface UPDInterface ()
@@ -67,7 +68,12 @@
             }];
         }];
         [self.navigationBar setSettingsButtonBlock:^{
-            
+            UPDSettingsView *settingsView = [[UPDSettingsView alloc] init];
+            __unsafe_unretained UPDSettingsView *weakSettingsView = settingsView;
+            [settingsView setCloseButtonBlock:^{
+                [weakSettingsView dismiss];
+            }];
+            [settingsView show];
         }];
         [self.scrollView addSubview:self.navigationBar];
         

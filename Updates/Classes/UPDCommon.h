@@ -15,6 +15,9 @@
 
 + (void)clearKeychainData;
 + (NSString *)getEncryptedPassword:(void (^)(NSString *encryptedPassword))completionBlock;
++ (BOOL)passwordSaved;
++ (BOOL)passwordSet;
++ (void)saveKeychainDataWithCancelBlock:(void (^)())cancelBlock;
 
 @end
 
@@ -60,6 +63,12 @@ extern const int UPD_PROCESSING_SCROLLVIEW_SIZE;
 extern const int UPD_PROCESSING_TEXTFIELD_HEIGHT;
 extern const int UPD_SEARCH_ENGINE_ICON_PADDING;
 extern const int UPD_SEARCH_ENGINE_ICON_SIZE;
+extern const int UPD_SETTINGS_BUTTON_HEIGHT;
+extern const int UPD_SETTINGS_BUTTON_WIDTH;
+extern const int UPD_SWITCH_ICON_SIZE;
+extern const int UPD_SWITCH_PADDING;
+extern const int UPD_SWITCH_SIZE_HEIGHT;
+extern const int UPD_SWITCH_SIZE_WIDTH;
 extern const int UPD_TEXT_SEARCH_BAR_BUTTON_SIZE;
 extern const int UPD_TEXT_SEARCH_BAR_HEIGHT;
 extern const int UPD_URL_BAR_HEIGHT;

@@ -92,9 +92,9 @@
         }
         else {
             if(requestPassword==0) {
-                __block __weak NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *text){
+                NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *text) {
                     BOOL emptyQueue = !queue.count;
-                    if(!encryptedPassword.length&&text.length) {
+                    if(text.length) {
                         for(int j=0;j<[self numberOfRowsInSection:0];j++) {
                             if([[self.updates objectAtIndex:j] locked].boolValue) {
                                 int insertionIndex = 0;

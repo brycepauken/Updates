@@ -63,7 +63,7 @@ const int UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT = 80;
 const int UPD_ALERT_BUTTON_HEIGHT = 50;
 const int UPD_ALERT_BUTTON_ICON_SIZE = 24;
 const int UPD_ALERT_BUTTON_PADDING = 4;
-const int UPD_ALERT_CANCEL_BUTTON_SIZE = 30;
+const int UPD_ALERT_CANCEL_BUTTON_SIZE = 28;
 const int UPD_ALERT_PADDING = 20;
 const int UPD_ALERT_WIDTH = 280;
 const int UPD_BOTTOM_BAR_BUTTON_SIZE = 16;
@@ -78,6 +78,12 @@ const int UPD_PROCESSING_SCROLLVIEW_SIZE = 280;
 const int UPD_PROCESSING_TEXTFIELD_HEIGHT = 50;
 const int UPD_SEARCH_ENGINE_ICON_PADDING = 10;
 const int UPD_SEARCH_ENGINE_ICON_SIZE = 50;
+const int UPD_SETTINGS_BUTTON_HEIGHT = 50;
+const int UPD_SETTINGS_BUTTON_WIDTH = 200;
+const int UPD_SWITCH_ICON_SIZE = 16;
+const int UPD_SWITCH_PADDING = 2;
+const int UPD_SWITCH_SIZE_HEIGHT = 32;
+const int UPD_SWITCH_SIZE_WIDTH = 60;
 const int UPD_TEXT_SEARCH_BAR_BUTTON_SIZE = 16;
 const int UPD_TEXT_SEARCH_BAR_HEIGHT = 50;
 const int UPD_URL_BAR_HEIGHT = 32;
@@ -167,7 +173,7 @@ static NSData *keychainID;
     }
     
     NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
-    [context performBlock:^{
+    [context performBlockAndWait:^{
         NSFetchRequest *optionEncryptionCheckRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
         [optionEncryptionCheckRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"EncryptionCheck"]];
         NSError *optionEncryptionCheckError;
@@ -175,7 +181,7 @@ static NSData *keychainID;
         
         if(optionEncryptionCheck) {
             if(savedPassword) {
-                if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:encryptedPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
+                if([[[NSString alloc] initWithData:[NSData decryptData:optionEncryptionCheck.dataValue withKey:savedPassword] encoding:NSUTF8StringEncoding] isEqualToString:@"success"]) {
                     encryptedPassword = savedPassword;
                     returnPassword = YES;
                     return;
@@ -237,7 +243,7 @@ static NSData *keychainID;
                             NSString *hashedText = [text hashedString];
                             void (^finishBlock)() = ^{
                                 [weakSavePasswordAlertView dismiss];
-                                [context performBlock:^{
+                                [context performBlockAndWait:^{
                                     CoreDataModelOption *optionEncryptionCheck = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
                                     [optionEncryptionCheck setDataValue:[NSData encryptData:[@"success" dataUsingEncoding:NSUTF8StringEncoding] withKey:hashedText]];
                                     [optionEncryptionCheck setName:@"EncryptionCheck"];
@@ -292,6 +298,52 @@ static NSData *keychainID;
         return encryptedPassword;
     }
     return nil;
+}
+
++ (BOOL)passwordSaved {
+    NSMutableDictionary *passwordQuery = [[NSMutableDictionary alloc] init];
+    [passwordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+    [passwordQuery setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
+    [passwordQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
+    [passwordQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnAttributes];
+    CFMutableDictionaryRef queryDictionary = nil;
+    return (SecItemCopyMatching((__bridge CFDictionaryRef)passwordQuery, (CFTypeRef *)&queryDictionary) == noErr);
+}
+
++ (BOOL)passwordSet {
+    __block BOOL returnVal;
+    NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
+    [context performBlockAndWait:^{
+        NSFetchRequest *optionEncryptionCheckRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
+        [optionEncryptionCheckRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"EncryptionCheck"]];
+        NSError *optionEncryptionCheckError;
+        CoreDataModelOption *optionEncryptionCheck = [[context executeFetchRequest:optionEncryptionCheckRequest error:&optionEncryptionCheckError] firstObject];
+        returnVal = !!optionEncryptionCheck;
+    }];
+    return returnVal;
+}
+
++ (void)saveKeychainDataWithCancelBlock:(void (^)())cancelBlock {
+    void (^completionBlock)(NSString *hashedText) = ^(NSString *hashedText) {
+        NSMutableDictionary *keychainDictionary = [NSMutableDictionary dictionary];
+        [keychainDictionary setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
+        [keychainDictionary setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+        [keychainDictionary setObject:[hashedText dataUsingEncoding:NSUTF8StringEncoding] forKey:(__bridge id)kSecValueData];
+        SecItemAdd((__bridge CFDictionaryRef)keychainDictionary,NULL);
+    };
+    NSString *encryptedPassword = [self getEncryptedPassword:^(NSString *encryptedPass) {
+        if(encryptedPass.length) {
+            completionBlock(encryptedPass);
+        }
+        else {
+            if(cancelBlock) {
+                cancelBlock();
+            }
+        }
+    }];
+    if(encryptedPassword.length) {
+        completionBlock(encryptedPassword);
+    }
 }
 
 @end
