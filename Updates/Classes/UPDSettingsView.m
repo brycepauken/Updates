@@ -8,6 +8,7 @@
 
 #import "UPDSettingsView.h"
 
+#import "UPDAlertView.h"
 #import "UPDAppDelegate.h"
 #import "UPDButton.h"
 #import "UPDInterface.h"
@@ -109,6 +110,27 @@
     if(button==self.closeButton && self.closeButtonBlock) {
         self.closeButtonBlock();
     }
+    else if(button==self.contactButton) {
+        if([MFMailComposeViewController canSendMail]) {
+            MFMailComposeViewController *mailComposeController = [[MFMailComposeViewController alloc] init];
+            
+            [mailComposeController setMailComposeDelegate:self];
+            [mailComposeController setSubject:@"Updates"];
+            [mailComposeController setToRecipients:@[@"updates@kingfi.sh"]];
+            
+            [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController presentViewController:mailComposeController animated:YES completion:nil];
+        }
+        else {
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Contact"];
+            [alertView setMessage:@"You don't appear to have an email account set up on this device.\n\nYou can still email updates@kingfi.sh from another device to get in touch!"];
+            [alertView setOkButtonBlock:^{
+                [weakAlertView dismiss];
+            }];
+            [alertView show];
+        }
+    }
 }
 
 - (void)dismiss {
@@ -140,6 +162,10 @@
     [self.helpButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     [self.contactButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     [self.closeButton setFrame:CGRectMake(-UPD_ALERT_CANCEL_BUTTON_SIZE/2, -UPD_ALERT_CANCEL_BUTTON_SIZE/2, UPD_ALERT_CANCEL_BUTTON_SIZE, UPD_ALERT_CANCEL_BUTTON_SIZE)];
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)show {

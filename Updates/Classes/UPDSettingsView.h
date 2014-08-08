@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MFMailComposeViewController.h>
 
-@interface UPDSettingsView : UIView
+@interface UPDSettingsView : UIView <MFMailComposeViewControllerDelegate>
 
 @property (nonatomic, copy) void (^closeButtonBlock)();
 
