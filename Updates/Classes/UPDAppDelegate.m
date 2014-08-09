@@ -14,6 +14,7 @@
 
 #import "UPDAppDelegate.h"
 
+#import "UPDStartView.h"
 #import "UPDTimer.h"
 #import "UPDViewController.h"
 
@@ -52,6 +53,19 @@
     [_window setRootViewController:_viewController];
     
     [self.window makeKeyAndVisible];
+    
+    if(![[NSUserDefaults standardUserDefaults] objectForKey:@"FirstRun"]) {
+        [[NSUserDefaults standardUserDefaults] setValue:@(NO) forKey:@"FirstRun"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        UPDStartView *startView = [[UPDStartView alloc] init];
+        __unsafe_unretained UPDStartView *weakStartView = startView;
+        [startView setOkButtonBlock:^{
+            [weakStartView dismiss];
+        }];
+        [startView show];
+    }
+    
     return YES;
 }
 

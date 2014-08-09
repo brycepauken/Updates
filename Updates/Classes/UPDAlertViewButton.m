@@ -53,6 +53,11 @@
     [self.iconImageView setAlpha:enabled?1:0.5];
 }
 
+- (void)setFont:(UIFont *)font {
+    [self.label setFont:font];
+    [self setNeedsLayout];
+}
+
 - (void)setHighlighted:(BOOL)highlighted {
     [super setHighlighted:highlighted];
     
@@ -75,6 +80,10 @@
     if(!self.highlighted) {
         [self setBackgroundColor:normalBackgroundColor];
     }
+}
+
+- (void)setTextColor:(UIColor *)color {
+    [self.label setTextColor:color];
 }
 
 - (void)setTitle:(NSString *)title {
