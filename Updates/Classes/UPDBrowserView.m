@@ -222,6 +222,7 @@
 - (void)cancelSession {
     [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
     [UPDURLProtocol invalidateSession];
+    [self clearPersistentData];
     if(self.cancelSessionBlock) {
         self.cancelSessionBlock();
     }
@@ -250,6 +251,7 @@
         
         [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
         [UPDURLProtocol invalidateSession];
+        [self clearPersistentData];
         
         NSString *currentURL = [self.webView stringByEvaluatingJavaScriptFromString:@"window.location.href"];
         if(!currentURL) {

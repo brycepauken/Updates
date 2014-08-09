@@ -62,9 +62,8 @@ static NSURLSession *_session;
 }
 
 - (void)startLoading {
-    __unsafe_unretained UPDURLProtocol *weakSelf = self;
     [_instancesLock lock];
-    [_instances addObject:weakSelf];
+    [_instances addObject:self];
     [_instancesLock unlock];
     NSMutableURLRequest *newRequest = [self.request mutableCopy];
     [NSURLProtocol setProperty:@YES forKey:@"UseDefaultImplementation" inRequest:newRequest];
@@ -135,11 +134,10 @@ static NSURLSession *_session;
             }
             if(headers && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
                 if(_instructionAccumulator) {
-                    NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:instance.request];
-                    if(!firstRequest) {
-                        firstRequest = instance.request;
+                    NSURLRequest *firstRequest = instance.request;
+                    while([NSURLProtocol propertyForKey:@"PreviousRequest" inRequest:firstRequest]) {
+                        firstRequest = [NSURLProtocol propertyForKey:@"PreviousRequest" inRequest:firstRequest];
                     }
-                    
                     [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:instance.request response:[[NSString alloc] initWithData:instance.data encoding:NSUTF8StringEncoding] headers:headers];
                 }
             }
@@ -156,31 +154,26 @@ static NSURLSession *_session;
 }
 
 + (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest *))completionHandler {
-    if(response!=nil) {
-        UPDURLProtocol *instance;
-        [_instancesLock lock];
-        for(UPDURLProtocol *singleInstance in _instances) {
-            if([singleInstance.task isEqual:task]) {
-                instance = singleInstance;
-                break;
-            }
-        }
-        [_instancesLock unlock];
-        if(instance) {
-            NSMutableURLRequest *mutableRequest = [request mutableCopy];
-            [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
-            NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:instance.request];
-            if(!firstRequest) {
-                firstRequest = instance.request;
-            }
-            [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
-            
-            [instance.client URLProtocol:instance wasRedirectedToRequest:mutableRequest redirectResponse:response];
-            [instance.task cancel];
-            [instance.client URLProtocol:instance didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
+    UPDURLProtocol *instance;
+    [_instancesLock lock];
+    for(UPDURLProtocol *singleInstance in _instances) {
+        if([singleInstance.task isEqual:task]) {
+            instance = singleInstance;
+            break;
         }
     }
-    completionHandler(request);
+    [_instancesLock unlock];
+    if(instance) {
+        NSMutableURLRequest *mutableRequest = [request mutableCopy];
+        [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
+        if(response) {
+            [NSURLProtocol setProperty:instance.request forKey:@"PreviousRequest" inRequest:mutableRequest];
+            [NSURLProtocol setProperty:response forKey:@"RedirectResponse" inRequest:mutableRequest];
+            [instance.client URLProtocol:instance wasRedirectedToRequest:mutableRequest redirectResponse:nil];
+        }
+        UPDURLProtocol *newProtocol = [[UPDURLProtocol alloc] initWithRequest:[mutableRequest copy] cachedResponse:nil client:instance.client];
+        [newProtocol startLoading];
+    }
 }
 
 @end

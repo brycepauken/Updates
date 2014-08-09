@@ -164,7 +164,7 @@
                 }
             }
             else {
-                /*step 2 failed, try rendering pages first*/
+                /*step 2 failed... error*/
                 if(self.errorBlock) {
                     self.errorBlock();
                 }
