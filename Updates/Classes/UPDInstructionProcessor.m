@@ -87,7 +87,9 @@
                 }
                 else {
                     /*using the last instruction alone doesn't work, but there's only one instruction... error*/
-                    
+                    if(self.errorBlock) {
+                        self.errorBlock();
+                    }
                 }
             }
         }];
@@ -95,7 +97,9 @@
     }
     else {
         /*no valid instruction found... error*/
-        
+        if(self.errorBlock) {
+            self.errorBlock();
+        }
     }
 }
 
@@ -161,8 +165,9 @@
             }
             else {
                 /*step 2 failed, try rendering pages first*/
-                [self clearPersistentData];
-                [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil usingSession:nil];
+                if(self.errorBlock) {
+                    self.errorBlock();
+                }
             }
         }
     }];

@@ -513,6 +513,22 @@
         weakSelf.url = url;
         [weakSelf tryCompletion];
     }];
+    [self.instructionProcessor setErrorBlock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Error"];
+            [alertView setMessage:@"Something's gone wrong, and we couldn't reach the final page. We're sorry about that!\n\nFeel free to contact us and let us know, and we'll do our best to support this site soon!"];
+            [alertView setFontSize:16];
+            [alertView setOkButtonBlock:^{
+                [weakAlertView dismiss];
+                if(weakSelf.errorBlock) {
+                    weakSelf.errorBlock();
+                }
+            }];
+            [alertView show];
+        });
+    }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [self.instructionProcessor beginProcessingWithLastInstructionBlock:^(UPDInternalInstruction *lastInstruction) {
             [self.textSearchView loadDocument:lastInstruction.response withBaseURL:lastInstruction.endRequest.URL];

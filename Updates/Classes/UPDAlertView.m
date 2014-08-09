@@ -223,7 +223,10 @@
         verticalOffset = goalY-curY;
     }
     [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, verticalOffset+(self.superview.bounds.size.height-self.bounds.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
-
+    if(verticalOffset==0 && self.frame.origin.y+self.frame.size.height+UPD_ALERT_PADDING+UPD_ALERT_BUTTON_HEIGHT>self.superview.bounds.size.height) {
+        [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, 5+(self.superview.bounds.size.height-(self.frame.size.height+UPD_ALERT_PADDING+UPD_ALERT_BUTTON_HEIGHT))/2, self.bounds.size.width, self.bounds.size.height)];
+    }
+    
     [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:self.frame.origin.y<20&&self.keyboardHeight>0];
     [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setNeedsStatusBarAppearanceUpdate];
 }

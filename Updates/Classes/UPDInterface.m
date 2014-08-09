@@ -184,6 +184,22 @@
                 [weakSelf.processingView setHidden:YES];
             }];
         }];
+        [self.processingView setErrorBlock:^{
+            [weakSelf.processingView setTag:1];
+            [weakSelf.processingView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
+            [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
+            
+            [weakSelf.scrollView setTag:0];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [weakSelf.scrollView setContentOffset:CGPointZero];
+            } completion:^(BOOL finsished) {
+                [weakSelf.processingView setTag:2];
+                [weakSelf.processingView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
+                
+                [weakSelf.preProcessingView setHidden:YES];
+                [weakSelf.processingView setHidden:YES];
+            }];
+        }];
         [self.scrollView addSubview:self.processingView];
         
         self.changesView = [[UPDChangesView alloc] initWithFrame:self.bounds];
