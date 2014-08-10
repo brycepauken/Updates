@@ -14,8 +14,11 @@
 
 #import "UPDURLProtocol.h"
 
+#import "UPDInstructionAccumulator.h"
+
 @interface UPDURLProtocol()
 
+@property (nonatomic, strong) NSMutableData *data;
 @property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) NSURLSessionTask *task;
 
@@ -23,6 +26,7 @@
 
 @implementation UPDURLProtocol
 
+static UPDInstructionAccumulator *_instructionAccumulator;
 static NSOperationQueue *_operationQueue;
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
@@ -34,6 +38,7 @@ static NSOperationQueue *_operationQueue;
 }
 
 + (void)createSession{
+    _operationQueue = [[NSOperationQueue alloc] init];
     _operationQueue.maxConcurrentOperationCount = 5;
 }
 
@@ -41,9 +46,12 @@ static NSOperationQueue *_operationQueue;
     _operationQueue = nil;
 }
 
-+ (void)setInstructionAccumulator:(UPDInstructionAccumulator *)instructionAccumulator{}
++ (void)setInstructionAccumulator:(UPDInstructionAccumulator *)instructionAccumulator {
+    _instructionAccumulator = instructionAccumulator;
+}
 
 - (void)startLoading {
+    self.data = [[NSMutableData alloc] init];
     self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:_operationQueue];
     
     NSMutableURLRequest *newRequest = [self.request mutableCopy];
@@ -57,11 +65,10 @@ static NSOperationQueue *_operationQueue;
 }
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
-    NSString *stringFromData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    if(stringFromData&&[stringFromData rangeOfString:@"<title>"].location!=NSNotFound) {
-        NSLog(@"Found DOC");
-    }
-    [self.client URLProtocol:self didLoadData:data];
+    [data enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *stop){
+        [self.data appendBytes:bytes length:byteRange.length];
+        [self.client URLProtocol:self didLoadData:[NSData dataWithBytes:bytes length:byteRange.length]];
+    }];
 }
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
@@ -71,6 +78,20 @@ static NSOperationQueue *_operationQueue;
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if(!error) {
+        NSDictionary *headers;
+        if(task.response && [task.response respondsToSelector:@selector(allHeaderFields)]) {
+            headers = [(NSHTTPURLResponse *)task.response allHeaderFields];
+        }
+        if(headers && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
+            if(_instructionAccumulator) {
+                NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
+                if(!firstRequest) {
+                    firstRequest = self.request;
+                }
+                
+                [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding] headers:headers];
+            }
+        }
         [self.client URLProtocolDidFinishLoading:self];
     }
     else {
@@ -86,7 +107,17 @@ static NSOperationQueue *_operationQueue;
     NSMutableURLRequest *mutableRequest = [request mutableCopy];
     [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
     if(response) {
+        NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
+        if(!firstRequest) {
+            firstRequest = self.request;
+        }
+        [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
         [self.client URLProtocol:self wasRedirectedToRequest:mutableRequest redirectResponse:response];
+        
+        if(([response.allHeaderFields objectForKey:@"Content-Length"]&&[[response.allHeaderFields objectForKey:@"Content-Length"] isEqualToString:@"0"])) {
+            [self.task cancel];
+            [self.client URLProtocol:self didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
+        }
     }
     completionHandler(mutableRequest);
 }
