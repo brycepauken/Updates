@@ -114,10 +114,9 @@ static NSOperationQueue *_operationQueue;
         [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
         [self.client URLProtocol:self wasRedirectedToRequest:mutableRequest redirectResponse:response];
         
-        if(([response.allHeaderFields objectForKey:@"Content-Length"]&&[[response.allHeaderFields objectForKey:@"Content-Length"] isEqualToString:@"0"])) {
-            [self.task cancel];
-            [self.client URLProtocol:self didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
-        }
+        [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:nil headers:response.allHeaderFields];
+        [self.task cancel];
+        [self.client URLProtocol:self didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
     }
     completionHandler(mutableRequest);
 }
