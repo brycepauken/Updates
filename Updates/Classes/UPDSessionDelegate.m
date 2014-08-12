@@ -44,6 +44,7 @@
     for(NSURLSessionTask *singleTask in self.redirectedTasks) {
         if(singleTask==task) {
             wasRedirected = YES;
+            [self.redirectedTasks removeObject:singleTask];
             break;
         }
     }
@@ -63,16 +64,26 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest *))completionHandler {
+    NSMutableURLRequest *mutableRequest = [self.request mutableCopy];
+    [mutableRequest setHTTPBody:nil];
+    [mutableRequest setHTTPMethod:@"GET"];
+    [mutableRequest setURL:request.URL];
+    
     if(response) {
         __unsafe_unretained NSURLSessionTask *weakTask = task;
         [self.redirectedTasksLock lock];
         [self.redirectedTasks addObject:weakTask];
         [self.redirectedTasksLock unlock];
         [task cancel];
+        
+        UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] init];
+        NSURLSession *newSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:session.delegateQueue];
+        [delegate setRequest:mutableRequest];
+        [delegate setCompletionBlock:self.completionBlock];
+        NSURLSessionDataTask *newTask = [newSession dataTaskWithRequest:mutableRequest];
+        [newTask resume];
     }
-    NSURLSessionTask *newTask = [session dataTaskWithRequest:request];
-    [newTask resume];
-    completionHandler(request);
+    completionHandler(mutableRequest);
 }
 
 @end

@@ -84,6 +84,7 @@ static NSOperationQueue *_operationQueue;
     for(NSURLSessionTask *singleTask in self.redirectedTasks) {
         if(singleTask==task) {
             wasRedirected = YES;
+            [self.redirectedTasks removeObject:singleTask];
             break;
         }
     }
@@ -99,7 +100,6 @@ static NSOperationQueue *_operationQueue;
                     if(!firstRequest) {
                         firstRequest = self.request;
                     }
-                    
                     [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding] headers:headers];
                 }
             }
@@ -116,8 +116,11 @@ static NSOperationQueue *_operationQueue;
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest *))completionHandler {
-    NSMutableURLRequest *mutableRequest = [request mutableCopy];
+    NSMutableURLRequest *mutableRequest = [self.request mutableCopy];
     [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
+    [mutableRequest setHTTPBody:nil];
+    [mutableRequest setHTTPMethod:@"GET"];
+    [mutableRequest setURL:request.URL];
     if(response) {
         NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
         if(!firstRequest) {
@@ -126,8 +129,6 @@ static NSOperationQueue *_operationQueue;
         [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
         [self.client URLProtocol:self wasRedirectedToRequest:mutableRequest redirectResponse:response];
         
-        //[_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:nil headers:response.allHeaderFields];
-        //[NSURLProtocol setProperty:@[] forKey:@"OriginalRequestDetails" inRequest:mutableRequest];
         __unsafe_unretained NSURLSessionTask *weakTask = task;
         [self.redirectedTasksLock lock];
         [self.redirectedTasks addObject:weakTask];

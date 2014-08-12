@@ -74,6 +74,7 @@
         [self clearPersistentData];
         UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] init];
         NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:queue];
+        [delegate setRequest:lastInstruction.request];
         [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
             [self clearPersistentData];
             if([lastInstruction.request.HTTPMethod isEqualToString:@"GET"]&&[UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
@@ -150,6 +151,7 @@
     index++;
     UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] init];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:queue];
+    [delegate setRequest:request];
     [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if(index<workingInstructions.count) {
