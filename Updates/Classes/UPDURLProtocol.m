@@ -19,6 +19,8 @@
 @interface UPDURLProtocol()
 
 @property (nonatomic, strong) NSMutableData *data;
+@property (nonatomic, strong) NSMutableArray *redirectedTasks;
+@property (nonatomic, strong) NSLock *redirectedTasksLock;
 @property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) NSURLSessionTask *task;
 
@@ -77,25 +79,35 @@ static NSOperationQueue *_operationQueue;
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    if(!error) {
-        NSDictionary *headers;
-        if(task.response && [task.response respondsToSelector:@selector(allHeaderFields)]) {
-            headers = [(NSHTTPURLResponse *)task.response allHeaderFields];
+    BOOL wasRedirected = NO;
+    [self.redirectedTasksLock lock];
+    for(NSURLSessionTask *singleTask in self.redirectedTasks) {
+        if(singleTask==task) {
+            wasRedirected = YES;
+            break;
         }
-        if(headers && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
-            if(_instructionAccumulator) {
-                NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
-                if(!firstRequest) {
-                    firstRequest = self.request;
-                }
-                
-                [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding] headers:headers];
-            }
-        }
-        [self.client URLProtocolDidFinishLoading:self];
     }
-    else {
-        [self.client URLProtocol:self didFailWithError:error];
+    if(!wasRedirected) {
+        if(!error) {
+            NSDictionary *headers;
+            if(task.response && [task.response respondsToSelector:@selector(allHeaderFields)]) {
+                headers = [(NSHTTPURLResponse *)task.response allHeaderFields];
+            }
+            if(headers && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
+                if(_instructionAccumulator) {
+                    NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
+                    if(!firstRequest) {
+                        firstRequest = self.request;
+                    }
+                    
+                    [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding] headers:headers];
+                }
+            }
+            [self.client URLProtocolDidFinishLoading:self];
+        }
+        else {
+            [self.client URLProtocol:self didFailWithError:error];
+        }
     }
 }
 
@@ -114,7 +126,12 @@ static NSOperationQueue *_operationQueue;
         [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
         [self.client URLProtocol:self wasRedirectedToRequest:mutableRequest redirectResponse:response];
         
-        [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:nil headers:response.allHeaderFields];
+        //[_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:nil headers:response.allHeaderFields];
+        //[NSURLProtocol setProperty:@[] forKey:@"OriginalRequestDetails" inRequest:mutableRequest];
+        __unsafe_unretained NSURLSessionTask *weakTask = task;
+        [self.redirectedTasksLock lock];
+        [self.redirectedTasks addObject:weakTask];
+        [self.redirectedTasksLock unlock];
         [self.task cancel];
         [self.client URLProtocol:self didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
     }
