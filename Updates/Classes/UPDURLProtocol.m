@@ -21,15 +21,17 @@
 @property (nonatomic, strong) NSMutableData *data;
 @property (nonatomic, strong) NSMutableArray *redirectedTasks;
 @property (nonatomic, strong) NSLock *redirectedTasksLock;
-@property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) NSURLSessionTask *task;
 
 @end
 
 @implementation UPDURLProtocol
 
+static NSMutableArray *_instances;
+static NSLock *_instancesLock;
 static UPDInstructionAccumulator *_instructionAccumulator;
 static NSOperationQueue *_operationQueue;
+static NSURLSession *_session;
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
     return ![NSURLProtocol propertyForKey:@"UseDefaultImplementation" inRequest:request];
@@ -39,13 +41,16 @@ static NSOperationQueue *_operationQueue;
     return request;
 }
 
-+ (void)createSession{
++ (void)createSession {
     _operationQueue = [[NSOperationQueue alloc] init];
     _operationQueue.maxConcurrentOperationCount = 5;
+    _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)self delegateQueue:_operationQueue];
+    _instances = [NSMutableArray array];
+    _instancesLock = [NSLock new];
 }
 
-+ (void)invalidateSession{
-    _operationQueue = nil;
++ (void)invalidateSession {
+    [_session invalidateAndCancel];
 }
 
 + (void)setInstructionAccumulator:(UPDInstructionAccumulator *)instructionAccumulator {
@@ -53,12 +58,15 @@ static NSOperationQueue *_operationQueue;
 }
 
 - (void)startLoading {
+    [_instancesLock lock];
+    [_instances addObject:self]; /*we need the strong reference, actually*/
+    [_instancesLock unlock];
+    
     self.data = [[NSMutableData alloc] init];
-    self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:_operationQueue];
     
     NSMutableURLRequest *newRequest = [self.request mutableCopy];
     [NSURLProtocol setProperty:@YES forKey:@"UseDefaultImplementation" inRequest:newRequest];
-    self.task = [self.session dataTaskWithRequest:newRequest];
+    self.task = [_session dataTaskWithRequest:newRequest];
     [self.task resume];
 }
 
@@ -66,77 +74,140 @@ static NSOperationQueue *_operationQueue;
     
 }
 
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
-    [data enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *stop){
-        [self.data appendBytes:bytes length:byteRange.length];
-        [self.client URLProtocol:self didLoadData:[NSData dataWithBytes:bytes length:byteRange.length]];
-    }];
-}
-
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
-    [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
-    completionHandler(NSURLSessionResponseAllow);
-}
-
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    BOOL wasRedirected = NO;
-    [self.redirectedTasksLock lock];
-    for(NSURLSessionTask *singleTask in self.redirectedTasks) {
-        if(singleTask==task) {
-            wasRedirected = YES;
-            [self.redirectedTasks removeObject:singleTask];
++ (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
+    UPDURLProtocol *instance;
+    [_instancesLock lock];
+    for(UPDURLProtocol *inst in _instances) {
+        if(inst.task==dataTask) {
+            instance = inst;
             break;
         }
     }
-    if(!wasRedirected) {
-        if(!error) {
-            NSDictionary *headers;
-            if(task.response && [task.response respondsToSelector:@selector(allHeaderFields)]) {
-                headers = [(NSHTTPURLResponse *)task.response allHeaderFields];
+    [_instancesLock unlock];
+    
+    if(instance) {
+        [data enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *stop){
+            [instance.data appendBytes:bytes length:byteRange.length];
+            [instance.client URLProtocol:instance didLoadData:[NSData dataWithBytes:bytes length:byteRange.length]];
+        }];
+    }
+}
+
++ (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+    UPDURLProtocol *instance;
+    [_instancesLock lock];
+    for(UPDURLProtocol *inst in _instances) {
+        if(inst.task==dataTask) {
+            instance = inst;
+            break;
+        }
+    }
+    [_instancesLock unlock];
+    
+    if(instance) {
+        [instance.client URLProtocol:instance didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
+        completionHandler(NSURLSessionResponseAllow);
+    }
+}
+
++ (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    UPDURLProtocol *instance;
+    [_instancesLock lock];
+    for(UPDURLProtocol *inst in _instances) {
+        if(inst.task==task) {
+            instance = inst;
+            [_instances removeObject:inst];
+            break;
+        }
+    }
+    [_instancesLock unlock];
+    
+    if(instance) {
+        BOOL wasRedirected = NO;
+        [instance.redirectedTasksLock lock];
+        for(NSURLSessionTask *singleTask in instance.redirectedTasks) {
+            if(singleTask==task) {
+                wasRedirected = YES;
+                [instance.redirectedTasks removeObject:singleTask];
+                break;
             }
-            if(headers && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
-                if(_instructionAccumulator) {
-                    NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
-                    if(!firstRequest) {
-                        firstRequest = self.request;
-                    }
-                    [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:self.request response:[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding] headers:headers];
+        }
+        if(!wasRedirected) {
+            if(!error) {
+                NSDictionary *headers;
+                if(task.response && [task.response respondsToSelector:@selector(allHeaderFields)]) {
+                    headers = [(NSHTTPURLResponse *)task.response allHeaderFields];
                 }
+                if(headers && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/css"]&&![[headers objectForKey:@"Content-Type"] hasPrefix:@"text/javascript"]) {
+                    if(_instructionAccumulator) {
+                        NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:instance.request];
+                        if(!firstRequest) {
+                            firstRequest = instance.request;
+                        }
+                        [_instructionAccumulator addInstructionWithRequest:firstRequest endRequest:instance.request response:[[NSString alloc] initWithData:instance.data encoding:NSUTF8StringEncoding] headers:headers];
+                    }
+                }
+                [instance.client URLProtocolDidFinishLoading:instance];
             }
-            [self.client URLProtocolDidFinishLoading:self];
-        }
-        else {
-            [self.client URLProtocol:self didFailWithError:error];
+            else {
+                [instance.client URLProtocol:instance didFailWithError:error];
+            }
         }
     }
 }
 
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
-    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
++ (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
+    UPDURLProtocol *instance;
+    [_instancesLock lock];
+    for(UPDURLProtocol *inst in _instances) {
+        if(inst.task==task) {
+            instance = inst;
+            break;
+        }
+    }
+    [_instancesLock unlock];
+    
+    if(instance) {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    }
 }
 
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest *))completionHandler {
-    NSMutableURLRequest *mutableRequest = [self.request mutableCopy];
-    [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
-    [mutableRequest setHTTPBody:nil];
-    [mutableRequest setHTTPMethod:@"GET"];
-    [mutableRequest setURL:request.URL];
-    if(response) {
-        NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:self.request];
-        if(!firstRequest) {
-            firstRequest = self.request;
++ (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest *))completionHandler {
+    UPDURLProtocol *instance;
+    [_instancesLock lock];
+    for(UPDURLProtocol *inst in _instances) {
+        if(inst.task==task) {
+            instance = inst;
+            break;
         }
-        [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
-        [self.client URLProtocol:self wasRedirectedToRequest:mutableRequest redirectResponse:response];
+    }
+    [_instancesLock unlock];
+    
+    if(instance) {
+        NSMutableURLRequest *mutableRequest = [request mutableCopy];
+        [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
+        [mutableRequest setHTTPBody:nil];
+        [mutableRequest setHTTPMethod:@"GET"];
+        [mutableRequest setURL:request.URL];
+        //[mutableRequest setAllHTTPHeaderFields:[NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]]];
         
-        __unsafe_unretained NSURLSessionTask *weakTask = task;
-        [self.redirectedTasksLock lock];
-        [self.redirectedTasks addObject:weakTask];
-        [self.redirectedTasksLock unlock];
-        [self.task cancel];
-        [self.client URLProtocol:self didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
+        if(response) {
+            NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:instance.request];
+            if(!firstRequest) {
+                firstRequest = instance.request;
+            }
+            [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
+            [instance.client URLProtocol:instance wasRedirectedToRequest:mutableRequest redirectResponse:response];
+            
+            __unsafe_unretained NSURLSessionTask *weakTask = task;
+            [instance.redirectedTasksLock lock];
+            [instance.redirectedTasks addObject:weakTask];
+            [instance.redirectedTasksLock unlock];
+            [instance.task cancel];
+            [instance.client URLProtocol:instance didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
+        }
+        completionHandler(mutableRequest);
     }
-    completionHandler(mutableRequest);
 }
 
 @end
