@@ -184,12 +184,11 @@ static NSURLSession *_session;
     [_instancesLock unlock];
     
     if(instance) {
-        NSMutableURLRequest *mutableRequest = [request mutableCopy];
+        NSMutableURLRequest *mutableRequest = [instance.request mutableCopy];
         [NSURLProtocol removePropertyForKey:@"UseDefaultImplementation" inRequest:mutableRequest];
         [mutableRequest setHTTPBody:nil];
         [mutableRequest setHTTPMethod:@"GET"];
         [mutableRequest setURL:request.URL];
-        //[mutableRequest setAllHTTPHeaderFields:[NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]]];
         
         if(response) {
             NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:instance.request];

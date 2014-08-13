@@ -20,20 +20,20 @@
     [self clearPersistentData];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [queue setMaxConcurrentOperationCount:5];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
     if(instructions.count==1) {
         UPDInternalInstruction *instruction = [instructions lastObject];
-        UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] init];
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:queue];
+        NSURLSessionDataTask *task = [session dataTaskWithRequest:instruction.request];
+        UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:instruction.request];
         [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
             [session invalidateAndCancel];
             NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
         }];
-        NSURLSessionDataTask *task = [session dataTaskWithRequest:instruction.request];
         [task resume];
     }
     else {
-        [self runAllInstructions:instructions fromIndex:0 lastResponse:nil usingQueue:queue differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
+        [self runAllInstructions:instructions fromIndex:0 lastResponse:nil usingSession:session differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
     }
 }
 
@@ -81,7 +81,7 @@
     }
 }
 
-+ (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingQueue:(NSOperationQueue *)queue differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
++ (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
     UPDInternalInstruction *prevInstruction = nil;
     UPDInternalInstruction *instruction = [workingInstructions objectAtIndex:index];
     NSURLRequest *request = instruction.request;
@@ -102,19 +102,18 @@
         request = mutableRequest;
     }
     index++;
-    UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] init];
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:queue];
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
+    UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:request];
     [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if(index<workingInstructions.count) {
-            [self runAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingQueue:queue differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
+            [self runAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingSession:session differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
         }
         else {
             [session invalidateAndCancel];
             [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
         }
     }];
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
     [task resume];
 }
 

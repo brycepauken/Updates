@@ -72,9 +72,9 @@
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         [queue setMaxConcurrentOperationCount:5];
         [self clearPersistentData];
-        UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] init];
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:queue];
-        [delegate setRequest:lastInstruction.request];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
+        NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request];
+        UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:lastInstruction.request];
         [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
             [self clearPersistentData];
             if([lastInstruction.request.HTTPMethod isEqualToString:@"GET"]&&[UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
@@ -86,7 +86,8 @@
             else {
                 /*step 2*/
                 if(workingInstructions.count>1) {
-                    [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil usingQueue:queue];
+                    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
+                    [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil usingSession:session];
                 }
                 else {
                     /*using the last instruction alone doesn't work, but there's only one instruction... error*/
@@ -96,7 +97,6 @@
                 }
             }
         }];
-        NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request];
         [task resume];
     }
     else {
@@ -127,7 +127,7 @@
  Called if beginProcessing determines that just querying the last page
  doesn't work as expected.
  */
-- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingQueue:(NSOperationQueue *)queue {
+- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session {
     UPDInternalInstruction *prevInstruction = nil;
     UPDInternalInstruction *instruction = [workingInstructions objectAtIndex:index];
     NSMutableURLRequest *request = [instruction.request mutableCopy];
@@ -149,16 +149,16 @@
     NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:[cookieStorage cookies]];
     [request setAllHTTPHeaderFields:headers];
     index++;
-    UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] init];
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:queue];
-    [delegate setRequest:request];
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
+    UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:request];
     [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if(index<workingInstructions.count) {
-            [self processAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingQueue:queue];
+            [self processAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingSession:session];
         }
         else {
             [self clearPersistentData];
+            NSLog(@"%@",newResponse);
             if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
                 if(self.completionBlock) {
                     self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
@@ -172,7 +172,6 @@
             }
         }
     }];
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
     [task resume];
 }
 
