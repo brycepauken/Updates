@@ -145,7 +145,7 @@ NSLock *_instancesLock;
         [mutableRequest setHTTPMethod:@"GET"];
         [mutableRequest setURL:request.URL];
         
-        //[mutableRequest setAllHTTPHeaderFields:[NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:mutableRequest.URL]]];
+        [mutableRequest setAllHTTPHeaderFields:[NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:mutableRequest.URL]]];
         
         if(response) {
             __unsafe_unretained NSURLSessionTask *weakTask = task;

@@ -190,22 +190,26 @@ static NSURLSession *_session;
         [mutableRequest setHTTPMethod:@"GET"];
         [mutableRequest setURL:request.URL];
         
+        [mutableRequest setAllHTTPHeaderFields:[NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:mutableRequest.URL]]];
+        
         if(response) {
             NSURLRequest *firstRequest = [NSURLProtocol propertyForKey:@"OriginalRequest" inRequest:instance.request];
             if(!firstRequest) {
                 firstRequest = instance.request;
             }
             [NSURLProtocol setProperty:firstRequest forKey:@"OriginalRequest" inRequest:mutableRequest];
-            [instance.client URLProtocol:instance wasRedirectedToRequest:mutableRequest redirectResponse:response];
             
             __unsafe_unretained NSURLSessionTask *weakTask = task;
             [instance.redirectedTasksLock lock];
             [instance.redirectedTasks addObject:weakTask];
             [instance.redirectedTasksLock unlock];
             [instance.task cancel];
+            [instance.client URLProtocol:instance wasRedirectedToRequest:mutableRequest redirectResponse:response];
             [instance.client URLProtocol:instance didFailWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
         }
-        completionHandler(mutableRequest);
+        else {
+            completionHandler(mutableRequest);
+        }
     }
 }
 
