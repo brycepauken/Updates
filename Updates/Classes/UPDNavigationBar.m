@@ -38,21 +38,21 @@
         [self setText:@"Updates"];
         
         self.addButton = [[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width-(UPD_NAVIGATION_BAR_BUTTON_SIZE+UPD_NAVIGATION_BAR_BUTTON_PADDING), 20+((self.bounds.size.height-20)-UPD_NAVIGATION_BAR_BUTTON_SIZE)/2, UPD_NAVIGATION_BAR_BUTTON_SIZE, UPD_NAVIGATION_BAR_BUTTON_SIZE)];
-        [self.addButton addTarget:self action:@selector(addButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.addButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.addButton setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin];
         [self.addButton setImage:[UIImage imageNamed:@"Add"] forState:UIControlStateNormal];
         [self.addButton setHidden:YES];
         [self addSubview:self.addButton];
         
         self.backButton = [[UIButton alloc] initWithFrame:CGRectMake(UPD_NAVIGATION_BAR_BUTTON_PADDING, 20+((self.bounds.size.height-20)-UPD_NAVIGATION_BAR_BUTTON_SIZE)/2, UPD_NAVIGATION_BAR_BUTTON_SIZE, UPD_NAVIGATION_BAR_BUTTON_SIZE)];
-        [self.backButton addTarget:self action:@selector(backButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.backButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.backButton setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
         [self.backButton setImage:[UIImage imageNamed:@"Back"] forState:UIControlStateNormal];
         [self.backButton setHidden:YES];
         [self addSubview:self.backButton];
         
         self.settingsButton = [[UIButton alloc] initWithFrame:CGRectMake(UPD_NAVIGATION_BAR_BUTTON_PADDING-(UPD_NAVIGATION_BAR_BUTTON_SIZE_SETTINGS-UPD_NAVIGATION_BAR_BUTTON_SIZE)/2, 20+((self.bounds.size.height-20)-UPD_NAVIGATION_BAR_BUTTON_SIZE_SETTINGS)/2, UPD_NAVIGATION_BAR_BUTTON_SIZE_SETTINGS, UPD_NAVIGATION_BAR_BUTTON_SIZE_SETTINGS)];
-        [self.settingsButton addTarget:self action:@selector(settingsButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.settingsButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.settingsButton setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
         [self.settingsButton setImage:[UIImage imageNamed:@"Settings"] forState:UIControlStateNormal];
         [self.settingsButton setHidden:YES];
@@ -61,20 +61,14 @@
     return self;
 }
 
-- (void)addButtonTapped {
-    if(self.addButtonBlock) {
+- (void)buttonTapped:(UIButton *)button {
+    if(button==self.addButton&&self.addButtonBlock) {
         self.addButtonBlock();
     }
-}
-
-- (void)backButtonTapped {
-    if(self.backButtonBlock) {
+    else if(button==self.backButton&&self.backButtonBlock) {
         self.backButtonBlock();
     }
-}
-
-- (void)settingsButtonTapped {
-    if(self.settingsButtonBlock) {
+    else if(button==self.settingsButton&&self.settingsButtonBlock) {
         self.settingsButtonBlock();
     }
 }

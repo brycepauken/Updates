@@ -42,10 +42,13 @@
         [labelText addAttribute:NSKernAttributeName value:@(6.0) range:NSMakeRange(0, labelText.length)];
         [self.navigationLabel setAttributedText:labelText];
         
-        self.backButton = [[UIButton alloc] initWithFrame:CGRectMake(UPD_NAVIGATION_BAR_BUTTON_PADDING, 20+((UPD_NAVIGATION_BAR_HEIGHT-20)-UPD_NAVIGATION_BAR_BUTTON_SIZE)/2, UPD_NAVIGATION_BAR_BUTTON_SIZE, UPD_NAVIGATION_BAR_BUTTON_SIZE)];
+        self.backButton = [[UIButton alloc] initWithFrame:CGRectMake(UPD_NAVIGATION_BAR_BUTTON_PADDING-UPD_NAVIGATION_BAR_BUTTON_SIZE/2, 20+((UPD_NAVIGATION_BAR_HEIGHT-20)-UPD_NAVIGATION_BAR_BUTTON_SIZE*2)/2, UPD_NAVIGATION_BAR_BUTTON_SIZE*2, UPD_NAVIGATION_BAR_BUTTON_SIZE*2)];
         [self.backButton addTarget:self action:@selector(backButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.backButton setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
         [self.backButton setImage:[UIImage imageNamed:@"Back"] forState:UIControlStateNormal];
+        [self.backButton.layer setBorderColor:[UIColor UPDOffWhiteColor].CGColor];
+        [self.backButton.layer setBorderWidth:1];
+        [self.backButton.layer setCornerRadius:4];
         [self addSubview:self.backButton];
         
         self.urlBar = [[UPDPreBrowserURLBar alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_PREBROWSER_URL_BAR_WIDTH)/2, (self.bounds.size.height-UPD_PREBROWSER_URL_BAR_HEIGHT)/2, UPD_PREBROWSER_URL_BAR_WIDTH, UPD_PREBROWSER_URL_BAR_HEIGHT)];
