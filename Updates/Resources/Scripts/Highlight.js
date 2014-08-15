@@ -11,7 +11,7 @@ function UPDHighlightOccurrencesOfString(str) {
                 element = element.childNodes[0];
                 var content = element.nodeValue;
                 var index = content.toLowerCase().indexOf(str);
-                if(index<0) {
+                if(index<0 || element.offsetParent === null) {
                     continue;
                 }
                 

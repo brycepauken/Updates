@@ -46,8 +46,9 @@
         [self.backButton addTarget:self action:@selector(backButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.backButton setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
         [self.backButton setImage:[UIImage imageNamed:@"Back"] forState:UIControlStateNormal];
+        [self.backButton setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.8, 0.8)];
         [self.backButton.layer setBorderColor:[UIColor UPDOffWhiteColor].CGColor];
-        [self.backButton.layer setBorderWidth:1];
+        [self.backButton.layer setBorderWidth:2];
         [self.backButton.layer setCornerRadius:4];
         [self addSubview:self.backButton];
         
