@@ -276,6 +276,9 @@ struct ElementCount {
  */
 + (void)iterateToNextTextNode:(xmlNode **)node {
     while(true) {
+        if(!(*node)) {
+            break;
+        }
         if((*node)->name && strcmp((char *)(*node)->name, "text")==0) {
             bool stringIsWhiteSpace = true;
             char *s = (char *)(*node)->content;
