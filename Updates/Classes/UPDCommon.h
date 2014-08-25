@@ -54,6 +54,7 @@ extern const int UPD_ALERT_WIDTH;
 extern const int UPD_BOTTOM_BAR_BUTTON_SIZE;
 extern const int UPD_CONFIRM_BUTTON_SIZE;
 extern const int UPD_CONFIRM_LABEL_WIDTH;
+extern const int UPD_HELPVIEW_HEIGHT;
 extern const int UPD_PREBROWSER_URL_BAR_BUTTON_SIZE;
 extern const int UPD_PREBROWSER_URL_BAR_HEIGHT;
 extern const int UPD_PREBROWSER_URL_BAR_WIDTH;

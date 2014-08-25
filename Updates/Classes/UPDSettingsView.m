@@ -12,6 +12,7 @@
 #import "UPDAppDelegate.h"
 #import "UPDButton.h"
 #import "UPDInterface.h"
+#import "UPDHelpView.h"
 #import "UPDSwitch.h"
 #import "UPDViewController.h"
 
@@ -109,6 +110,14 @@
 - (void)buttonTapped:(UIButton *)button {
     if(button==self.closeButton && self.closeButtonBlock) {
         self.closeButtonBlock();
+    }
+    else if(button==self.helpButton) {
+        UPDHelpView *helpView = [[UPDHelpView alloc] init];
+        __unsafe_unretained UPDHelpView *weakHelpView = helpView;
+        [helpView setCloseButtonBlock:^{
+            [weakHelpView dismiss];
+        }];
+        [helpView show];
     }
     else if(button==self.contactButton) {
         if([MFMailComposeViewController canSendMail]) {

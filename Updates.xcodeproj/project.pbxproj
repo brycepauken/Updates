@@ -24,6 +24,8 @@
 		023346DB199580020028DAF5 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 023346D919957FF30028DAF5 /* MessageUI.framework */; };
 		023346DE1995A1A00028DAF5 /* UPDStartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 023346DD1995A1A00028DAF5 /* UPDStartView.m */; };
 		02388DE319897A52004BB64A /* UPDDocumentSearcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */; };
+		0239FCF2199DD05C001F5027 /* Help.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0239FCF1199DD05C001F5027 /* Help.plist */; };
+		0239FCF5199DD1E5001F5027 /* UPDHelpView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0239FCF4199DD1E5001F5027 /* UPDHelpView.m */; };
 		024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */; };
 		024C45141975D269000896E4 /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45131975D269000896E4 /* UPDInterface.m */; };
 		024C451B1975E51F000896E4 /* KingfishIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45171975E51F000896E4 /* KingfishIcon.png */; };
@@ -132,6 +134,9 @@
 		023346DD1995A1A00028DAF5 /* UPDStartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDStartView.m; path = Classes/UPDStartView.m; sourceTree = "<group>"; };
 		02388DE119897A52004BB64A /* UPDDocumentSearcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDocumentSearcher.h; path = Classes/UPDDocumentSearcher.h; sourceTree = "<group>"; };
 		02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = UPDDocumentSearcher.mm; path = Classes/UPDDocumentSearcher.mm; sourceTree = "<group>"; };
+		0239FCF1199DD05C001F5027 /* Help.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Help.plist; sourceTree = "<group>"; };
+		0239FCF3199DD1E5001F5027 /* UPDHelpView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDHelpView.h; path = Classes/UPDHelpView.h; sourceTree = "<group>"; };
+		0239FCF4199DD1E5001F5027 /* UPDHelpView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDHelpView.m; path = Classes/UPDHelpView.m; sourceTree = "<group>"; };
 		024C450F1975CF8B000896E4 /* UIColor+UPDColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+UPDColors.h"; path = "Classes/UIColor+UPDColors.h"; sourceTree = "<group>"; };
 		024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "UIColor+UPDColors.mm"; path = "Classes/UIColor+UPDColors.mm"; sourceTree = "<group>"; };
 		024C45121975D269000896E4 /* UPDInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInterface.h; path = Classes/UPDInterface.h; sourceTree = "<group>"; };
@@ -293,12 +298,13 @@
 				023346D919957FF30028DAF5 /* MessageUI.framework */,
 				02D251251992C3A300BBEDBE /* QuartzCore.framework */,
 				02D251231992C39400BBEDBE /* Security.framework */,
+				0253CD27197F9E800078E90E /* libxml2.2.dylib */,
+				0239FCF1199DD05C001F5027 /* Help.plist */,
 				0213C2411974FE0C006BC204 /* Images.xcassets */,
 				0213C2381974FE0C006BC204 /* Info.plist */,
 				0213C2391974FE0C006BC204 /* main.m */,
 				0213C23E1974FE0C006BC204 /* Updates.xcdatamodeld */,
 				02A73D1D1975C555000A7C48 /* UPDPrefixHeader.pch */,
-				0253CD27197F9E800078E90E /* libxml2.2.dylib */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -412,6 +418,8 @@
 				02260FF9198C75240086326D /* UPDDocumentRenderer.m */,
 				02388DE119897A52004BB64A /* UPDDocumentSearcher.h */,
 				02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */,
+				0239FCF3199DD1E5001F5027 /* UPDHelpView.h */,
+				0239FCF4199DD1E5001F5027 /* UPDHelpView.m */,
 				02AF8755197A3124007D06C5 /* UPDInstructionAccumulator.h */,
 				02AF8756197A3124007D06C5 /* UPDInstructionAccumulator.m */,
 				0253CD22197F90420078E90E /* UPDInstructionProcessor.h */,
@@ -538,6 +546,7 @@
 				02AF8765197B7E7E007D06C5 /* Accept@2x.png in Resources */,
 				02261006198DDAA30086326D /* Highlight.js in Resources */,
 				02AF8761197B7E79007D06C5 /* Cancel@2x.png in Resources */,
+				0239FCF2199DD05C001F5027 /* Help.plist in Resources */,
 				02A733FB197731B9002A86F3 /* SearchEngineIconBing@2x.png in Resources */,
 				02AF8760197B7E79007D06C5 /* Cancel.png in Resources */,
 				024C451E1975E51F000896E4 /* UpdatesIcon@2x.png in Resources */,
@@ -602,6 +611,7 @@
 				02AF8754197A2F9C007D06C5 /* UPDURLProtocol.m in Sources */,
 				0253CD24197F90420078E90E /* UPDInstructionProcessor.m in Sources */,
 				02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */,
+				0239FCF5199DD1E5001F5027 /* UPDHelpView.m in Sources */,
 				02A73D181975C256000A7C48 /* UPDAppDelegate.m in Sources */,
 				02934A3119830E3100FEBB03 /* UPDButton.m in Sources */,
 				023346D81994D3790028DAF5 /* UPDSwitch.m in Sources */,
