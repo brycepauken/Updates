@@ -33,6 +33,7 @@
     [instruction setRequest:request];
     [instruction setEndRequest:endRequest];
     [instruction setResponse:response];
+    [instruction setReliesOnPrevRequest:NO];
     
     for(int getOrPost=0;getOrPost<2;getOrPost++) {
         NSString *targetString = (getOrPost?[[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]:request.URL.query);

@@ -34,6 +34,7 @@
         self.headers = [decoder decodeObjectForKey:@"headers"];
         self.fullURL = [decoder decodeObjectForKey:@"fullURL"];
         self.post = [decoder decodeObjectForKey:@"post"];
+        self.reliesOnPrevRequest = [[decoder decodeObjectForKey:@"reliesOnPrevRequest"] boolValue];
         self.request = [decoder decodeObjectForKey:@"request"];
         self.response = [decoder decodeObjectForKey:@"response"];
     }
@@ -47,6 +48,7 @@
     [encoder encodeObject:self.headers forKey:@"headers"];
     [encoder encodeObject:self.fullURL forKey:@"fullURL"];
     [encoder encodeObject:self.post forKey:@"post"];
+    [encoder encodeObject:@(self.reliesOnPrevRequest) forKey:@"reliesOnPrevRequest"];
     [encoder encodeObject:self.request forKey:@"request"];
     [encoder encodeObject:self.response forKey:@"response"];
 }

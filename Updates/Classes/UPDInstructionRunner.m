@@ -25,7 +25,7 @@
         UPDInternalInstruction *instruction = [instructions lastObject];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:instruction.request];
         UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:instruction.request];
-        [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
+        [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
             [session invalidateAndCancel];
             NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
@@ -104,7 +104,7 @@
     index++;
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
     UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:request];
-    [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
         NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if(index<workingInstructions.count) {
             [self runAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingSession:session differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];

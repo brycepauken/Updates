@@ -10,7 +10,7 @@
 
 @interface UPDSessionDelegate : NSObject <NSURLSessionDelegate>
 
-@property (nonatomic, copy) void(^completionBlock)(NSData *data, NSURLResponse *response, NSError *error);
+@property (nonatomic, copy) void(^completionBlock)(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error);
 
 - (instancetype)initWithTask:(NSURLSessionTask *)task request:(NSURLRequest *)request;
 

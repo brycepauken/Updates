@@ -16,6 +16,7 @@
 @property (nonatomic, strong) NSDictionary *headers;
 @property (nonatomic, strong) NSString *fullURL;
 @property (nonatomic, strong) NSMutableArray *post;
+@property (nonatomic) BOOL reliesOnPrevRequest;
 @property (nonatomic, strong) NSURLRequest *request;
 @property (nonatomic, strong) NSString *response;
 

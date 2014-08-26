@@ -14,6 +14,7 @@
 @property (nonatomic, strong) NSMutableArray *redirectedTasks;
 @property (nonatomic, strong) NSLock *redirectedTasksLock;
 @property (nonatomic, strong) NSURLRequest *request;
+@property (nonatomic, strong) NSMutableDictionary *returnedCookies;
 @property (nonatomic, strong) NSURLSessionTask *task;
 
 @end
@@ -39,6 +40,7 @@ NSLock *_instancesLock;
         [self setRedirectedTasks:[NSMutableArray array]];
         [self setRedirectedTasksLock:[NSLock new]];
         [self setRequest:request];
+        [self setReturnedCookies:[NSMutableDictionary dictionary]];
         [self setTask:task];
     }
     return self;
@@ -103,10 +105,10 @@ NSLock *_instancesLock;
         [instance.redirectedTasksLock unlock];
         if(!wasRedirected&&instance.completionBlock) {
             if(!error) {
-                instance.completionBlock(instance.data, task.response, nil);
+                instance.completionBlock(instance.data, task.response, nil, nil);
             }
             else {
-                instance.completionBlock(nil, nil, error);
+                instance.completionBlock(nil, nil, nil, error);
             }
         }
     }

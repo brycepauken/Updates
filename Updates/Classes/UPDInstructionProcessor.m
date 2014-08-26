@@ -13,14 +13,13 @@
  
  The general steps involed in this process are:
  1) Check if final page is reachable by single GET request—if it is, just use that. If not...
- 2) Figure out where a request URL came from
-    a) First URL is given, no need for processing
-    b) If exact URL shows up on previous response page, use that one in the future
-    c) If exact URL doesn't show up, check if base url shows up as GET form action, and use that
- 3) Figure out where parameters came from (GET and POST)
-    a) Check input forms in prevoius response page for data—use field in the future if possible
- 4) Try the entire instruction list again, checking if end page is the same or equivalent
- 
+ 2) Try the entire instruction list to get to the final page
+    a) Get parameters from previous page input forms (GET and POST)
+    b) If that doesn't work, give up hope
+ 3) Try fetching only requests that are...
+    a) The final request
+    b) POST requests
+    c) Requests before POST requests, if it provides the POST fields
  */
 
 #import "UPDInstructionProcessor.h"
@@ -75,7 +74,7 @@
         NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request];
         UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:lastInstruction.request];
-        [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
+        [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
             [self clearPersistentData];
             if([lastInstruction.request.HTTPMethod isEqualToString:@"GET"]&&[UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
                 /*the final request works on its own, use it!*/
@@ -86,8 +85,7 @@
             else {
                 /*step 2*/
                 if(workingInstructions.count>1) {
-                    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
-                    [self processAllInstructions:workingInstructions fromIndex:0 lastResponse:nil usingSession:session];
+                    [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingSession:nil withDelegateQueue:queue];
                 }
                 else {
                     /*using the last instruction alone doesn't work, but there's only one instruction... error*/
@@ -134,40 +132,70 @@
     if(index>0 && lastResponse) {
         prevInstruction = [workingInstructions objectAtIndex:index-1];
         NSArray *newPost = [UPDDocumentSearcher document:lastResponse equivilantInputFieldForArray:instruction.post orignalResponse:prevInstruction.response];
-        NSMutableString *newHTTPBody = [[NSMutableString alloc] init];
-        for(int i=0;i<newPost.count;i++) {
-            if(i>0) {
-                [newHTTPBody appendString:@"&"];
+        if(![newPost isEqual:instruction.post]) {
+            NSMutableString *newHTTPBody = [[NSMutableString alloc] init];
+            for(int i=0;i<newPost.count;i++) {
+                if(i>0) {
+                    [newHTTPBody appendString:@"&"];
+                }
+                [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:0], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
+                [newHTTPBody appendString:@"="];
+                [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:1], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
             }
-            [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:0], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
-            [newHTTPBody appendString:@"="];
-            [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:1], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
+            [request setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
+            [instruction setReliesOnPrevRequest:YES];
         }
-        [request setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
     }
-    NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:[cookieStorage cookies]];
+    NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL]];
     [request setAllHTTPHeaderFields:headers];
     index++;
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
     UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:request];
-    [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
         NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if(index<workingInstructions.count) {
-            [self processAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingSession:session];
+            [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingSession:session withDelegateQueue:queue];
         }
         else {
             [self clearPersistentData];
             NSLog(@"%@",newResponse);
             if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
-                if(self.completionBlock) {
-                    self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                switch(currentStep) {
+                    case 2:
+                        for(int i=0;i<workingInstructions.count;i++) {
+                            if(i<workingInstructions.count-1&&![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&[[workingInstructions objectAtIndex:i] reliesOnPrevRequest]==NO) {
+                                [workingInstructions removeObjectAtIndex:i];
+                                i--;
+                            }
+                        }
+                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingSession:nil withDelegateQueue:queue];
+                        break;
+                    case 3:
+                        NSLog(@"woot %i",(int)workingInstructions.count);
+                        if(self.completionBlock) {
+                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                        }
+                        break;
+                    default:
+                        if(self.errorBlock) {
+                            self.errorBlock();
+                        }
+                        break;
                 }
             }
             else {
-                /*step 2 failed... error*/
-                if(self.errorBlock) {
-                    self.errorBlock();
+                switch(currentStep) {
+                    case 3:
+                        if(self.completionBlock) {
+                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                        }
+                        break;
+                    default:
+                        /*step 2 failed (or invalid step)... error*/
+                        if(self.errorBlock) {
+                            self.errorBlock();
+                        }
+                        break;
                 }
             }
         }
