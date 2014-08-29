@@ -88,18 +88,20 @@
     if(index>0 && lastResponse) {
         prevInstruction = [workingInstructions objectAtIndex:index-1];
         NSArray *newPost = [UPDDocumentSearcher document:lastResponse equivilantInputFieldForArray:instruction.post orignalResponse:prevInstruction.response];
-        NSMutableString *newHTTPBody = [[NSMutableString alloc] init];
-        for(int i=0;i<newPost.count;i++) {
-            if(i>0) {
-                [newHTTPBody appendString:@"&"];
+        if(newPost) {
+            NSMutableString *newHTTPBody = [[NSMutableString alloc] init];
+            for(int i=0;i<newPost.count;i++) {
+                if(i>0) {
+                    [newHTTPBody appendString:@"&"];
+                }
+                [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:0], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
+                [newHTTPBody appendString:@"="];
+                [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:1], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
             }
-            [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:0], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
-            [newHTTPBody appendString:@"="];
-            [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:1], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
+            NSMutableURLRequest *mutableRequest = [request mutableCopy];
+            [mutableRequest setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
+            request = mutableRequest;
         }
-        NSMutableURLRequest *mutableRequest = [request mutableCopy];
-        [mutableRequest setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
-        request = mutableRequest;
     }
     index++;
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request];

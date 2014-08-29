@@ -85,7 +85,7 @@
             else {
                 /*step 2*/
                 if(workingInstructions.count>1) {
-                    [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingSession:nil withDelegateQueue:queue];
+                    [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:nil];
                 }
                 else {
                     /*using the last instruction alone doesn't work, but there's only one instruction... error*/
@@ -125,14 +125,17 @@
  Called if beginProcessing determines that just querying the last page
  doesn't work as expected.
  */
-- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue {
+- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue lastSuccessfulCompletionBlock:(void (^)())lastSuccessfulCompletionBlock {
+    if(!session) {
+        session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
+    }
     UPDInternalInstruction *prevInstruction = nil;
     UPDInternalInstruction *instruction = [workingInstructions objectAtIndex:index];
     NSMutableURLRequest *request = [instruction.request mutableCopy];
     if(index>0 && lastResponse) {
         prevInstruction = [workingInstructions objectAtIndex:index-1];
         NSArray *newPost = [UPDDocumentSearcher document:lastResponse equivilantInputFieldForArray:instruction.post orignalResponse:prevInstruction.response];
-        if(![newPost isEqual:instruction.post]) {
+        if(newPost) {
             NSMutableString *newHTTPBody = [[NSMutableString alloc] init];
             for(int i=0;i<newPost.count;i++) {
                 if(i>0) {
@@ -144,6 +147,14 @@
             }
             [request setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
             [instruction setReliesOnPrevRequest:YES];
+            NSLog(@"new post: %@",[[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
+        }
+        else if(instruction.reliesOnPrevRequest) {
+            if(lastSuccessfulCompletionBlock) {
+                NSLog(@"defaulting!");
+                lastSuccessfulCompletionBlock();
+            }
+            return;
         }
     }
     NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL]];
@@ -154,22 +165,25 @@
     [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
         NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if(index<workingInstructions.count) {
-            [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingSession:session withDelegateQueue:queue];
+            [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingSession:session withDelegateQueue:queue lastSuccessfulCompletionBlock:lastSuccessfulCompletionBlock];
         }
         else {
             [self clearPersistentData];
-            NSLog(@"%@",newResponse);
             if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
                 switch(currentStep) {
-                    case 2:
+                    case 2: {
+                        void (^newLastSuccessfulCompletionBlock)() = ^{
+                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                        };
                         for(int i=0;i<workingInstructions.count;i++) {
                             if(i<workingInstructions.count-1&&![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&[[workingInstructions objectAtIndex:i] reliesOnPrevRequest]==NO) {
                                 [workingInstructions removeObjectAtIndex:i];
                                 i--;
                             }
                         }
-                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingSession:nil withDelegateQueue:queue];
+                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:newLastSuccessfulCompletionBlock];
                         break;
+                    }
                     case 3:
                         NSLog(@"woot %i",(int)workingInstructions.count);
                         if(self.completionBlock) {
