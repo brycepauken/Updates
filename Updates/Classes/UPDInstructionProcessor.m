@@ -147,11 +147,9 @@
             }
             [request setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
             [instruction setReliesOnPrevRequest:YES];
-            NSLog(@"new post: %@",[[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
         }
         else if(instruction.reliesOnPrevRequest) {
             if(lastSuccessfulCompletionBlock) {
-                NSLog(@"defaulting!");
                 lastSuccessfulCompletionBlock();
             }
             return;
@@ -185,7 +183,6 @@
                         break;
                     }
                     case 3:
-                        NSLog(@"woot %i",(int)workingInstructions.count);
                         if(self.completionBlock) {
                             self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
                         }
