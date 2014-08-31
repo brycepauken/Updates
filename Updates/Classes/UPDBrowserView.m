@@ -296,7 +296,7 @@
                 [self.completeOverlay setTransform:CGAffineTransformScale(CGAffineTransformIdentity, UPD_BROWSER_IMAGE_SCALE, UPD_BROWSER_IMAGE_SCALE)];
                 [self.completeOverlay setAlpha:UPD_BROWSER_IMAGE_OPACITY];
             } completion:^(BOOL finished) {
-                self.confirmBlock(browserImage, self.instructionAccumulator.instructions, currentURL, timerResult, origDate);
+                self.confirmBlock(browserImage, self.instructionAccumulator.instructions, currentURL, [self.webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"], timerResult, origDate);
             }];
         }];
     }

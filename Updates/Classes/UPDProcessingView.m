@@ -490,7 +490,7 @@
     }
 }
 
-- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate {
+- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withFinalResponse:(NSString *)finalResponse withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate {
     self.instructions = nil;
     self.canComplete = NO;
     [self scrollToPage:0 animated:NO];
@@ -531,6 +531,7 @@
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [self.instructionProcessor beginProcessingWithLastInstructionBlock:^(UPDInternalInstruction *lastInstruction) {
+            lastInstruction.response = finalResponse;
             [self.textSearchView loadDocument:lastInstruction.response withBaseURL:lastInstruction.endRequest.URL];
         }];
     });

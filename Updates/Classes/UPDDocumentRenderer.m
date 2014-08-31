@@ -6,6 +6,13 @@
 //  Copyright (c) 2014 Kingfish. All rights reserved.
 //
 
+/*
+ The document renderer is designed to load an HTML document in a
+ web view. This can be used both for getting the final HTML code of
+ a document (after executing JavaScript, for example), and for
+ retrieving any cookies set with JavaScript.
+ */
+
 #import "UPDDocumentRenderer.h"
 
 @interface UPDDocumentRenderer()
@@ -36,6 +43,10 @@ static UIWindow *_window;
 }
 
 - (void)clearWebView {
+    [self performSelectorOnMainThread:@selector(clearWebViewMainThread) withObject:nil waitUntilDone:YES];
+}
+
+- (void)clearWebViewMainThread {
     [self.webView stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
 }
 
@@ -70,7 +81,7 @@ static UIWindow *_window;
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     self.webViewLoadingCount--;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if(self.webViewLoadingCount == 0) {
             if(self.completionBlock) {
                 void(^completionBlockCopy)(NSString *newResponse) = [self.completionBlock copy];

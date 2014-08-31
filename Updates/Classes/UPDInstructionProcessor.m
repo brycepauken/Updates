@@ -26,6 +26,7 @@
 
 #import <libxml/HTMLparser.h>
 #import "UPDDocumentComparator.h"
+#import "UPDDocumentRenderer.h"
 #import "UPDDocumentSearcher.h"
 #import "UPDInternalInstruction.h"
 #import "UPDSessionDelegate.h"
@@ -75,25 +76,28 @@
         NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request];
         UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:lastInstruction.request];
         [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
-            [self clearPersistentData];
-            if([lastInstruction.request.HTTPMethod isEqualToString:@"GET"]&&[UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]]) {
-                /*the final request works on its own, use it!*/
-                if(self.completionBlock) {
-                    self.completionBlock([NSArray arrayWithObject:lastInstruction], self.favicon, lastInstruction.response, lastInstruction.request.URL);
-                }
-            }
-            else {
-                /*step 2*/
-                if(workingInstructions.count>1) {
-                    [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:nil];
-                }
-                else {
-                    /*using the last instruction alone doesn't work, but there's only one instruction... error*/
-                    if(self.errorBlock) {
-                        self.errorBlock();
+            UPDDocumentRenderer *renderer = [UPDDocumentRenderer new];
+            [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:lastInstruction.request.URL completionBlock:^(NSString *newResponse) {
+                [self clearPersistentData];
+                if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:newResponse]) {
+                    /*the final request works on its own, use it!*/
+                    if(self.completionBlock) {
+                        self.completionBlock([NSArray arrayWithObject:lastInstruction], self.favicon, lastInstruction.response, lastInstruction.request.URL);
                     }
                 }
-            }
+                else {
+                    /*step 2*/
+                    if(workingInstructions.count>1) {
+                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:nil];
+                    }
+                    else {
+                        /*using the last instruction alone doesn't work, but there's only one instruction... error*/
+                        if(self.errorBlock) {
+                            self.errorBlock();
+                        }
+                    }
+                }
+            }];
         }];
         [task resume];
     }
@@ -125,7 +129,7 @@
  Called if beginProcessing determines that just querying the last page
  doesn't work as expected.
  */
-- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue lastSuccessfulCompletionBlock:(void (^)())lastSuccessfulCompletionBlock {
+- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingRenderer:(UPDDocumentRenderer *)renderer usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue lastSuccessfulCompletionBlock:(void (^)())lastSuccessfulCompletionBlock {
     if(!session) {
         session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
     }
@@ -161,55 +165,57 @@
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
     UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:request];
     [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
-        NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if(index<workingInstructions.count) {
-            [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingSession:session withDelegateQueue:queue lastSuccessfulCompletionBlock:lastSuccessfulCompletionBlock];
-        }
-        else {
-            [self clearPersistentData];
-            if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
-                switch(currentStep) {
-                    case 2: {
-                        void (^newLastSuccessfulCompletionBlock)() = ^{
-                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                        };
-                        for(int i=0;i<workingInstructions.count;i++) {
-                            if(i<workingInstructions.count-1&&![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&[[workingInstructions objectAtIndex:i] reliesOnPrevRequest]==NO) {
-                                [workingInstructions removeObjectAtIndex:i];
-                                i--;
-                            }
-                        }
-                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:newLastSuccessfulCompletionBlock];
-                        break;
-                    }
-                    case 3:
-                        if(self.completionBlock) {
-                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                        }
-                        break;
-                    default:
-                        if(self.errorBlock) {
-                            self.errorBlock();
-                        }
-                        break;
-                }
+        [renderer clearWebView];
+        [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:request.URL completionBlock:^(NSString *newResponse) {
+            if(index<workingInstructions.count) {
+                [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingRenderer:renderer usingSession:session withDelegateQueue:queue lastSuccessfulCompletionBlock:lastSuccessfulCompletionBlock];
             }
             else {
-                switch(currentStep) {
-                    case 3:
-                        if(self.completionBlock) {
-                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                [self clearPersistentData];
+                if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
+                    switch(currentStep) {
+                        case 2: {
+                            void (^newLastSuccessfulCompletionBlock)() = ^{
+                                self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                            };
+                            for(int i=0;i<workingInstructions.count;i++) {
+                                if(i<workingInstructions.count-1&&![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&[[workingInstructions objectAtIndex:i] reliesOnPrevRequest]==NO) {
+                                    [workingInstructions removeObjectAtIndex:i];
+                                    i--;
+                                }
+                            }
+                            [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:newLastSuccessfulCompletionBlock];
+                            break;
                         }
-                        break;
-                    default:
-                        /*step 2 failed (or invalid step)... error*/
-                        if(self.errorBlock) {
-                            self.errorBlock();
-                        }
-                        break;
+                        case 3:
+                            if(self.completionBlock) {
+                                self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                            }
+                            break;
+                        default:
+                            if(self.errorBlock) {
+                                self.errorBlock();
+                            }
+                            break;
+                    }
+                }
+                else {
+                    switch(currentStep) {
+                        case 3:
+                            if(self.completionBlock) {
+                                self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                            }
+                            break;
+                        default:
+                            /*step 2 failed (or invalid step)... error*/
+                            if(self.errorBlock) {
+                                self.errorBlock();
+                            }
+                            break;
+                    }
                 }
             }
-        }
+        }];
     }];
     [task resume];
 }

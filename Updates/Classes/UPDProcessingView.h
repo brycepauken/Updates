@@ -14,6 +14,6 @@
 @property (nonatomic, copy) void(^errorBlock)();
 
 - (void)beginProcessingAnimation;
-- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate;
+- (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withFinalResponse:(NSString *)finalResponse withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate;
 
 @end

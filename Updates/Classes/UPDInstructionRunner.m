@@ -21,19 +21,21 @@
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [queue setMaxConcurrentOperationCount:5];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
+    UPDDocumentRenderer *renderer = [UPDDocumentRenderer new];
     if(instructions.count==1) {
         UPDInternalInstruction *instruction = [instructions lastObject];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:instruction.request];
         UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:instruction.request];
         [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
             [session invalidateAndCancel];
-            NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
+            [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:instruction.request.URL completionBlock:^(NSString *newResponse) {
+                [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
+            }];
         }];
         [task resume];
     }
     else {
-        [self runAllInstructions:instructions fromIndex:0 lastResponse:nil usingSession:session differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
+        [self runAllInstructions:instructions fromIndex:0 lastResponse:nil usingRenderer:renderer usingSession:session differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
     }
 }
 
@@ -81,7 +83,7 @@
     }
 }
 
-+ (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingSession:(NSURLSession *)session differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
++ (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingRenderer:(UPDDocumentRenderer *)renderer usingSession:(NSURLSession *)session differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
     UPDInternalInstruction *prevInstruction = nil;
     UPDInternalInstruction *instruction = [workingInstructions objectAtIndex:index];
     NSURLRequest *request = instruction.request;
@@ -107,14 +109,16 @@
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
     UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:request];
     [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
-        NSString *newResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if(index<workingInstructions.count) {
-            [self runAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingSession:session differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
-        }
-        else {
-            [session invalidateAndCancel];
-            [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
-        }
+        [renderer clearWebView];
+        [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:request.URL completionBlock:^(NSString *newResponse) {
+            if(index<workingInstructions.count) {
+                [self runAllInstructions:workingInstructions fromIndex:index lastResponse:newResponse usingRenderer:renderer usingSession:session differencePage:page differenceOptions:differenceOptions completionBlock:completionBlock];
+            }
+            else {
+                [session invalidateAndCancel];
+                [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
+            }
+        }];
     }];
     [task resume];
 }

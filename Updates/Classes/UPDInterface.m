@@ -129,10 +129,10 @@
                 [weakSelf.browserView setFrame:CGRectMake(weakSelf.scrollView.bounds.size.width*2, 0, weakSelf.scrollView.bounds.size.width, weakSelf.scrollView.bounds.size.height)];
             }];
         }];
-        [self.browserView setConfirmBlock:^(UIImage *browserImage, NSArray *instructions, NSString *url, NSTimeInterval timerResult, NSDate *origDate) {
+        [self.browserView setConfirmBlock:^(UIImage *browserImage, NSArray *instructions, NSString *url, NSString *finalResponse, NSTimeInterval timerResult, NSDate *origDate) {
             [weakSelf.preProcessingView setHidden:NO];
             [weakSelf.preProcessingView beginPreProcessingWithBrowserImage:browserImage];
-            [weakSelf.processingView processInstructions:instructions forURL:url withTimerResult:timerResult withOrigDate:origDate];
+            [weakSelf.processingView processInstructions:instructions forURL:url withFinalResponse:finalResponse withTimerResult:timerResult withOrigDate:origDate];
         }];
         [self.scrollView addSubview:self.browserView];
         
