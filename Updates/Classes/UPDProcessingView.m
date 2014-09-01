@@ -18,6 +18,7 @@
 #import "UPDButton.h"
 #import "UPDInstructionProcessor.h"
 #import "UPDInternalInstruction.h"
+#import "UPDLoadingCircle.h"
 #import "UPDProcessingTextField.h"
 #import "UPDTextSearchView.h"
 
@@ -38,6 +39,7 @@
 @property (nonatomic, strong) UPDInstructionProcessor *instructionProcessor;
 @property (nonatomic, strong) NSArray *instructions;
 @property (nonatomic, strong) NSString *lastResponse;
+@property (nonatomic, strong) UPDLoadingCircle *loadingCircle;
 @property (nonatomic) BOOL locked;
 @property (nonatomic, strong) UPDButton *nameButton;
 @property (nonatomic, strong) UILabel *nameLabel;
@@ -66,6 +68,12 @@
         [self setBackgroundColor:[UIColor UPDLightBlueColor]];
         self.canComplete = NO;
         __unsafe_unretained UPDProcessingView *weakSelf = self;
+        
+        self.loadingCircle = [[UPDLoadingCircle alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
+        [self.loadingCircle setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        [self.loadingCircle setColor:[UIColor UPDLightWhiteBlueColor]];
+        [self.loadingCircle setHidden:YES];
+        [self addSubview:self.loadingCircle];
         
         self.outlineQuarter = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
         [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
@@ -272,6 +280,7 @@
 }
 
 - (void)beginProcessingAnimation {
+    [self.loadingCircle setHidden:NO];
     [self.outlineQuarter setHidden:NO];
     
     CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
@@ -295,12 +304,14 @@
     [self.scrollView setFrame:newScrollViewFrame];
     [self layoutIfNeeded];
     [self.checkmark setAutoresizingMask:UIViewAutoresizingNone];
+    [self.loadingCircle setAutoresizingMask:UIViewAutoresizingNone];
     [self.outline setAutoresizingMask:UIViewAutoresizingNone];
     [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingNone];
     [UIView animateWithDuration:UPD_PROCESSING_ANIMATION_DURATION animations:^{
         [self.outline setAlpha:0];
         
         [self.checkmark setFrame:newCheckFrame];
+        [self.loadingCircle setFrame:newCheckFrame];
         [self.outline setFrame:newCheckFrame];
         [self.outlineQuarter setFrame:newCheckFrame];
         
@@ -356,6 +367,7 @@
         }
         
         [self.checkmark setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
+        [self.loadingCircle setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outline setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
         CGRect newCheckFrame = CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE);
@@ -367,6 +379,7 @@
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
                 [self.checkmark setFrame:newCheckFrame];
+                [self.loadingCircle setFrame:newCheckFrame];
                 [self.outline setFrame:newCheckFrame];
                 [self.outlineQuarter setFrame:newCheckFrame];
             } completion:^(BOOL finished) {
@@ -461,6 +474,7 @@
         newScrollViewFrame.origin.y += viewOffset;
         
         [self.checkmark setFrame:newCheckFrame];
+        [self.loadingCircle setFrame:newCheckFrame];
         [self.outline setFrame:newCheckFrame];
         [self.outlineQuarter setFrame:newCheckFrame];
         [self.scrollView setFrame:newScrollViewFrame];
@@ -497,6 +511,7 @@
     [self.processingLabel setAlpha:0];
     [self.processingButton setAlpha:0];
     [self.scrollView setUserInteractionEnabled:YES];
+    [self.loadingCircle setAlpha:1];
     [self.outlineQuarter setAlpha:1];
     [self.nameTextField setText:@""];
     
@@ -528,6 +543,9 @@
             }];
             [alertView show];
         });
+    }];
+    [self.instructionProcessor setProgressBlock:^(CGFloat progress) {
+        [weakSelf.loadingCircle setProgress:progress];
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [self.instructionProcessor beginProcessingWithLastInstructionBlock:^(UPDInternalInstruction *lastInstruction) {

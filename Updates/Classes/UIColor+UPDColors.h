@@ -17,6 +17,7 @@
 + (UIColor *)UPDLighterBlueColor;
 + (UIColor *)UPDLightGreyBlueColor;
 + (UIColor *)UPDLightGreyColor;
++ (UIColor *)UPDLightWhiteBlueColor;
 + (UIColor *)UPDMoreOffWhiteColor;
 + (UIColor *)UPDOffBlackColor;
 + (UIColor *)UPDOffWhiteColor;

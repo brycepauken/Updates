@@ -57,6 +57,8 @@ static UIWindow *_window;
 }
 
 - (void)dealloc {
+    [self.webView setDelegate:nil];
+    [self.webView stopLoading];
     self.webView = nil;
 }
 

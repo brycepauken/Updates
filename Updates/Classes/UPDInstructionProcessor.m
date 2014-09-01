@@ -81,6 +81,9 @@
                 [self clearPersistentData];
                 if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:newResponse]) {
                     /*the final request works on its own, use it!*/
+                    if(self.progressBlock) {
+                        self.progressBlock(1);
+                    }
                     if(self.completionBlock) {
                         self.completionBlock([NSArray arrayWithObject:lastInstruction], self.favicon, lastInstruction.response, lastInstruction.request.URL);
                     }
@@ -88,6 +91,9 @@
                 else {
                     /*step 2*/
                     if(workingInstructions.count>1) {
+                        if(self.progressBlock) {
+                            self.progressBlock(1.0/(1+self.instructions.count*2));
+                        }
                         [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:nil];
                     }
                     else {
@@ -130,6 +136,7 @@
  doesn't work as expected.
  */
 - (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingRenderer:(UPDDocumentRenderer *)renderer usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue lastSuccessfulCompletionBlock:(void (^)())lastSuccessfulCompletionBlock {
+    NSLog(@"Step %i (%i/%i)",currentStep,(index+1),(int)workingInstructions.count);
     if(!session) {
         session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
     }
@@ -154,6 +161,7 @@
         }
         else if(instruction.reliesOnPrevRequest) {
             if(lastSuccessfulCompletionBlock) {
+                self.progressBlock(1);
                 lastSuccessfulCompletionBlock();
             }
             return;
@@ -168,50 +176,48 @@
         [renderer clearWebView];
         [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:request.URL completionBlock:^(NSString *newResponse) {
             if(index<workingInstructions.count) {
+                if(self.progressBlock) {
+                    if(currentStep==2) {
+                        self.progressBlock((2+index)/(CGFloat)(1+self.instructions.count*2));
+                    }
+                    else {
+                        self.progressBlock((2+index+self.instructions.count)/(CGFloat)(1+self.instructions.count+workingInstructions.count));
+                    }
+                }
                 [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingRenderer:renderer usingSession:session withDelegateQueue:queue lastSuccessfulCompletionBlock:lastSuccessfulCompletionBlock];
             }
             else {
                 [self clearPersistentData];
                 if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
-                    switch(currentStep) {
-                        case 2: {
-                            void (^newLastSuccessfulCompletionBlock)() = ^{
-                                self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                            };
-                            for(int i=0;i<workingInstructions.count;i++) {
-                                if(i<workingInstructions.count-1&&![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&[[workingInstructions objectAtIndex:i] reliesOnPrevRequest]==NO) {
-                                    [workingInstructions removeObjectAtIndex:i];
-                                    i--;
-                                }
+                    if(currentStep==2) {
+                        void (^newLastSuccessfulCompletionBlock)() = ^{
+                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                        };
+                        for(int i=0;i<workingInstructions.count;i++) {
+                            if(i<workingInstructions.count-1&&![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&[[workingInstructions objectAtIndex:i] reliesOnPrevRequest]==NO) {
+                                [workingInstructions removeObjectAtIndex:i];
+                                i--;
                             }
-                            [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:newLastSuccessfulCompletionBlock];
-                            break;
                         }
-                        case 3:
-                            if(self.completionBlock) {
-                                self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                            }
-                            break;
-                        default:
-                            if(self.errorBlock) {
-                                self.errorBlock();
-                            }
-                            break;
+                        self.progressBlock((2+index)/(CGFloat)(1+self.instructions.count+workingInstructions.count));
+                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:newLastSuccessfulCompletionBlock];
+                    }
+                    else {
+                        self.progressBlock(1);
+                        if(self.completionBlock) {
+                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                        }
                     }
                 }
                 else {
-                    switch(currentStep) {
-                        case 3:
-                            if(self.completionBlock) {
-                                self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                            }
-                            break;
-                        default:
-                            /*step 2 failed (or invalid step)... error*/
-                            if(self.errorBlock) {
-                                self.errorBlock();
-                            }
-                            break;
+                    if(currentStep==2||!lastSuccessfulCompletionBlock) {
+                        if(self.errorBlock) {
+                            self.errorBlock();
+                        }
+                    }
+                    else {
+                        self.progressBlock(1);
+                        lastSuccessfulCompletionBlock();
                     }
                 }
             }

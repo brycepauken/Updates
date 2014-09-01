@@ -91,6 +91,8 @@
 		02C238801976CED9009327F8 /* Add.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387E1976CED9009327F8 /* Add.png */; };
 		02C238811976CED9009327F8 /* Add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387F1976CED9009327F8 /* Add@2x.png */; };
 		02C238841976D594009327F8 /* UPDTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C238831976D594009327F8 /* UPDTableView.m */; };
+		02C940F619B39E260043CD34 /* UPDLoadingCircle.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C940F519B39E260043CD34 /* UPDLoadingCircle.m */; };
+		02C940F919B3A60B0043CD34 /* UPDLoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C940F819B3A60B0043CD34 /* UPDLoadingCircleLayer.m */; };
 		02D251241992C39500BBEDBE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D251231992C39400BBEDBE /* Security.framework */; };
 		02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D251251992C3A300BBEDBE /* QuartzCore.framework */; };
 		02D2512C1993425100BBEDBE /* UPDAlertViewTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D2512B1993425100BBEDBE /* UPDAlertViewTextField.m */; };
@@ -237,6 +239,10 @@
 		02C2387F1976CED9009327F8 /* Add@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Add@2x.png"; path = "Resources/Images/Add@2x.png"; sourceTree = "<group>"; };
 		02C238821976D594009327F8 /* UPDTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDTableView.h; path = Classes/UPDTableView.h; sourceTree = "<group>"; };
 		02C238831976D594009327F8 /* UPDTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTableView.m; path = Classes/UPDTableView.m; sourceTree = "<group>"; };
+		02C940F419B39E260043CD34 /* UPDLoadingCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDLoadingCircle.h; path = Classes/UPDLoadingCircle.h; sourceTree = "<group>"; };
+		02C940F519B39E260043CD34 /* UPDLoadingCircle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDLoadingCircle.m; path = Classes/UPDLoadingCircle.m; sourceTree = "<group>"; };
+		02C940F719B3A60B0043CD34 /* UPDLoadingCircleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDLoadingCircleLayer.h; path = Classes/UPDLoadingCircleLayer.h; sourceTree = "<group>"; };
+		02C940F819B3A60B0043CD34 /* UPDLoadingCircleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDLoadingCircleLayer.m; path = Classes/UPDLoadingCircleLayer.m; sourceTree = "<group>"; };
 		02D251231992C39400BBEDBE /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		02D251251992C3A300BBEDBE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		02D2512A1993425100BBEDBE /* UPDAlertViewTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDAlertViewTextField.h; path = Classes/UPDAlertViewTextField.h; sourceTree = "<group>"; };
@@ -432,6 +438,10 @@
 				02AF8759197B7488007D06C5 /* UPDInternalInstruction.m */,
 				02934A3B19840C6A00FEBB03 /* UPDInternalUpdate.h */,
 				02934A3C19840C6A00FEBB03 /* UPDInternalUpdate.m */,
+				02C940F419B39E260043CD34 /* UPDLoadingCircle.h */,
+				02C940F519B39E260043CD34 /* UPDLoadingCircle.m */,
+				02C940F719B3A60B0043CD34 /* UPDLoadingCircleLayer.h */,
+				02C940F819B3A60B0043CD34 /* UPDLoadingCircleLayer.m */,
 				02C2387B1976C7A9009327F8 /* UPDNavigationBar.h */,
 				02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */,
 				02A733F1197724A6002A86F3 /* UPDPreBrowserTextField.h */,
@@ -578,6 +588,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02C940F919B3A60B0043CD34 /* UPDLoadingCircleLayer.m in Sources */,
 				02934A3D19840C6A00FEBB03 /* UPDInternalUpdate.m in Sources */,
 				023346D51994C6250028DAF5 /* UPDSettingsView.m in Sources */,
 				02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */,
@@ -602,6 +613,7 @@
 				02901A491985AF4500274AAE /* UPDChangesView.m in Sources */,
 				02C238841976D594009327F8 /* UPDTableView.m in Sources */,
 				0220020C1978897B002FF38D /* UPDBrowserTextField.m in Sources */,
+				02C940F619B39E260043CD34 /* UPDLoadingCircle.m in Sources */,
 				02A733EC19770AB6002A86F3 /* UPDPreBrowserURLBar.m in Sources */,
 				02D2512F19935A7300BBEDBE /* NSData+UPDExtensions.m in Sources */,
 				028D7EB4197DB62B00BE0643 /* UPDBrowserConfirmButton.m in Sources */,

@@ -15,6 +15,7 @@
 @property (nonatomic, copy) void(^completionBlock)(NSArray *instructions, UIImage *favicon, NSString *lastResponse, NSURL *url);
 @property (nonatomic, copy) void(^errorBlock)();
 @property (nonatomic, strong) NSArray *instructions;
+@property (nonatomic, copy) void(^progressBlock)(CGFloat progress);
 @property (nonatomic, strong) NSString *url;
 
 - (void)beginProcessingWithLastInstructionBlock:(void (^)(UPDInternalInstruction *))lastInstructionBlock;
