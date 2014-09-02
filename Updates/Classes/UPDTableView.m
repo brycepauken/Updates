@@ -159,6 +159,7 @@
         NSDate *startDate = [NSDate date];
         void (^completionBlock)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions) = ^(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions) {
             [cell hideSpinnerWithContactBlock:^{
+                [cell setLoadingCircleProgress:0];
                 [cell setLastUpdated:[NSDate date]];
                 if(result>update.status.intValue) {
                     if(result==1) {
@@ -176,12 +177,15 @@
                 }
             }];
         };
+        void (^progressBlock)(CGFloat progress) = ^(CGFloat progress) {
+            [cell setLoadingCircleProgress:progress];
+        };
         if(update.locked.boolValue) {
             NSString *key = [UPDCommon getEncryptedPassword:nil];
-            [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.instructions withKey:key]] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.origResponse withKey:key]] differenceOptions:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.differenceOptions withKey:key]] completionBlock:completionBlock];
+            [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.instructions withKey:key]] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.origResponse withKey:key]] differenceOptions:[NSKeyedUnarchiver unarchiveObjectWithData:[NSData decryptData:update.differenceOptions withKey:key]] progressBlock:progressBlock completionBlock:completionBlock];
         }
         else {
-            [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] differenceOptions:[NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions] completionBlock:completionBlock];
+            [UPDInstructionRunner pageFromInstructions:[NSKeyedUnarchiver unarchiveObjectWithData:update.instructions] differsFromPage:[NSKeyedUnarchiver unarchiveObjectWithData:update.origResponse] differenceOptions:[NSKeyedUnarchiver unarchiveObjectWithData:update.differenceOptions] progressBlock:progressBlock completionBlock:completionBlock];
         }
     }
 }

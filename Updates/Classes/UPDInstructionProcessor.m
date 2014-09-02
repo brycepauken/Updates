@@ -136,7 +136,6 @@
  doesn't work as expected.
  */
 - (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingRenderer:(UPDDocumentRenderer *)renderer usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue lastSuccessfulCompletionBlock:(void (^)())lastSuccessfulCompletionBlock {
-    NSLog(@"Step %i (%i/%i)",currentStep,(index+1),(int)workingInstructions.count);
     if(!session) {
         session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
     }

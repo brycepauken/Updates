@@ -15,6 +15,7 @@
 - (void)setDividerHidden:(BOOL)hidden;
 - (void)setFavicon:(UIImage *)favicon;
 - (void)setLastUpdated:(NSDate *)lastUpdated;
+- (void)setLoadingCircleProgress:(CGFloat)progress;
 - (void)setLockIconHidden:(BOOL)hidden;
 - (void)setName:(NSString *)name;
 - (void)showSpinner;

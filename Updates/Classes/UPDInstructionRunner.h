@@ -16,6 +16,6 @@ typedef NS_ENUM(NSInteger, UPDInstructionRunnerResult) {
 
 @interface UPDInstructionRunner : NSObject
 
-+ (void)pageFromInstructions:(NSArray *)instructions differsFromPage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock;
++ (void)pageFromInstructions:(NSArray *)instructions differsFromPage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions progressBlock:(void (^)(CGFloat progress))progressBlock completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock;
 
 @end

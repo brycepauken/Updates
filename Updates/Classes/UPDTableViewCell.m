@@ -9,6 +9,7 @@
 #import "UPDTableViewCell.h"
 
 #import "NSDate+UPDExtensions.h"
+#import "UPDLoadingCircle.h"
 
 @interface UPDTableViewCell()
 
@@ -19,9 +20,9 @@
 @property (nonatomic, strong) UIImageView *faviconView;
 @property (nonatomic) BOOL hideMessageReceived;
 @property (nonatomic, strong) NSDate *lastUpdated;
+@property (nonatomic, strong) UPDLoadingCircle *loadingCircle;
 @property (nonatomic, strong) UIImageView *lockIcon;
 @property (nonatomic, strong) UILabel *nameLabel;
-@property (nonatomic, strong) UIActivityIndicatorView *spinner;
 @property (nonatomic, strong) UILabel *updatedLabel;
 @property (nonatomic, strong) NSTimer *updatedLabelTimer;
 
@@ -47,9 +48,9 @@
         [self.bar setBackgroundColor:[UIColor whiteColor]];
         [self addSubview:self.bar];
         
-        self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [self.spinner setHidesWhenStopped:YES];
-        [self addSubview:self.spinner];
+        self.loadingCircle = [[UPDLoadingCircle alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
+        [self.loadingCircle setColor:[UIColor UPDLightWhiteBlueColor]];
+        [self addSubview:self.loadingCircle];
         
         self.lockIcon = [[UIImageView alloc] init];
         [self.lockIcon setImage:[UIImage imageNamed:@"Lock"]];
@@ -119,7 +120,7 @@
     [self.nameLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2-nameLabelSize.height/2-10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, nameLabelSize.height)];
     [self.updatedLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2+10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, updatedLabelSize.height)];
     [self positionLeftSide];
-    [self.spinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
+    [self.loadingCircle setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.bar setFrame:CGRectMake(0, 0, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
 }
@@ -201,11 +202,13 @@
     [self.nameLabel setText:name];
 }
 
+- (void)setLoadingCircleProgress:(CGFloat)progress {
+    [self.loadingCircle setProgress:progress];
+}
+
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {}
 
 - (void)showSpinner {
-    [self.spinner startAnimating];
-    
     [self setCanHide:NO];
     [self setHideMessageReceived:NO];
     
