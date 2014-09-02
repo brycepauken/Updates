@@ -28,6 +28,7 @@
 #import "UPDProcessingView.h"
 #import "UPDSettingsView.h"
 #import "UPDTableView.h"
+#import "UPDURLProtocol.h"
 
 @interface UPDInterface ()
 
@@ -79,7 +80,8 @@
         
         self.tableView = [[UPDTableView alloc] initWithFrame:CGRectMake(0, self.navigationBar.frame.size.height, self.scrollView.bounds.size.width, self.scrollView.bounds.size.height-UPD_NAVIGATION_BAR_HEIGHT)];
         [self.tableView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
-        [self.tableView setUpdateSelected:^(UPDInternalUpdate *update){
+        [self.tableView setUpdateSelected:^(UPDInternalUpdate *update) {
+            [UPDURLProtocol setDisableProtocol:YES];
             [weakSelf.changesView showUpdate:update];
             [weakSelf.tableView setUserInteractionEnabled:NO];
             [weakSelf.changesView setHidden:NO];
@@ -204,7 +206,8 @@
         
         self.changesView = [[UPDChangesView alloc] initWithFrame:self.bounds];
         [self.changesView setHidden:YES];
-        [self.changesView setBackButtonBlock:^(UPDInternalUpdate *update){
+        [self.changesView setBackButtonBlock:^(UPDInternalUpdate *update) {
+            [UPDURLProtocol setDisableProtocol:NO];
             [weakSelf.tableView updateWasOpened:update];
             [weakSelf.changesView setUserInteractionEnabled:NO];
             [weakSelf.scrollView setTag:0];

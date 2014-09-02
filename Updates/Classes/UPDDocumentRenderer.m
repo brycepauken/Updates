@@ -15,6 +15,8 @@
 
 #import "UPDDocumentRenderer.h"
 
+#import "UPDURLProtocol.h"
+
 @interface UPDDocumentRenderer()
 
 @property (nonatomic, copy) void (^completionBlock)(NSString *newResponse);
@@ -27,9 +29,11 @@
 
 @implementation UPDDocumentRenderer
 
+static BOOL _urlProtocolRegistered;
 static UIWindow *_window;
 
 + (void)initialize {
+    _urlProtocolRegistered = NO;
     _window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 568)];
 }
 
@@ -47,10 +51,22 @@ static UIWindow *_window;
 }
 
 - (void)clearWebViewMainThread {
+    if(_urlProtocolRegistered) {
+        _urlProtocolRegistered = NO;
+        [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
+        [UPDURLProtocol invalidateSession];
+    }
     [self.webView stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
 }
 
 - (void)countOccurrencesOfString:(NSString *)str inDocument:(NSString *)doc withBaseURL:(NSURL *)url withCompletionBlock:(void (^)(int count))completionBlock {
+    if(!_urlProtocolRegistered) {
+        _urlProtocolRegistered = YES;
+        [UPDURLProtocol setInstructionAccumulator:nil];
+        [UPDURLProtocol setPreventUnnecessaryLoading:YES];
+        [UPDURLProtocol createSession];
+        [NSURLProtocol registerClass:[UPDURLProtocol class]];
+    }
     [self setCountOccurrencesCompletion:completionBlock];
     [self setSearchString:str];
     [self.webView loadHTMLString:doc baseURL:url];
@@ -63,6 +79,13 @@ static UIWindow *_window;
 }
 
 - (void)renderDocument:(NSString *)doc withBaseURL:(NSURL *)url completionBlock:(void (^)(NSString *newResponse))completionBlock {
+    if(!_urlProtocolRegistered) {
+        _urlProtocolRegistered = YES;
+        [UPDURLProtocol setInstructionAccumulator:nil];
+        [UPDURLProtocol setPreventUnnecessaryLoading:YES];
+        [UPDURLProtocol createSession];
+        [NSURLProtocol registerClass:[UPDURLProtocol class]];
+    }
     [self setCompletionBlock:completionBlock];
     [self.webView loadHTMLString:doc baseURL:url];
 }

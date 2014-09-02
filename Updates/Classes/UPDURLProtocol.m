@@ -27,14 +27,16 @@
 
 @implementation UPDURLProtocol
 
+static BOOL _disableProtocol;
 static NSMutableArray *_instances;
 static NSLock *_instancesLock;
 static UPDInstructionAccumulator *_instructionAccumulator;
 static NSOperationQueue *_operationQueue;
+static BOOL _preventUnnecessaryLoading;
 static NSURLSession *_session;
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
-    return ![NSURLProtocol propertyForKey:@"UseDefaultImplementation" inRequest:request];
+    return !_disableProtocol&&![NSURLProtocol propertyForKey:@"UseDefaultImplementation" inRequest:request];
 }
 
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
@@ -53,8 +55,20 @@ static NSURLSession *_session;
     [_session invalidateAndCancel];
 }
 
++ (BOOL)requestIsCacheEquivalent:(NSURLRequest *)aRequest toRequest:(NSURLRequest *)bRequest {
+    return NO;
+}
+
++ (void)setDisableProtocol:(BOOL)disableProtocol {
+    _disableProtocol = disableProtocol;
+}
+
 + (void)setInstructionAccumulator:(UPDInstructionAccumulator *)instructionAccumulator {
     _instructionAccumulator = instructionAccumulator;
+}
+
++ (void)setPreventUnnecessaryLoading:(BOOL)preventUnnecessaryLoading {
+    _preventUnnecessaryLoading = preventUnnecessaryLoading;
 }
 
 - (void)startLoading {
@@ -105,8 +119,16 @@ static NSURLSession *_session;
     [_instancesLock unlock];
     
     if(instance) {
-        [instance.client URLProtocol:instance didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
+        BOOL didCancel = NO;
+        if(_preventUnnecessaryLoading&&([[((NSHTTPURLResponse *)response).allHeaderFields objectForKey:@"Content-Type"] hasPrefix:@"image"])) {
+            [instance.task cancel];
+            didCancel = YES;
+        }
+        [instance.client URLProtocol:instance didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
         completionHandler(NSURLSessionResponseAllow);
+        if(didCancel) {
+            [instance.client URLProtocolDidFinishLoading:instance];
+        }
     }
 }
 

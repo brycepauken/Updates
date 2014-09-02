@@ -166,6 +166,7 @@
     [self clearPersistentData];
     self.instructionAccumulator = [[UPDInstructionAccumulator alloc] init];
     [UPDURLProtocol setInstructionAccumulator:self.instructionAccumulator];
+    [UPDURLProtocol setPreventUnnecessaryLoading:NO];
     [UPDURLProtocol createSession];
     [NSURLProtocol registerClass:[UPDURLProtocol class]];
     
