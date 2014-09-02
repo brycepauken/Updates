@@ -51,6 +51,14 @@ static NSURLSession *_session;
     _instancesLock = [NSLock new];
 }
 
+- (id)initWithRequest:(NSURLRequest *)request cachedResponse:(NSCachedURLResponse *)cachedResponse client:(id<NSURLProtocolClient>)client {
+    self = [super initWithRequest:request cachedResponse:cachedResponse client:client];
+    if(self) {
+        CFRetain((__bridge CFTypeRef)(client));
+    }
+    return self;
+}
+
 + (void)invalidateSession {
     [_session invalidateAndCancel];
 }
