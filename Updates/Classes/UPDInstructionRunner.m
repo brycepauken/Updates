@@ -88,7 +88,7 @@
 + (void)runAllInstructions:(NSArray *)workingInstructions fromIndex:(int)index lastResponse:(NSString *)lastResponse usingRenderer:(UPDDocumentRenderer *)renderer usingSession:(NSURLSession *)session differencePage:(NSString *)page differenceOptions:(NSDictionary *)differenceOptions progressBlock:(void (^)(CGFloat progress))progressBlock completionBlock:(void (^)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions))completionBlock {
     UPDInternalInstruction *prevInstruction = nil;
     UPDInternalInstruction *instruction = [workingInstructions objectAtIndex:index];
-    NSURLRequest *request = instruction.request;
+    NSMutableURLRequest *request = [instruction.request mutableCopy];
     if(index>0 && lastResponse) {
         prevInstruction = [workingInstructions objectAtIndex:index-1];
         NSArray *newPost = [UPDDocumentSearcher document:lastResponse equivilantInputFieldForArray:instruction.post orignalResponse:prevInstruction.response];
@@ -102,12 +102,12 @@
                 [newHTTPBody appendString:@"="];
                 [newHTTPBody appendString:CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[[newPost objectAtIndex:i] objectAtIndex:1], NULL, (__bridge CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)))];
             }
-            NSMutableURLRequest *mutableRequest = [request mutableCopy];
-            [mutableRequest setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
-            request = mutableRequest;
+            [request setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
         }
     }
     index++;
+    NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL]];
+    [request setAllHTTPHeaderFields:headers];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
     UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:request];
     [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {

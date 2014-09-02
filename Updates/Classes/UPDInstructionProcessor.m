@@ -13,13 +13,13 @@
  
  The general steps involed in this process are:
  1) Check if final page is reachable by single GET request—if it is, just use that. If not...
- 2) Try the entire instruction list to get to the final page
-    a) Get parameters from previous page input forms (GET and POST)
-    b) If that doesn't work, give up hope
- 3) Try fetching only requests that are...
+ 2) Try fetching only requests that are...
     a) The final request
     b) POST requests
     c) Requests before POST requests, if it provides the POST fields
+ 3) Try the entire instruction list to get to the final page
+    a) Get parameters from previous page input forms (GET and POST)
+    b) If that doesn't work, give up hope
  */
 
 #import "UPDInstructionProcessor.h"
@@ -91,10 +91,16 @@
                 else {
                     /*step 2*/
                     if(workingInstructions.count>1) {
-                        if(self.progressBlock) {
-                            self.progressBlock(1.0/(1+self.instructions.count*2));
+                        for(int i=0;i<workingInstructions.count-1;i++) {
+                            if(![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&![[[workingInstructions objectAtIndex:i+1] request].HTTPMethod isEqualToString:@"POST"]) {
+                                [workingInstructions removeObjectAtIndex:i];
+                                i--;
+                            }
                         }
-                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:nil];
+                        if(self.progressBlock) {
+                            self.progressBlock(1.0/(1+self.instructions.count+workingInstructions.count));
+                        }
+                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue shortenedInstructionCount:(int)workingInstructions.count];
                     }
                     else {
                         /*using the last instruction alone doesn't work, but there's only one instruction... error*/
@@ -135,7 +141,7 @@
  Called if beginProcessing determines that just querying the last page
  doesn't work as expected.
  */
-- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingRenderer:(UPDDocumentRenderer *)renderer usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue lastSuccessfulCompletionBlock:(void (^)())lastSuccessfulCompletionBlock {
+- (void)processAllInstructions:(NSMutableArray *)workingInstructions fromIndex:(int)index currentStep:(int)currentStep lastResponse:(NSString *)lastResponse usingRenderer:(UPDDocumentRenderer *)renderer usingSession:(NSURLSession *)session withDelegateQueue:(NSOperationQueue *)queue shortenedInstructionCount:(int)shortenedInstructionCount {
     if(!session) {
         session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
     }
@@ -158,13 +164,6 @@
             [request setHTTPBody:[newHTTPBody dataUsingEncoding:NSUTF8StringEncoding]];
             [instruction setReliesOnPrevRequest:YES];
         }
-        else if(instruction.reliesOnPrevRequest) {
-            if(lastSuccessfulCompletionBlock) {
-                self.progressBlock(1);
-                lastSuccessfulCompletionBlock();
-            }
-            return;
-        }
     }
     NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL]];
     [request setAllHTTPHeaderFields:headers];
@@ -177,46 +176,28 @@
             if(index<workingInstructions.count) {
                 if(self.progressBlock) {
                     if(currentStep==2) {
-                        self.progressBlock((2+index)/(CGFloat)(1+self.instructions.count*2));
+                        self.progressBlock((2+index)/(CGFloat)(1+self.instructions.count+workingInstructions.count));
                     }
                     else {
-                        self.progressBlock((2+index+self.instructions.count)/(CGFloat)(1+self.instructions.count+workingInstructions.count));
+                        self.progressBlock((2+index+shortenedInstructionCount)/(CGFloat)(1+self.instructions.count+shortenedInstructionCount));
                     }
                 }
-                [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingRenderer:renderer usingSession:session withDelegateQueue:queue lastSuccessfulCompletionBlock:lastSuccessfulCompletionBlock];
+                [self processAllInstructions:workingInstructions fromIndex:index currentStep:currentStep lastResponse:newResponse usingRenderer:renderer usingSession:session withDelegateQueue:queue shortenedInstructionCount:shortenedInstructionCount];
             }
             else {
                 [self clearPersistentData];
                 if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
-                    if(currentStep==2) {
-                        void (^newLastSuccessfulCompletionBlock)() = ^{
-                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                        };
-                        for(int i=0;i<workingInstructions.count;i++) {
-                            if(i<workingInstructions.count-1&&![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&[[workingInstructions objectAtIndex:i] reliesOnPrevRequest]==NO) {
-                                [workingInstructions removeObjectAtIndex:i];
-                                i--;
-                            }
-                        }
-                        self.progressBlock((2+index)/(CGFloat)(1+self.instructions.count+workingInstructions.count));
-                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:3 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue lastSuccessfulCompletionBlock:newLastSuccessfulCompletionBlock];
-                    }
-                    else {
-                        self.progressBlock(1);
-                        if(self.completionBlock) {
-                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
-                        }
-                    }
+                    self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
                 }
                 else {
-                    if(currentStep==2||!lastSuccessfulCompletionBlock) {
+                    if(currentStep==2) {
+                        self.progressBlock((2+index)/(CGFloat)(1+workingInstructions.count));
+                        [self processAllInstructions:[self.instructions mutableCopy] fromIndex:0 currentStep:3 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue shortenedInstructionCount:shortenedInstructionCount];
+                    }
+                    else {
                         if(self.errorBlock) {
                             self.errorBlock();
                         }
-                    }
-                    else {
-                        self.progressBlock(1);
-                        lastSuccessfulCompletionBlock();
                     }
                 }
             }
