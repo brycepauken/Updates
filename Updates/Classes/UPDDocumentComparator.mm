@@ -246,6 +246,7 @@ struct ElementCount {
             continue;
         }
         else if(i>0 && (j==0 || lcsTable[i][j-1] < lcsTable[i-1][j])) {
+            #ifndef __clang_analyzer__
             const char *newStyle;
             const char *existingStyle = (const char *)xmlGetProp(textElements1.at(i-1)->parent, (xmlChar*)"style");
             if(existingStyle != NULL) {
@@ -259,8 +260,8 @@ struct ElementCount {
                 newStyle = "background: #f8f388 !important; color: #000 !important;";
             }
             xmlNewProp(textElements1.at(i-1)->parent, (xmlChar*)"style", (xmlChar*)newStyle);
-            
             i--;
+            #endif
             continue;
         }
         break;
