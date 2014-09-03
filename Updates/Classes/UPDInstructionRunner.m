@@ -30,6 +30,7 @@
         [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
             [session invalidateAndCancel];
             [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:instruction.request.URL completionBlock:^(NSString *newResponse) {
+                [renderer clearWebView];
                 progressBlock(1);
                 [self page:newResponse differsFromPage:page baseURL:instruction.endRequest.URL differenceOptions:differenceOptions completionBlock:completionBlock];
             }];

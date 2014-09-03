@@ -12,9 +12,9 @@
 
 @interface UPDBrowserBottomBar()
 
-@property (nonatomic, retain) NSMutableArray *buttonBlocks;
-@property (nonatomic, retain) NSArray *buttonNames;
-@property (nonatomic, retain) NSMutableArray *buttons;
+@property (nonatomic, strong) NSMutableArray *buttonBlocks;
+@property (nonatomic, strong) NSArray *buttonNames;
+@property (nonatomic, strong) NSMutableArray *buttons;
 
 @end
 

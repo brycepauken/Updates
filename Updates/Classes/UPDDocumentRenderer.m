@@ -92,8 +92,8 @@ static UIWindow *_window;
 
 - (void)setupWebView {
     self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 320, 568)];
-    [self.webView setBackgroundColor:[UIColor redColor]];
     [self.webView setDelegate:self];
+    [self.webView setScalesPageToFit:YES];
     [_window addSubview:self.webView];
 }
 
