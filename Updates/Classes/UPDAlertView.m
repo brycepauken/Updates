@@ -32,6 +32,7 @@
 @property (nonatomic, strong) UPDAlertViewButton *noButton;
 @property (nonatomic, strong) UPDAlertViewButton *okButton;
 @property (nonatomic, strong) UILabel *messageLabel;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UITextField *textField;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UPDAlertViewButton *yesButton;
@@ -53,9 +54,15 @@
         [self.interfaceOverlay setBackgroundColor:[UIColor UPDOffBlackColor]];
         [self.interfaceOverlay setUserInteractionEnabled:YES];
         
+        self.scrollView = [[UIScrollView alloc] init];
+        [self.scrollView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.scrollView setScrollEnabled:NO];
+        [self.scrollView setScrollsToTop:NO];
+        
         self.titleLabel = [[UILabel alloc] init];
         [self.titleLabel setBackgroundColor:[UIColor UPDLightBlueColor]];
         [self.titleLabel setFont:[UIFont fontWithName:@"Futura-Medium" size:20]];
+        [self.titleLabel setNumberOfLines:0];
         [self.titleLabel setTextAlignment:NSTextAlignmentCenter];
         [self.titleLabel setTextColor:[UIColor UPDOffWhiteColor]];
         [self addSubview:self.titleLabel];
@@ -147,13 +154,15 @@
     
     [self setUserInteractionEnabled:NO];
     [self.interfaceOverlay setUserInteractionEnabled:NO];
+    [self.scrollView setUserInteractionEnabled:NO];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [self setAlpha:0];
-        [self setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5)];
+        [self.scrollView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5)];
         [self.interfaceOverlay setAlpha:0];
     } completion:^(BOOL finished) {
         [self removeFromSuperview];
         [self.interfaceOverlay removeFromSuperview];
+        [self.scrollView removeFromSuperview];
     }];
 }
 
@@ -227,8 +236,27 @@
         [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, 5+(self.superview.bounds.size.height-(self.frame.size.height+UPD_ALERT_PADDING+UPD_ALERT_BUTTON_HEIGHT))/2, self.bounds.size.width, self.bounds.size.height)];
     }
     
-    [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:self.frame.origin.y<20&&self.keyboardHeight>0];
+    if(self.frame.origin.y<20) {
+        [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:YES];
+        
+        if(self.keyboardHeight==0) {
+            CGRect currentFrame = self.frame;
+            currentFrame.origin.y = 50;
+            [self setFrame:currentFrame];
+            
+            [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, self.bounds.size.height+UPD_ALERT_PADDING+UPD_ALERT_BUTTON_HEIGHT+100)];
+            [self.scrollView setScrollEnabled:YES];
+        }
+    }
+    else {
+        [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:NO];
+        
+        [self.scrollView setContentSize:self.scrollView.bounds.size];
+        [self.scrollView setScrollEnabled:NO];
+    }
     [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setNeedsStatusBarAppearanceUpdate];
+    
+    
 }
 
 - (void)setFontSize:(CGFloat)fontSize {
@@ -264,6 +292,8 @@
     
     [self.interfaceOverlay setFrame:interface.bounds];
     [interface addSubview:self.interfaceOverlay];
+    [self.scrollView setFrame:interface.bounds];
+    [interface addSubview:self.scrollView];
     
     CGSize titleLabelSize = [self.title boundingRectWithSize:CGSizeMake(UPD_ALERT_WIDTH-UPD_ALERT_PADDING*2, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: self.titleLabel.font} context:nil].size;
     titleLabelSize.height = ceilf(titleLabelSize.height);
@@ -280,7 +310,7 @@
     CGFloat alertHeight = titleLabelSize.height+messageLabelSize.height+UPD_ALERT_PADDING*3;
     CGFloat alertHeightWithButtons = alertHeight+UPD_ALERT_BUTTON_HEIGHT+UPD_ALERT_PADDING;
     [self setFrame:CGRectMake((interface.bounds.size.width-UPD_ALERT_WIDTH)/2, (interface.bounds.size.height-alertHeightWithButtons)/2, UPD_ALERT_WIDTH, alertHeight)];
-    [interface addSubview:self];
+    [self.scrollView addSubview:self];
     
     /*begin alert animation*/
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
@@ -300,7 +330,7 @@
     animation.removedOnCompletion = YES;
     animation.duration = UPD_TRANSITION_DURATION;
     
-    [self.layer addAnimation:animation forKey:@"popup"];
+    [self.scrollView.layer addAnimation:animation forKey:@"popup"];
     /*end alert animation*/
     
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
