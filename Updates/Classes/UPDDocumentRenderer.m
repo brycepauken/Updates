@@ -57,7 +57,8 @@ static UIWindow *_window;
         [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
         [UPDURLProtocol invalidateSession];
     }
-    [self.webView stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
+    [self.webView stopLoading];
+    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
 }
 
 - (void)complete {

@@ -96,7 +96,8 @@
 }
 
 - (void)showUpdate:(UPDInternalUpdate *)update {
-    [self.webView stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
+    [self.webView stopLoading];
+    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
     self.update = update;
     [self.navigationBar setText:update.name];
     void (^completionBlock)(NSDictionary *differenceOptions, NSString *key) = ^(NSDictionary *differenceOptions, NSString *key) {
