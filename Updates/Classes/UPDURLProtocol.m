@@ -22,6 +22,7 @@
 @property (nonatomic, strong) NSMutableArray *redirectedTasks;
 @property (nonatomic, strong) NSLock *redirectedTasksLock;
 @property (nonatomic, strong) NSURLSessionTask *task;
+@property (nonatomic) id<NSURLProtocolClient> theClient;
 
 @end
 
@@ -54,7 +55,7 @@ static NSURLSession *_session;
 - (id)initWithRequest:(NSURLRequest *)request cachedResponse:(NSCachedURLResponse *)cachedResponse client:(id<NSURLProtocolClient>)client {
     self = [super initWithRequest:request cachedResponse:cachedResponse client:client];
     if(self) {
-        CFRetain((__bridge CFTypeRef)(client));
+        self.theClient = client;
     }
     return self;
 }
