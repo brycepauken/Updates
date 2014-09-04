@@ -266,6 +266,7 @@ static NSData *keychainID;
                                 [keychainDictionary setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
                                 [keychainDictionary setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
                                 [keychainDictionary setObject:[hashedText dataUsingEncoding:NSUTF8StringEncoding] forKey:(__bridge id)kSecValueData];
+                                [keychainDictionary setObject:(__bridge id)(kSecAttrAccessibleWhenUnlockedThisDeviceOnly) forKey:(__bridge id)kSecAttrAccessible];
                                 SecItemAdd((__bridge CFDictionaryRef)keychainDictionary,NULL);
                                 finishBlock();
                             }];
@@ -331,6 +332,7 @@ static NSData *keychainID;
         [keychainDictionary setObject:keychainID forKey:(__bridge id)kSecAttrGeneric];
         [keychainDictionary setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
         [keychainDictionary setObject:[hashedText dataUsingEncoding:NSUTF8StringEncoding] forKey:(__bridge id)kSecValueData];
+        [keychainDictionary setObject:(__bridge id)(kSecAttrAccessibleWhenUnlockedThisDeviceOnly) forKey:(__bridge id)kSecAttrAccessible];
         SecItemAdd((__bridge CFDictionaryRef)keychainDictionary,NULL);
     };
     NSString *encryptedPassword = [self getEncryptedPassword:^(NSString *encryptedPass) {

@@ -168,7 +168,7 @@
                 }
                 [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newDifferenceOptions:newDifferenceOptions newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
                 if(queue.count) {
-                    UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row+1 inSection:0]];
+                    UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:((NSNumber *)[queue firstObject]).intValue inSection:0]];
                     [nextCell showSpinner];
                     [self refreshRowWithQueue:queue firstRequest:firstRequest];
                 }
