@@ -155,10 +155,12 @@
     [self setUserInteractionEnabled:NO];
     [self.interfaceOverlay setUserInteractionEnabled:NO];
     [self.scrollView setUserInteractionEnabled:NO];
+    [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:NO];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [self setAlpha:0];
         [self.scrollView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5)];
         [self.interfaceOverlay setAlpha:0];
+        [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setNeedsStatusBarAppearanceUpdate];
     } completion:^(BOOL finished) {
         [self removeFromSuperview];
         [self.interfaceOverlay removeFromSuperview];
