@@ -21,6 +21,7 @@
 
 @property (nonatomic, copy) void (^completionBlock)(NSString *newResponse);
 @property (nonatomic, copy) void (^countOccurrencesCompletion)(int count);
+@property (nonatomic, strong) NSTimer *timeoutTimer;
 @property (nonatomic, strong) NSString *searchString;
 @property (nonatomic, strong) UIWebView *webView;
 @property (nonatomic) int webViewLoadingCount;
@@ -59,6 +60,29 @@ static UIWindow *_window;
     [self.webView stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
 }
 
+- (void)complete {
+    if(self.completionBlock) {
+        void(^completionBlockCopy)(NSString *newResponse) = [self.completionBlock copy];
+        self.completionBlock = nil;
+        completionBlockCopy([self.webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"]);
+    }
+    
+    else if(self.countOccurrencesCompletion) {
+        void(^countOccurrencesCompletionCopy)(int count) = [self.countOccurrencesCompletion copy];
+        self.countOccurrencesCompletion = nil;
+        
+        static NSString *highlightJS;
+        static dispatch_once_t dispatchOnceToken;
+        dispatch_once(&dispatchOnceToken, ^{
+            highlightJS = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Highlight" ofType:@"js"] encoding:NSUTF8StringEncoding error:nil];
+        });
+        [self.webView stringByEvaluatingJavaScriptFromString:highlightJS];
+        
+        [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"UPDHighlightOccurrencesOfString(\"%@\");",self.searchString]];
+        countOccurrencesCompletionCopy([[self.webView stringByEvaluatingJavaScriptFromString:@"UPDHighlightCount"] intValue]);
+    }
+}
+
 - (void)countOccurrencesOfString:(NSString *)str inDocument:(NSString *)doc withBaseURL:(NSURL *)url withCompletionBlock:(void (^)(int count))completionBlock {
     if(!_urlProtocolRegistered) {
         _urlProtocolRegistered = YES;
@@ -90,6 +114,12 @@ static UIWindow *_window;
     [self.webView loadHTMLString:doc baseURL:url];
 }
 
+- (void)resetTimer {
+    [self.timeoutTimer invalidate];
+    [self setTimeoutTimer:nil];
+    self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(timeout) userInfo:nil repeats:NO];
+}
+
 - (void)setupWebView {
     self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 320, 568)];
     [self.webView setDelegate:self];
@@ -97,37 +127,27 @@ static UIWindow *_window;
     [_window addSubview:self.webView];
 }
 
+- (void)timeout {
+    [self.timeoutTimer invalidate];
+    [self setTimeoutTimer:nil];
+    [self complete];
+}
+
 #pragma mark - UIWebView Delegate Methods
 
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     self.webViewLoadingCount++;
+    [self resetTimer];
 }
 
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     self.webViewLoadingCount--;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if(self.webViewLoadingCount == 0) {
-            if(self.completionBlock) {
-                void(^completionBlockCopy)(NSString *newResponse) = [self.completionBlock copy];
-                self.completionBlock = nil;
-                completionBlockCopy([webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"]);
-            }
-            
-            else if(self.countOccurrencesCompletion) {
-                void(^countOccurrencesCompletionCopy)(int count) = [self.countOccurrencesCompletion copy];
-                self.countOccurrencesCompletion = nil;
-                
-                static NSString *highlightJS;
-                static dispatch_once_t dispatchOnceToken;
-                dispatch_once(&dispatchOnceToken, ^{
-                    highlightJS = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Highlight" ofType:@"js"] encoding:NSUTF8StringEncoding error:nil];
-                });
-                [self.webView stringByEvaluatingJavaScriptFromString:highlightJS];
-                
-                [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"UPDHighlightOccurrencesOfString(\"%@\");",self.searchString]];
-                countOccurrencesCompletionCopy([[self.webView stringByEvaluatingJavaScriptFromString:@"UPDHighlightCount"] intValue]);
-            }
+            [self.timeoutTimer invalidate];
+            [self setTimeoutTimer:nil];
+            [self complete];
         }
     });
 }
