@@ -21,6 +21,7 @@
 @property (nonatomic) BOOL hideMessageReceived;
 @property (nonatomic, strong) NSDate *lastUpdated;
 @property (nonatomic, strong) UPDLoadingCircle *loadingCircle;
+@property (nonatomic, strong) UIImageView *loadingCircleSpinner;
 @property (nonatomic, strong) UIImageView *lockIcon;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UILabel *updatedLabel;
@@ -51,6 +52,17 @@
         self.loadingCircle = [[UPDLoadingCircle alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
         [self.loadingCircle setColor:[UIColor UPDLightWhiteBlueColor]];
         [self addSubview:self.loadingCircle];
+        
+        self.loadingCircleSpinner = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
+        [self.loadingCircleSpinner setImage:[UIImage imageNamed:@"SmallOutlineQuarter"]];
+        [self.loadingCircleSpinner setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1.18, 1.18)];
+        [self addSubview:self.loadingCircleSpinner];
+        CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        [rotationAnimation setCumulative:YES];
+        [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
+        [rotationAnimation setRepeatCount:MAXFLOAT];
+        [rotationAnimation setToValue:@(M_PI*2)];
+        [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
         
         self.lockIcon = [[UIImageView alloc] init];
         [self.lockIcon setImage:[UIImage imageNamed:@"Lock"]];
@@ -121,6 +133,7 @@
     [self.updatedLabel setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height/2+10, self.bounds.size.width-UPD_TABLEVIEW_CELL_LEFT_WIDTH-rightPadding, updatedLabelSize.height)];
     [self positionLeftSide];
     [self.loadingCircle setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
+    [self.loadingCircleSpinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.bar setFrame:CGRectMake(0, 0, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
 }
