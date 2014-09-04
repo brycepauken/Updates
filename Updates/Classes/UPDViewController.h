@@ -10,9 +10,10 @@
 
 @class UPDInterface;
 
-@interface UPDViewController : UIViewController
+@interface UPDViewController : UIViewController <UIGestureRecognizerDelegate>
 
 @property (nonatomic) BOOL hideStatusBar;
 @property (nonatomic, strong) UPDInterface *interface;
+@property (nonatomic) BOOL registersTaps;
 
 @end

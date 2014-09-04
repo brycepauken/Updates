@@ -102,6 +102,7 @@
 		02D251361994492400BBEDBE /* Lock@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251341994492400BBEDBE /* Lock@2x.png */; };
 		02D251391994B7F400BBEDBE /* Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251371994B7F400BBEDBE /* Settings.png */; };
 		02D2513A1994B7F400BBEDBE /* Settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D251381994B7F400BBEDBE /* Settings@2x.png */; };
+		02EB7A9A19B6953D00A93686 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02EB7A9919B6953D00A93686 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -255,6 +256,7 @@
 		02D251341994492400BBEDBE /* Lock@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Lock@2x.png"; path = "Resources/Images/Lock@2x.png"; sourceTree = "<group>"; };
 		02D251371994B7F400BBEDBE /* Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Settings.png; path = Resources/Images/Settings.png; sourceTree = "<group>"; };
 		02D251381994B7F400BBEDBE /* Settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Settings@2x.png"; path = "Resources/Images/Settings@2x.png"; sourceTree = "<group>"; };
+		02EB7A9919B6953D00A93686 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -262,10 +264,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */,
 				023346DB199580020028DAF5 /* MessageUI.framework in Frameworks */,
 				02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */,
 				02D251241992C39500BBEDBE /* Security.framework in Frameworks */,
-				0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */,
+				02EB7A9A19B6953D00A93686 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,10 +304,11 @@
 		0213C2371974FE0C006BC204 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				0253CD27197F9E800078E90E /* libxml2.2.dylib */,
 				023346D919957FF30028DAF5 /* MessageUI.framework */,
 				02D251251992C3A300BBEDBE /* QuartzCore.framework */,
 				02D251231992C39400BBEDBE /* Security.framework */,
-				0253CD27197F9E800078E90E /* libxml2.2.dylib */,
+				02EB7A9919B6953D00A93686 /* SystemConfiguration.framework */,
 				0239FCF1199DD05C001F5027 /* Help.plist */,
 				0213C2411974FE0C006BC204 /* Images.xcassets */,
 				0213C2381974FE0C006BC204 /* Info.plist */,

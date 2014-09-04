@@ -21,6 +21,7 @@
 
 - (void)dismiss;
 - (void)setFontSize:(CGFloat)fontSize;
+- (void)setOkButtonTitle:(NSString *)okButtonTitle;
 - (void)show;
 
 @end

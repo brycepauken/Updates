@@ -236,6 +236,10 @@
     [self.titleLabel setFont:[UIFont fontWithName:@"Futura-Medium" size:fontSize+2]];
 }
 
+- (void)setOkButtonTitle:(NSString *)okButtonTitle {
+    [self.okButton setTitle:okButtonTitle];
+}
+
 - (void)setTitle:(NSString *)title {
     _title = [title uppercaseString];
 }

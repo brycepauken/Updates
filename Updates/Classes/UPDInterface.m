@@ -29,6 +29,7 @@
 #import "UPDSettingsView.h"
 #import "UPDTableView.h"
 #import "UPDURLProtocol.h"
+#import "UPDViewController.h"
 
 @interface UPDInterface ()
 
@@ -69,9 +70,11 @@
             }];
         }];
         [self.navigationBar setSettingsButtonBlock:^{
+            ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.registersTaps = YES;
             UPDSettingsView *settingsView = [[UPDSettingsView alloc] init];
             __unsafe_unretained UPDSettingsView *weakSettingsView = settingsView;
             [settingsView setCloseButtonBlock:^{
+                ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.registersTaps = NO;
                 [weakSettingsView dismiss];
             }];
             [settingsView show];
