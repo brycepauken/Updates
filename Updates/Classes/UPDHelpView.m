@@ -122,7 +122,7 @@ static NSArray *_questions;
     UPDAlertView *alertView = [[UPDAlertView alloc] init];
     __unsafe_unretained UPDAlertView *weakAlertView = alertView;
     [alertView setTitle:[[_questions objectAtIndex:indexPath.row] objectAtIndex:0]];
-    [alertView setMessage:[[_questions objectAtIndex:indexPath.row] objectAtIndex:1]];
+    [alertView setMessage:[[[_questions objectAtIndex:indexPath.row] objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\\n" withString:@"\n"]];
     [alertView setOkButtonBlock:^{
         [weakAlertView dismiss];
     }];
