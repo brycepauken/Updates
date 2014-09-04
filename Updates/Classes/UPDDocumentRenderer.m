@@ -118,7 +118,7 @@ static UIWindow *_window;
 - (void)resetTimer {
     [self.timeoutTimer invalidate];
     [self setTimeoutTimer:nil];
-    self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(timeout) userInfo:nil repeats:NO];
+    self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(timeout) userInfo:nil repeats:NO];
 }
 
 - (void)setupWebView {
