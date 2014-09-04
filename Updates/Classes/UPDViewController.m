@@ -78,6 +78,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return self.hideStatusBar;
 }
 
+- (void)setRegistersTaps:(BOOL)registersTaps {
+    _registersTaps = registersTaps;
+    if(!registersTaps) {
+        self.taps = [NSMutableArray new];
+    }
+}
+
 - (void)setupHiddenAlerts {
     self.hiddenAlerts = @[@{@"tapCount":@(16),@"decryption":@"LF+Obv7NUbPuhye5bCisaw==",@"title":@"Gifa/+BaTNkR6pkPinH8Ns72mwg7y1Og1yfazA3feDk=",@"message":@"PabBsnQyFmPTIg7fGNWmxj391ImMCv0V505CjkwvWJsEy6zEFYZTY6ooSwzaeq/CAJxexCTY0bQ1aEvhPjh5WIjCK7Dbn9vBPU4h6+YoL9u4V2bTMpF3+KC66zXtIj3aWZzNpc5TaTOBiXMTUtc+IbdZhVqD+rzZ8vd/SDhdKTwFbiwLXbTA/Ny4f4WiCRWP",@"button":@"ROJ/OrBwkfd+LptEqkle4Q=="}];
     
