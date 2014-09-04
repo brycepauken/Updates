@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UPDHelpView : UIView
+@interface UPDHelpView : UIView <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, copy) void (^closeButtonBlock)();
 

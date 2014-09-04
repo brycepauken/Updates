@@ -8,7 +8,9 @@
 
 #import "UPDHelpView.h"
 
+#import "UPDAlertView.h"
 #import "UPDAppDelegate.h"
+#import "UPDHelpViewCell.h"
 #import "UPDInterface.h"
 #import "UPDViewController.h"
 
@@ -16,10 +18,20 @@
 
 @property (nonatomic, strong) UIButton *closeButton;
 @property (nonatomic, strong) UIView *interfaceOverlay;
+@property (nonatomic, strong) UITableView *tableView;
 
 @end
 
 @implementation UPDHelpView
+
+static NSArray *_questions;
+
++ (void)initialize {
+    static dispatch_once_t dispatchOnceToken;
+    dispatch_once(&dispatchOnceToken, ^{
+        _questions = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Help" ofType:@"plist"]];
+    });
+}
 
 - (instancetype)init {
     self = [super init];
@@ -35,6 +47,13 @@
         [self.interfaceOverlay setBackgroundColor:[UIColor UPDOffBlackColor]];
         [self.interfaceOverlay setUserInteractionEnabled:YES];
         
+        self.tableView = [[UITableView alloc] init];
+        [self.tableView setBackgroundColor:[UIColor UPDLightBlueColor]];
+        [self.tableView setDataSource:self];
+        [self.tableView setDelegate:self];
+        [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        [self addSubview:self.tableView];
+        
         self.closeButton = [[UIButton alloc] init];
         [self.closeButton addTarget:self action:@selector(closeButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.closeButton setBackgroundColor:[UIColor UPDLightGreyBlueColor]];
@@ -47,6 +66,8 @@
         [self.closeButton.layer setShadowOpacity:0.5];
         [self.closeButton.layer setShadowRadius:1];
         [self addSubview:self.closeButton];
+        
+        [self.tableView registerClass:[UPDHelpViewCell class] forCellReuseIdentifier:@"UPDHelpViewCell"];
     }
     return self;
 }
@@ -81,6 +102,42 @@
     [self.closeButton setFrame:CGRectMake(-UPD_ALERT_CANCEL_BUTTON_SIZE/2, -UPD_ALERT_CANCEL_BUTTON_SIZE/2, UPD_ALERT_CANCEL_BUTTON_SIZE, UPD_ALERT_CANCEL_BUTTON_SIZE)];
 }
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UPDHelpViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UPDHelpViewCell"];
+    if(!cell) {
+        cell = [[UPDHelpViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"UPDHelpViewCell"];
+    }
+    [cell setBottomDividerHidden:indexPath.row<[self tableView:tableView numberOfRowsInSection:indexPath.section]-1];
+    [cell setText:[[_questions objectAtIndex:indexPath.row] objectAtIndex:0]];
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
+    UPDAlertView *alertView = [[UPDAlertView alloc] init];
+    __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+    [alertView setTitle:[[_questions objectAtIndex:indexPath.row] objectAtIndex:0]];
+    [alertView setMessage:[[_questions objectAtIndex:indexPath.row] objectAtIndex:1]];
+    [alertView setOkButtonBlock:^{
+        [weakAlertView dismiss];
+    }];
+    [alertView show];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CGSize labelSize = [[[_questions objectAtIndex:indexPath.row] objectAtIndex:0] boundingRectWithSize:CGSizeMake(UPD_ALERT_WIDTH-UPD_ALERT_PADDING*2, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont fontWithName:@"Futura-Medium" size:UPD_HELPVIEW_CELL_FONT_SIZE]} context:nil].size;
+    return ceilf(labelSize.height)+UPD_ALERT_PADDING*2;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [_questions count];
+}
+
 - (void)show {
     UIView *interface = ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.interface;
     
@@ -91,6 +148,7 @@
     [self layoutSubviews];
     
     [self setFrame:CGRectMake((interface.bounds.size.width-UPD_ALERT_WIDTH)/2, (interface.bounds.size.height-UPD_HELPVIEW_HEIGHT)/2, UPD_ALERT_WIDTH, UPD_HELPVIEW_HEIGHT)];
+    [self.tableView setFrame:self.bounds];
     [interface addSubview:self];
     
     /*begin settings animation*/

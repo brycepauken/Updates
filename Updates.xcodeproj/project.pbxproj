@@ -37,6 +37,7 @@
 		0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0253CD27197F9E800078E90E /* libxml2.2.dylib */; };
 		0263499C19B8574E00365696 /* SmallOutlineQuarter.png in Resources */ = {isa = PBXBuildFile; fileRef = 0263499A19B8574E00365696 /* SmallOutlineQuarter.png */; };
 		0263499D19B8574E00365696 /* SmallOutlineQuarter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0263499B19B8574E00365696 /* SmallOutlineQuarter@2x.png */; };
+		026349A019B8668400365696 /* UPDHelpViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0263499F19B8668400365696 /* UPDHelpViewCell.m */; };
 		02644070197DBBA7009CE430 /* CancelLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406E197DBBA7009CE430 /* CancelLarge.png */; };
 		02644071197DBBA7009CE430 /* CancelLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406F197DBBA7009CE430 /* CancelLarge@2x.png */; };
 		02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644073197DBC0D009CE430 /* UPDBrowserCancelButton.m */; };
@@ -157,6 +158,8 @@
 		0253CD27197F9E800078E90E /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = usr/lib/libxml2.2.dylib; sourceTree = SDKROOT; };
 		0263499A19B8574E00365696 /* SmallOutlineQuarter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallOutlineQuarter.png; path = Resources/Images/SmallOutlineQuarter.png; sourceTree = "<group>"; };
 		0263499B19B8574E00365696 /* SmallOutlineQuarter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SmallOutlineQuarter@2x.png"; path = "Resources/Images/SmallOutlineQuarter@2x.png"; sourceTree = "<group>"; };
+		0263499E19B8668400365696 /* UPDHelpViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDHelpViewCell.h; path = Classes/UPDHelpViewCell.h; sourceTree = "<group>"; };
+		0263499F19B8668400365696 /* UPDHelpViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDHelpViewCell.m; path = Classes/UPDHelpViewCell.m; sourceTree = "<group>"; };
 		0264406E197DBBA7009CE430 /* CancelLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CancelLarge.png; path = Resources/Images/CancelLarge.png; sourceTree = "<group>"; };
 		0264406F197DBBA7009CE430 /* CancelLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CancelLarge@2x.png"; path = "Resources/Images/CancelLarge@2x.png"; sourceTree = "<group>"; };
 		02644072197DBC0D009CE430 /* UPDBrowserCancelButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserCancelButton.h; path = Classes/UPDBrowserCancelButton.h; sourceTree = "<group>"; };
@@ -436,6 +439,8 @@
 				02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */,
 				0239FCF3199DD1E5001F5027 /* UPDHelpView.h */,
 				0239FCF4199DD1E5001F5027 /* UPDHelpView.m */,
+				0263499E19B8668400365696 /* UPDHelpViewCell.h */,
+				0263499F19B8668400365696 /* UPDHelpViewCell.m */,
 				02AF8755197A3124007D06C5 /* UPDInstructionAccumulator.h */,
 				02AF8756197A3124007D06C5 /* UPDInstructionAccumulator.m */,
 				0253CD22197F90420078E90E /* UPDInstructionProcessor.h */,
@@ -600,6 +605,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				026349A019B8668400365696 /* UPDHelpViewCell.m in Sources */,
 				02C940F919B3A60B0043CD34 /* UPDLoadingCircleLayer.m in Sources */,
 				02934A3D19840C6A00FEBB03 /* UPDInternalUpdate.m in Sources */,
 				023346D51994C6250028DAF5 /* UPDSettingsView.m in Sources */,
