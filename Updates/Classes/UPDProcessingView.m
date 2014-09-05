@@ -24,6 +24,7 @@
 
 @interface UPDProcessingView()
 
+@property (nonatomic) BOOL animationCompleted;
 @property (nonatomic) BOOL canComplete;
 @property (nonatomic, strong) UIImageView *checkmark;
 @property (nonatomic, strong) UILabel *checkTypeLabel;
@@ -49,6 +50,7 @@
 @property (nonatomic, strong) UIImageView *outlineQuarter;
 @property (nonatomic, strong) UPDButton *processingButton;
 @property (nonatomic, strong) UILabel *processingLabel;
+@property (nonatomic) CGFloat progressBeforeAnimation;
 @property (nonatomic, strong) UILabel *protectLabel;
 @property (nonatomic, strong) UPDButton *protectButtonNo;
 @property (nonatomic, strong) UPDButton *protectButtonWhy;
@@ -317,6 +319,12 @@
         
         [self.processingButton setAlpha:1];
         [self.processingLabel setAlpha:1];
+    } completion:^(BOOL finished) {
+        self.animationCompleted = YES;
+        if(self.progressBeforeAnimation>=0) {
+            [self.loadingCircle setProgress:self.progressBeforeAnimation];
+        }
+        self.progressBeforeAnimation = -1;
     }];
 }
 
@@ -507,6 +515,8 @@
 - (void)processInstructions:(NSArray *)instructions forURL:(NSString *)url withFinalResponse:(NSString *)finalResponse withTimerResult:(NSTimeInterval)timerResult withOrigDate:(NSDate *)origDate {
     self.instructions = nil;
     self.canComplete = NO;
+    self.animationCompleted = NO;
+    self.progressBeforeAnimation = -1;
     [self scrollToPage:0 animated:NO];
     [self.processingLabel setAlpha:0];
     [self.processingButton setAlpha:0];
@@ -545,7 +555,12 @@
         });
     }];
     [self.instructionProcessor setProgressBlock:^(CGFloat progress) {
-        [weakSelf.loadingCircle setProgress:progress];
+        if(weakSelf.animationCompleted) {
+            [weakSelf.loadingCircle setProgress:progress];
+        }
+        else {
+            weakSelf.progressBeforeAnimation = progress;
+        }
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [self.instructionProcessor beginProcessingWithLastInstructionBlock:^(UPDInternalInstruction *lastInstruction) {
