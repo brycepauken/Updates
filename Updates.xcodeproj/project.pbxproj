@@ -38,6 +38,8 @@
 		0263499C19B8574E00365696 /* SmallOutlineQuarter.png in Resources */ = {isa = PBXBuildFile; fileRef = 0263499A19B8574E00365696 /* SmallOutlineQuarter.png */; };
 		0263499D19B8574E00365696 /* SmallOutlineQuarter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0263499B19B8574E00365696 /* SmallOutlineQuarter@2x.png */; };
 		026349A019B8668400365696 /* UPDHelpViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0263499F19B8668400365696 /* UPDHelpViewCell.m */; };
+		026349A519B8901600365696 /* UPDUpgradeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 026349A419B8901600365696 /* UPDUpgradeController.m */; };
+		026349A719BA144900365696 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 026349A619BA144900365696 /* StoreKit.framework */; };
 		02644070197DBBA7009CE430 /* CancelLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406E197DBBA7009CE430 /* CancelLarge.png */; };
 		02644071197DBBA7009CE430 /* CancelLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406F197DBBA7009CE430 /* CancelLarge@2x.png */; };
 		02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644073197DBC0D009CE430 /* UPDBrowserCancelButton.m */; };
@@ -160,6 +162,9 @@
 		0263499B19B8574E00365696 /* SmallOutlineQuarter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SmallOutlineQuarter@2x.png"; path = "Resources/Images/SmallOutlineQuarter@2x.png"; sourceTree = "<group>"; };
 		0263499E19B8668400365696 /* UPDHelpViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDHelpViewCell.h; path = Classes/UPDHelpViewCell.h; sourceTree = "<group>"; };
 		0263499F19B8668400365696 /* UPDHelpViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDHelpViewCell.m; path = Classes/UPDHelpViewCell.m; sourceTree = "<group>"; };
+		026349A319B8901600365696 /* UPDUpgradeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDUpgradeController.h; path = Classes/UPDUpgradeController.h; sourceTree = "<group>"; };
+		026349A419B8901600365696 /* UPDUpgradeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDUpgradeController.m; path = Classes/UPDUpgradeController.m; sourceTree = "<group>"; };
+		026349A619BA144900365696 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		0264406E197DBBA7009CE430 /* CancelLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CancelLarge.png; path = Resources/Images/CancelLarge.png; sourceTree = "<group>"; };
 		0264406F197DBBA7009CE430 /* CancelLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CancelLarge@2x.png"; path = "Resources/Images/CancelLarge@2x.png"; sourceTree = "<group>"; };
 		02644072197DBC0D009CE430 /* UPDBrowserCancelButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserCancelButton.h; path = Classes/UPDBrowserCancelButton.h; sourceTree = "<group>"; };
@@ -274,6 +279,7 @@
 				0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */,
 				023346DB199580020028DAF5 /* MessageUI.framework in Frameworks */,
 				02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */,
+				026349A719BA144900365696 /* StoreKit.framework in Frameworks */,
 				02D251241992C39500BBEDBE /* Security.framework in Frameworks */,
 				02EB7A9A19B6953D00A93686 /* SystemConfiguration.framework in Frameworks */,
 			);
@@ -285,6 +291,7 @@
 		0213C22B1974FE0C006BC204 = {
 			isa = PBXGroup;
 			children = (
+				026349A619BA144900365696 /* StoreKit.framework */,
 				0213C2361974FE0C006BC204 /* Updates */,
 				0213C2351974FE0C006BC204 /* Products */,
 			);
@@ -491,6 +498,8 @@
 				02260FFC198D99880086326D /* UPDTextSearchView.m */,
 				02901A351984B38100274AAE /* UPDTimer.h */,
 				02901A361984B38100274AAE /* UPDTimer.m */,
+				026349A319B8901600365696 /* UPDUpgradeController.h */,
+				026349A419B8901600365696 /* UPDUpgradeController.m */,
 				02AF8752197A2F9C007D06C5 /* UPDURLProtocol.h */,
 				02AF8753197A2F9C007D06C5 /* UPDURLProtocol.m */,
 				02A73D131975C24B000A7C48 /* UPDViewController.h */,
@@ -531,6 +540,11 @@
 					0213C2331974FE0C006BC204 = {
 						CreatedOnToolsVersion = 6.0;
 						DevelopmentTeam = FGFSR7EX83;
+						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -611,6 +625,7 @@
 				023346D51994C6250028DAF5 /* UPDSettingsView.m in Sources */,
 				02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */,
 				02AF876B197BA831007D06C5 /* UPDAlertViewButton.m in Sources */,
+				026349A519B8901600365696 /* UPDUpgradeController.m in Sources */,
 				02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */,
 				0253CD21197F2D1E0078E90E /* UPDProcessingView.m in Sources */,
 				02A733F3197724A6002A86F3 /* UPDPreBrowserTextField.m in Sources */,

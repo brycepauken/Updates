@@ -16,6 +16,7 @@
 
 #import "UPDStartView.h"
 #import "UPDTimer.h"
+#import "UPDUpgradeController.h"
 #import "UPDViewController.h"
 
 @implementation UPDAppDelegate
@@ -29,6 +30,7 @@
  */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [UPDCommon initialize];
+    [UPDUpgradeController initialize];
     
     /*preload the keyboard*/
     UITextField *field = [UITextField new];

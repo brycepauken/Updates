@@ -18,6 +18,7 @@
 #import "CoreDataModelUpdateList.h"
 #import "NSData+UPDExtensions.h"
 #import "QuartzCore/CALayer.h"
+#import "UPDAlertView.h"
 #import "UPDAppDelegate.h"
 #import "UPDBrowserView.h"
 #import "UPDChangesView.h"
@@ -28,6 +29,7 @@
 #import "UPDProcessingView.h"
 #import "UPDSettingsView.h"
 #import "UPDTableView.h"
+#import "UPDUpgradeController.h"
 #import "UPDURLProtocol.h"
 #import "UPDViewController.h"
 
@@ -63,11 +65,31 @@
         self.navigationBar = [[UPDNavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT)];
         [self.navigationBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [self.navigationBar setAddButtonBlock:^{
-            [weakSelf.preBrowserView reset];
-            [weakSelf.scrollView setTag:1];
-            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
-               [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
-            }];
+            if([weakSelf.tableView numberOfRowsInSection:0]<3||[UPDUpgradeController purchasedUpgrade]) {
+                [weakSelf.preBrowserView reset];
+                [weakSelf.scrollView setTag:1];
+                [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                    [weakSelf.scrollView setContentOffset:CGPointMake(weakSelf.scrollView.bounds.size.width, 0)];
+                }];
+            }
+            else {
+                UPDAlertView *alertView = [[UPDAlertView alloc] init];
+                __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+                [alertView setTitle:@"Out of Updates"];
+                [alertView setMessage:@"You need to upgrade the Updates app before watching any more web pages.\n\nWould you like to upgrade now? It only costs a dollar for unlimited updates!"];
+                [alertView setFontSize:16];
+                [alertView setMinTextLength:6];
+                [alertView setYesButtonBlock:^{
+                    [UPDUpgradeController purchaseUpgradeWithCompletionBlock:^{
+                        NSLog(@"complete");
+                    }];
+                    [weakAlertView dismiss];
+                }];
+                [alertView setNoButtonBlock:^{
+                    [weakAlertView dismiss];
+                }];
+                [alertView show];
+            }
         }];
         [self.navigationBar setSettingsButtonBlock:^{
             ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.registersTaps = YES;
