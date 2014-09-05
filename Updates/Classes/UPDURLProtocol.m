@@ -22,7 +22,8 @@
 @property (nonatomic, strong) NSMutableArray *redirectedTasks;
 @property (nonatomic, strong) NSLock *redirectedTasksLock;
 @property (nonatomic, strong) NSURLSessionTask *task;
-@property (nonatomic) id<NSURLProtocolClient> theClient;
+@property (nonatomic, strong) NSObject<NSURLProtocolClient> *theClient;
+@property (nonatomic, strong) UPDURLProtocol *theSelf;
 
 @end
 
@@ -52,10 +53,20 @@ static NSURLSession *_session;
     _instancesLock = [NSLock new];
 }
 
+- (void)freeResources {
+    self.theSelf = nil;
+    self.theClient = nil;
+    self.data = nil;
+    self.redirectedTasks = nil;
+    self.redirectedTasksLock = nil;
+    self.task = nil;
+}
+
 - (id)initWithRequest:(NSURLRequest *)request cachedResponse:(NSCachedURLResponse *)cachedResponse client:(id<NSURLProtocolClient>)client {
     self = [super initWithRequest:request cachedResponse:cachedResponse client:client];
     if(self) {
         self.theClient = client;
+        self.theSelf = self;
     }
     return self;
 }
@@ -81,8 +92,9 @@ static NSURLSession *_session;
 }
 
 - (void)startLoading {
+    self.theSelf = self;
     [_instancesLock lock];
-    [_instances addObject:self]; /*we need the strong reference, actually*/
+    [_instances addObject:self];
     [_instancesLock unlock];
     
     self.data = [[NSMutableData alloc] init];
@@ -93,9 +105,7 @@ static NSURLSession *_session;
     [self.task resume];
 }
 
-- (void)stopLoading {
-    
-}
+- (void)stopLoading {}
 
 + (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     UPDURLProtocol *instance;
@@ -137,6 +147,7 @@ static NSURLSession *_session;
         completionHandler(NSURLSessionResponseAllow);
         if(didCancel) {
             [instance.client URLProtocolDidFinishLoading:instance];
+            [instance freeResources];
         }
     }
 }
@@ -184,6 +195,7 @@ static NSURLSession *_session;
                 [instance.client URLProtocol:instance didFailWithError:error];
             }
         }
+        [instance freeResources];
     }
 }
 
