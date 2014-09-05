@@ -57,12 +57,6 @@
         [self.loadingCircleSpinner setImage:[UIImage imageNamed:@"SmallOutlineQuarter"]];
         [self.loadingCircleSpinner setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1.18, 1.18)];
         [self addSubview:self.loadingCircleSpinner];
-        CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-        [rotationAnimation setCumulative:YES];
-        [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
-        [rotationAnimation setRepeatCount:MAXFLOAT];
-        [rotationAnimation setToValue:@(M_PI*2)];
-        [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
         
         self.lockIcon = [[UIImageView alloc] init];
         [self.lockIcon setImage:[UIImage imageNamed:@"Lock"]];
@@ -115,6 +109,7 @@
     if(elapsedTime>=0.2) {
         [self.displayLink invalidate];
         [self setBounds:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
+        [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
     }
 }
 
@@ -242,6 +237,14 @@
     if(!self.startTimestamp) {
         self.startTimestamp = self.displayLink.timestamp;
     }
+    [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
+    CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    [rotationAnimation setCumulative:YES];
+    [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
+    [rotationAnimation setRepeatCount:MAXFLOAT];
+    [rotationAnimation setToValue:@(M_PI*2)];
+    [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    
     CFTimeInterval elapsedTime = (self.displayLink.timestamp - self.startTimestamp);
     CGFloat mappedTime;
     if(elapsedTime<=0.5) {
