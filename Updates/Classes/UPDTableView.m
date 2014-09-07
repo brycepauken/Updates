@@ -42,7 +42,6 @@
         [self setDataSource:self];
         [self setDelegate:self];
         
-        [self setAllowsMultipleSelectionDuringEditing:NO];
         [self setBackgroundColor:[UIColor UPDLightGreyColor]];
         [self setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         
@@ -174,6 +173,9 @@
                 }
                 else {
                     [self endRefresh];
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        [self beginRefresh];
+                    });
                 }
             }];
         };
@@ -486,7 +488,7 @@
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+/*- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSManagedObjectID *objectID = ((UPDInternalUpdate *)[self.updates objectAtIndex:indexPath.row]).objectID;
         [self.updates removeObjectAtIndex:indexPath.row];
@@ -518,7 +520,7 @@
             }
         }];
     }
-}
+}*/
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];

@@ -16,6 +16,7 @@
 @property (nonatomic, strong) UIView *bar;
 @property (nonatomic) BOOL canHide;
 @property (nonatomic, strong) UIView *circleView;
+@property (nonatomic, strong) UIView *content;
 @property (nonatomic, strong) UIView *divider;
 @property (nonatomic, strong) UIImageView *faviconView;
 @property (nonatomic) BOOL hideMessageReceived;
@@ -24,6 +25,7 @@
 @property (nonatomic, strong) UIImageView *loadingCircleSpinner;
 @property (nonatomic, strong) UIImageView *lockIcon;
 @property (nonatomic, strong) UILabel *nameLabel;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UILabel *updatedLabel;
 @property (nonatomic, strong) NSTimer *updatedLabelTimer;
 
@@ -39,28 +41,37 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         [self setClipsToBounds:YES];
+        self.canHide = YES;
+        self.hideMessageReceived = YES;
         
         self.divider = [[UIView alloc] init];
         [self.divider setBackgroundColor:[UIColor UPDLightGreyColor]];
         [self.divider setHidden:YES];
         [self addSubview:self.divider];
         
+        self.scrollView = [[UIScrollView alloc] init];
+        [self.scrollView setScrollsToTop:NO];
+        [self addSubview:self.scrollView];
+        
+        self.content = [[UIView alloc] init];
+        [self.scrollView addSubview:self.content];
+        
         self.bar = [[UIView alloc] init];
         [self.bar setBackgroundColor:[UIColor whiteColor]];
-        [self addSubview:self.bar];
+        [self.content addSubview:self.bar];
         
         self.loadingCircle = [[UPDLoadingCircle alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
         [self.loadingCircle setColor:[UIColor UPDLightWhiteBlueColor]];
-        [self addSubview:self.loadingCircle];
+        [self.content addSubview:self.loadingCircle];
         
         self.loadingCircleSpinner = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
         [self.loadingCircleSpinner setImage:[UIImage imageNamed:@"SmallOutlineQuarter"]];
         [self.loadingCircleSpinner setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1.18, 1.18)];
-        [self addSubview:self.loadingCircleSpinner];
+        [self.content addSubview:self.loadingCircleSpinner];
         
         self.lockIcon = [[UIImageView alloc] init];
         [self.lockIcon setImage:[UIImage imageNamed:@"Lock"]];
-        [self addSubview:self.lockIcon];
+        [self.content addSubview:self.lockIcon];
         
         self.circleView = [[UIView alloc] init];
         [self.circleView setAlpha:0];
@@ -69,20 +80,20 @@
         [self.circleView.layer setShadowOffset:CGSizeZero];
         [self.circleView.layer setShadowOpacity:0.5];
         [self.circleView.layer setShadowRadius:1];
-        [self addSubview:self.circleView];
+        [self.content addSubview:self.circleView];
         
         self.faviconView = [[UIImageView alloc] init];
-        [self addSubview:self.faviconView];
+        [self.content addSubview:self.faviconView];
         
         self.nameLabel = [[UILabel alloc] init];
         [self.nameLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:22]];
         [self.nameLabel setTextColor:[UIColor UPDOffBlackColor]];
-        [self addSubview:self.nameLabel];
+        [self.content addSubview:self.nameLabel];
         
         self.updatedLabel = [[UILabel alloc] init];
         [self.updatedLabel setFont:[UIFont systemFontOfSize:14]];
         [self.updatedLabel setTextColor:[UIColor grayColor]];
-        [self addSubview:self.updatedLabel];
+        [self.content addSubview:self.updatedLabel];
     }
     return self;
 }
@@ -99,7 +110,7 @@
     }
     CFTimeInterval elapsedTime = (self.displayLink.timestamp - self.startTimestamp);
     CGFloat mappedTime = -2.5*(elapsedTime*2)*(elapsedTime*2)+3.5*(elapsedTime*2);
-    [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH*mappedTime, 0, self.bounds.size.width, self.bounds.size.height)];
+    [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH*(mappedTime), 0)];
     
     if(elapsedTime>=0.1&&self.contactBlock) {
         void (^contactBlock)() = self.contactBlock;
@@ -107,9 +118,11 @@
         contactBlock();
     }
     if(elapsedTime>=0.2) {
+        [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
+        [self updateScrollViewContentSize];
+        [self.scrollView setScrollEnabled:YES];
         [self.displayLink invalidate];
         [self setBounds:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
-        [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
     }
 }
 
@@ -131,6 +144,9 @@
     [self.loadingCircleSpinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.bar setFrame:CGRectMake(0, 0, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
+    
+    [self.scrollView setFrame:self.bounds];
+    [self updateScrollViewContentSize];
 }
 
 - (void)positionLeftSide {
@@ -217,8 +233,19 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {}
 
 - (void)showSpinner {
+    [self.scrollView setScrollEnabled:NO];
     [self setCanHide:NO];
     [self setHideMessageReceived:NO];
+    [self updateScrollViewContentSize];
+    [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0)];
+    
+    [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
+    CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    [rotationAnimation setCumulative:YES];
+    [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
+    [rotationAnimation setRepeatCount:MAXFLOAT];
+    [rotationAnimation setToValue:@(M_PI*2)];
+    [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     
     self.startTimestamp = 0;
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(showSpinnerAnimation)];
@@ -237,14 +264,6 @@
     if(!self.startTimestamp) {
         self.startTimestamp = self.displayLink.timestamp;
     }
-    [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
-    CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    [rotationAnimation setCumulative:YES];
-    [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
-    [rotationAnimation setRepeatCount:MAXFLOAT];
-    [rotationAnimation setToValue:@(M_PI*2)];
-    [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
-    
     CFTimeInterval elapsedTime = (self.displayLink.timestamp - self.startTimestamp);
     CGFloat mappedTime;
     if(elapsedTime<=0.5) {
@@ -253,12 +272,11 @@
     else {
         mappedTime = -1.6*(elapsedTime*2)*(elapsedTime*2)+4*(elapsedTime*2)-1.4;
     }
-    [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH*mappedTime, 0, self.bounds.size.width, self.bounds.size.height)];
-
+    [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH*(1-mappedTime), 0)];
+    
     if(elapsedTime>=0.75) {
         [self.displayLink invalidate];
-        
-        [self setBounds:CGRectMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0, self.bounds.size.width, self.bounds.size.height)];
+        [self.scrollView setContentOffset:CGPointZero];
     }
 }
 
@@ -279,6 +297,17 @@
     }
     else {
         [self.updatedLabel setText:@"Never updated"];
+    }
+}
+
+- (void)updateScrollViewContentSize {
+    if(self.canHide&&self.hideMessageReceived) {
+        [self.scrollView setContentSize:CGSizeMake(self.bounds.size.width+1, self.bounds.size.height)];
+        [self.content setFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
+    }
+    else {
+        [self.scrollView setContentSize:CGSizeMake(self.bounds.size.width+UPD_TABLEVIEW_CELL_LEFT_WIDTH, self.bounds.size.height)];
+        [self.content setFrame:CGRectMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0, self.bounds.size.width, self.bounds.size.height)];
     }
 }
 
