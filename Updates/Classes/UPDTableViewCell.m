@@ -50,6 +50,7 @@
         [self addSubview:self.divider];
         
         self.scrollView = [[UIScrollView alloc] init];
+        [self.scrollView setDelegate:self];
         [self.scrollView setScrollsToTop:NO];
         [self addSubview:self.scrollView];
         UITapGestureRecognizer *scrollViewTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTapped)];
@@ -167,6 +168,22 @@
         CGFloat bottomViewSize = self.circleView.tag==1?UPD_TABLEVIEW_CIRCLE_SIZE:UPD_TABLEVIEW_CELL_LOCK_SIZE;
         [self.faviconView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH-UPD_TABLEVIEW_FAVICON_SIZE)/2, self.bounds.size.height/2-10-UPD_TABLEVIEW_FAVICON_SIZE/2, UPD_TABLEVIEW_FAVICON_SIZE, UPD_TABLEVIEW_FAVICON_SIZE)];
         [bottomView setFrame:CGRectMake((UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH+UPD_TABLEVIEW_CELL_LEFT_WIDTH-bottomViewSize)/2, self.bounds.size.height/2+10+self.updatedLabel.bounds.size.height/2-bottomViewSize/2, bottomViewSize, bottomViewSize)];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if(scrollView==self.scrollView&&scrollView.contentOffset.x==1) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.scrollView setContentOffset:CGPointZero];
+        });
+    }
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if(scrollView==self.scrollView&&!decelerate&&scrollView.contentOffset.x==1) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.scrollView setContentOffset:CGPointZero];
+        });
     }
 }
 
