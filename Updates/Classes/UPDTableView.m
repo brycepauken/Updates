@@ -137,6 +137,13 @@
     }
 }
 
+- (void)cellSelected:(int)row {
+    [self deselectRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0] animated:NO];
+    if(self.updateSelected) {
+        self.updateSelected([self.updates objectAtIndex:row]);
+    }
+}
+
 - (void)endRefresh {
     [self.refreshView setTag:0];
     [self setRefreshLabelFormat:@"You've saved %@ so far.\nPull to save more!"];
@@ -485,6 +492,11 @@
     [cell setLockIconHidden:!update.locked.boolValue];
     [cell setDividerHidden:indexPath.row==0];
     
+    __unsafe_unretained UPDTableView *weakSelf = self;
+    [cell setCellTapped:^{
+        [weakSelf cellSelected:(int)indexPath.row];
+    }];
+    
     return cell;
 }
 
@@ -521,13 +533,6 @@
         }];
     }
 }*/
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    if(self.updateSelected) {
-        self.updateSelected([self.updates objectAtIndex:indexPath.row]);
-    }
-}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return UPD_TABLEVIEW_CELL_HEIGHT;

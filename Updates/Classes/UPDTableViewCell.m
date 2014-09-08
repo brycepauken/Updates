@@ -51,8 +51,10 @@
         
         self.scrollView = [[UIScrollView alloc] init];
         [self.scrollView setScrollsToTop:NO];
-        [self.scrollView setUserInteractionEnabled:NO];
         [self addSubview:self.scrollView];
+        UITapGestureRecognizer *scrollViewTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTapped)];
+        [scrollViewTapRecognizer setCancelsTouchesInView:YES];
+        [self.scrollView addGestureRecognizer:scrollViewTapRecognizer];
         
         self.content = [[UIView alloc] init];
         [self.scrollView addSubview:self.content];
@@ -232,6 +234,12 @@
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {}
+
+- (void)scrollViewTapped {
+    if(self.cellTapped) {
+        self.cellTapped();
+    }
+}
 
 - (void)showSpinner {
     [self.scrollView setScrollEnabled:NO];
