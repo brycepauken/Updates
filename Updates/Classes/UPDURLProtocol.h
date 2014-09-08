@@ -12,8 +12,6 @@
 
 @interface UPDURLProtocol : NSURLProtocol <NSURLSessionDelegate>
 
-+ (void)createSession;
-+ (void)invalidateSession;
 + (void)setDisableProtocol:(BOOL)disableProtocol;
 + (void)setInstructionAccumulator:(UPDInstructionAccumulator *)instructionAccumulator;
 + (void)setPreventUnnecessaryLoading:(BOOL)preventUnnecessaryLoading;

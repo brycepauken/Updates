@@ -167,7 +167,6 @@
     self.instructionAccumulator = [[UPDInstructionAccumulator alloc] init];
     [UPDURLProtocol setInstructionAccumulator:self.instructionAccumulator];
     [UPDURLProtocol setPreventUnnecessaryLoading:NO];
-    [UPDURLProtocol createSession];
     [NSURLProtocol registerClass:[UPDURLProtocol class]];
     
     for(UIView *view in [self subviews]) {
@@ -222,7 +221,6 @@
 
 - (void)cancelSession {
     [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
-    [UPDURLProtocol invalidateSession];
     [self clearPersistentData];
     if(self.cancelSessionBlock) {
         self.cancelSessionBlock();
@@ -251,7 +249,6 @@
         NSDate *origDate = [NSDate date];
         
         [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
-        [UPDURLProtocol invalidateSession];
         [self clearPersistentData];
         
         NSString *currentURL = [self.webView stringByEvaluatingJavaScriptFromString:@"window.location.href"];

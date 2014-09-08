@@ -55,7 +55,6 @@ static UIWindow *_window;
     if(_urlProtocolRegistered) {
         _urlProtocolRegistered = NO;
         [NSURLProtocol unregisterClass:[UPDURLProtocol class]];
-        [UPDURLProtocol invalidateSession];
     }
     [self.webView stopLoading];
     [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
@@ -89,7 +88,6 @@ static UIWindow *_window;
         _urlProtocolRegistered = YES;
         [UPDURLProtocol setInstructionAccumulator:nil];
         [UPDURLProtocol setPreventUnnecessaryLoading:YES];
-        [UPDURLProtocol createSession];
         [NSURLProtocol registerClass:[UPDURLProtocol class]];
     }
     [self setCountOccurrencesCompletion:completionBlock];
@@ -108,7 +106,6 @@ static UIWindow *_window;
         _urlProtocolRegistered = YES;
         [UPDURLProtocol setInstructionAccumulator:nil];
         [UPDURLProtocol setPreventUnnecessaryLoading:YES];
-        [UPDURLProtocol createSession];
         [NSURLProtocol registerClass:[UPDURLProtocol class]];
     }
     [self setCompletionBlock:completionBlock];

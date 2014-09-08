@@ -51,6 +51,7 @@
         
         self.scrollView = [[UIScrollView alloc] init];
         [self.scrollView setScrollsToTop:NO];
+        [self.scrollView setUserInteractionEnabled:NO];
         [self addSubview:self.scrollView];
         
         self.content = [[UIView alloc] init];
