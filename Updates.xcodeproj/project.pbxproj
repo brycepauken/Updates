@@ -45,6 +45,8 @@
 		02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644073197DBC0D009CE430 /* UPDBrowserCancelButton.m */; };
 		02644077197DC636009CE430 /* UPDPreProcessingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644076197DC636009CE430 /* UPDPreProcessingView.m */; };
 		0287539219BCDCA70026F21A /* UPDURLProtocolSwitcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 0287539119BCDCA70026F21A /* UPDURLProtocolSwitcher.m */; };
+		0287539519BEAA210026F21A /* SmallOutline.png in Resources */ = {isa = PBXBuildFile; fileRef = 0287539319BEAA210026F21A /* SmallOutline.png */; };
+		0287539619BEAA210026F21A /* SmallOutline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0287539419BEAA210026F21A /* SmallOutline@2x.png */; };
 		028D7EA8197DB41000BE0643 /* AcceptLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EA6197DB41000BE0643 /* AcceptLarge.png */; };
 		028D7EA9197DB41000BE0643 /* AcceptLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EA7197DB41000BE0643 /* AcceptLarge@2x.png */; };
 		028D7EAE197DB41700BE0643 /* ButtonOutline.png in Resources */ = {isa = PBXBuildFile; fileRef = 028D7EAA197DB41700BE0643 /* ButtonOutline.png */; };
@@ -174,6 +176,8 @@
 		02644076197DC636009CE430 /* UPDPreProcessingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDPreProcessingView.m; path = Classes/UPDPreProcessingView.m; sourceTree = "<group>"; };
 		0287539019BCDCA70026F21A /* UPDURLProtocolSwitcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDURLProtocolSwitcher.h; path = Classes/UPDURLProtocolSwitcher.h; sourceTree = "<group>"; };
 		0287539119BCDCA70026F21A /* UPDURLProtocolSwitcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDURLProtocolSwitcher.m; path = Classes/UPDURLProtocolSwitcher.m; sourceTree = "<group>"; };
+		0287539319BEAA210026F21A /* SmallOutline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallOutline.png; path = Resources/Images/SmallOutline.png; sourceTree = "<group>"; };
+		0287539419BEAA210026F21A /* SmallOutline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SmallOutline@2x.png"; path = "Resources/Images/SmallOutline@2x.png"; sourceTree = "<group>"; };
 		028D7EA6197DB41000BE0643 /* AcceptLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AcceptLarge.png; path = Resources/Images/AcceptLarge.png; sourceTree = "<group>"; };
 		028D7EA7197DB41000BE0643 /* AcceptLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AcceptLarge@2x.png"; path = "Resources/Images/AcceptLarge@2x.png"; sourceTree = "<group>"; };
 		028D7EAA197DB41700BE0643 /* ButtonOutline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonOutline.png; path = Resources/Images/ButtonOutline.png; sourceTree = "<group>"; };
@@ -388,6 +392,8 @@
 				02A733F9197731B9002A86F3 /* SearchEngineIconYahoo@2x.png */,
 				02D251371994B7F400BBEDBE /* Settings.png */,
 				02D251381994B7F400BBEDBE /* Settings@2x.png */,
+				0287539319BEAA210026F21A /* SmallOutline.png */,
+				0287539419BEAA210026F21A /* SmallOutline@2x.png */,
 				0263499A19B8574E00365696 /* SmallOutlineQuarter.png */,
 				0263499B19B8574E00365696 /* SmallOutlineQuarter@2x.png */,
 				024C45191975E51F000896E4 /* UpdatesIcon.png */,
@@ -579,6 +585,7 @@
 				0263499D19B8574E00365696 /* SmallOutlineQuarter@2x.png in Resources */,
 				0213C2421974FE0C006BC204 /* Images.xcassets in Resources */,
 				02644071197DBBA7009CE430 /* CancelLarge@2x.png in Resources */,
+				0287539519BEAA210026F21A /* SmallOutline.png in Resources */,
 				02A733FE197731B9002A86F3 /* SearchEngineIconYahoo.png in Resources */,
 				02A733FF197731B9002A86F3 /* SearchEngineIconYahoo@2x.png in Resources */,
 				02644070197DBBA7009CE430 /* CancelLarge.png in Resources */,
@@ -613,6 +620,7 @@
 				02A733FD197731B9002A86F3 /* SearchEngineIconGoogle@2x.png in Resources */,
 				02A733EF1977226B002A86F3 /* Forward.png in Resources */,
 				02A733FC197731B9002A86F3 /* SearchEngineIconGoogle.png in Resources */,
+				0287539619BEAA210026F21A /* SmallOutline@2x.png in Resources */,
 				02AF8764197B7E7E007D06C5 /* Accept.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

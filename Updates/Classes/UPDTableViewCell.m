@@ -22,6 +22,7 @@
 @property (nonatomic) BOOL hideMessageReceived;
 @property (nonatomic, strong) NSDate *lastUpdated;
 @property (nonatomic, strong) UPDLoadingCircle *loadingCircle;
+@property (nonatomic, strong) UIImageView *loadingCircleOutline;
 @property (nonatomic, strong) UIImageView *loadingCircleSpinner;
 @property (nonatomic, strong) UIImageView *lockIcon;
 @property (nonatomic, strong) UILabel *nameLabel;
@@ -72,9 +73,14 @@
         [self.content addSubview:self.loadingCircle];
         
         self.loadingCircleSpinner = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
+        [self.loadingCircleSpinner setAlpha:0];
         [self.loadingCircleSpinner setImage:[UIImage imageNamed:@"SmallOutlineQuarter"]];
         [self.loadingCircleSpinner setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1.18, 1.18)];
         [self.content addSubview:self.loadingCircleSpinner];
+        
+        self.loadingCircleOutline = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
+        [self.loadingCircleOutline setImage:[UIImage imageNamed:@"SmallOutline"]];
+        [self.content addSubview:self.loadingCircleOutline];
         
         self.lockIcon = [[UIImageView alloc] init];
         [self.lockIcon setImage:[UIImage imageNamed:@"Lock"]];
@@ -126,6 +132,8 @@
     }
     if(elapsedTime>=0.2) {
         [self updateScrollViewContentSize];
+        [self.loadingCircleOutline setAlpha:1];
+        [self.loadingCircleSpinner setAlpha:0];
         [self.scrollView setScrollEnabled:YES];
         [self.displayLink invalidate];
         [self setBounds:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -148,6 +156,7 @@
     [self positionLeftSide];
     [self.loadingCircle setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.loadingCircleSpinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
+    [self.loadingCircleOutline setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.bar setFrame:CGRectMake(0, 0, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
     
@@ -192,8 +201,10 @@
         [self setHideMessageReceived:NO];
         [self updateScrollViewContentSize];
         self.requestRefresh();
+        [self.loadingCircleSpinner setAlpha:1];
         [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
             [self.scrollView setContentOffset:CGPointMake(-sqrtf(fabs(velocity)), 0)];
+            [self.loadingCircleOutline setAlpha:0];
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
                 [self.scrollView setContentOffset:CGPointZero];
@@ -280,6 +291,8 @@
         [self setHideMessageReceived:NO];
         [self updateScrollViewContentSize];
         [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0)];
+        [self.loadingCircleOutline setAlpha:0];
+        [self.loadingCircleSpinner setAlpha:1];
         
         self.startTimestamp = 0;
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(showSpinnerAnimation)];
