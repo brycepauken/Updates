@@ -50,7 +50,7 @@
     /*step 1*/
     UPDInternalInstruction *lastInstruction;
     for(int i=(int)workingInstructions.count-1;i>=0;i--) {
-        NSURL *instructionURL = [NSURL URLWithString:((UPDInternalInstruction *)[workingInstructions objectAtIndex:i]).fullURL];
+        NSURL *instructionURL = [[workingInstructions objectAtIndex:i] endRequest].URL;
         if(([instructionURL.scheme isEqualToString:workingURL.scheme]||(!instructionURL.scheme&&!workingURL.scheme)) && ([instructionURL.host isEqualToString:workingURL.host]||(!instructionURL.host&&!workingURL.host)) && ([instructionURL.path isEqualToString:workingURL.path]||(!instructionURL.path&&!workingURL.path)) && ([instructionURL.parameterString isEqualToString:workingURL.parameterString]||(!instructionURL.parameterString&&!workingURL.parameterString))) {
             lastInstruction = [workingInstructions objectAtIndex:i];
             break;
