@@ -50,8 +50,11 @@
         [self addSubview:self.divider];
         
         self.scrollView = [[UIScrollView alloc] init];
+        [self.scrollView setAlwaysBounceHorizontal:YES];
         [self.scrollView setDelegate:self];
         [self.scrollView setScrollsToTop:NO];
+        [self.scrollView setShowsHorizontalScrollIndicator:NO];
+        [self.scrollView setShowsVerticalScrollIndicator:NO];
         [self addSubview:self.scrollView];
         UITapGestureRecognizer *scrollViewTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTapped)];
         [scrollViewTapRecognizer setCancelsTouchesInView:YES];
@@ -122,7 +125,6 @@
         contactBlock();
     }
     if(elapsedTime>=0.2) {
-        [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
         [self updateScrollViewContentSize];
         [self.scrollView setScrollEnabled:YES];
         [self.displayLink invalidate];
@@ -171,19 +173,38 @@
     }
 }
 
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    if(scrollView==self.scrollView&&scrollView.contentOffset.x==1) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.scrollView setContentOffset:CGPointZero];
-        });
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if(scrollView==self.scrollView) {
+        if(![self.loadingCircleSpinner.layer animationForKey:@"rotationAnimation"]) {
+            CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+            [rotationAnimation setCumulative:YES];
+            [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
+            [rotationAnimation setRepeatCount:MAXFLOAT];
+            [rotationAnimation setToValue:@(M_PI*2)];
+            [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+        }
+    }
+    if(scrollView==self.scrollView&&self.requestRefresh&&self.canHide&&self.hideMessageReceived&&scrollView.contentOffset.x<=-UPD_TABLEVIEW_CELL_LEFT_WIDTH) {
+        CGFloat velocity = [[self.scrollView panGestureRecognizer] velocityInView:self].x;
+        
+        [self.scrollView setScrollEnabled:NO];
+        [self setCanHide:NO];
+        [self setHideMessageReceived:NO];
+        [self updateScrollViewContentSize];
+        self.requestRefresh();
+        [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+            [self.scrollView setContentOffset:CGPointMake(-sqrtf(fabs(velocity)), 0)];
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [self.scrollView setContentOffset:CGPointZero];
+            }];
+        }];
     }
 }
 
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if(scrollView==self.scrollView&&!decelerate&&scrollView.contentOffset.x==1) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.scrollView setContentOffset:CGPointZero];
-        });
+- (void)scrollViewTapped {
+    if(self.cellTapped) {
+        self.cellTapped();
     }
 }
 
@@ -252,33 +273,21 @@
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {}
 
-- (void)scrollViewTapped {
-    if(self.cellTapped) {
-        self.cellTapped();
-    }
-}
-
 - (void)showSpinner {
-    [self.scrollView setScrollEnabled:NO];
-    [self setCanHide:NO];
-    [self setHideMessageReceived:NO];
-    [self updateScrollViewContentSize];
-    [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0)];
-    
-    [self.loadingCircle.layer removeAnimationForKey:@"rotationAnimation"];
-    CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    [rotationAnimation setCumulative:YES];
-    [rotationAnimation setDuration:UPD_PROCESSING_ANIMATION_DURATION];
-    [rotationAnimation setRepeatCount:MAXFLOAT];
-    [rotationAnimation setToValue:@(M_PI*2)];
-    [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
-    
-    self.startTimestamp = 0;
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(showSpinnerAnimation)];
-    [self.displayLink setFrameInterval:1];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-    });
+    if(self.canHide||self.hideMessageReceived) {
+        [self.scrollView setScrollEnabled:NO];
+        [self setCanHide:NO];
+        [self setHideMessageReceived:NO];
+        [self updateScrollViewContentSize];
+        [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0)];
+        
+        self.startTimestamp = 0;
+        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(showSpinnerAnimation)];
+        [self.displayLink setFrameInterval:1];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        });
+    }
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self setCanHide:YES];
@@ -328,7 +337,7 @@
 
 - (void)updateScrollViewContentSize {
     if(self.canHide&&self.hideMessageReceived) {
-        [self.scrollView setContentSize:CGSizeMake(self.bounds.size.width+1, self.bounds.size.height)];
+        [self.scrollView setContentSize:CGSizeMake(self.bounds.size.width, self.bounds.size.height)];
         [self.content setFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
     }
     else {

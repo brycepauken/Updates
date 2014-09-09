@@ -11,6 +11,7 @@
 @interface UPDTableViewCell : UITableViewCell <UIScrollViewDelegate>
 
 @property (nonatomic, copy) void(^cellTapped)();
+@property (nonatomic, copy) void(^requestRefresh)();
 
 - (void)hideSpinnerWithContactBlock:(void (^)())contactBlock;
 - (void)setCircleColor:(UIColor *)color animate:(BOOL)animate;

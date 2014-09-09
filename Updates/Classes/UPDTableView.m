@@ -24,9 +24,11 @@
 
 @interface UPDTableView()
 
+@property (nonatomic) int currentlyRefreshing;
 @property (nonatomic, strong) UILabel *refreshLabel;
 @property (nonatomic, strong) NSString *refreshLabelFontSize;
 @property (nonatomic, strong) NSString *refreshLabelFormat;
+@property (nonatomic, strong) NSMutableArray *refreshQueue;
 @property (nonatomic, strong) UIView *refreshView;
 @property (nonatomic, strong) UILabel *startLabel;
 @property (nonatomic) double timeSaved;
@@ -44,6 +46,7 @@
         
         [self setBackgroundColor:[UIColor UPDLightGreyColor]];
         [self setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        self.currentlyRefreshing = -1;
         
         self.startLabel = [[UILabel alloc] init];
         [self.startLabel setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
@@ -83,27 +86,37 @@
 }
 
 - (void)beginRefresh {
-    NSMutableArray *queue = [NSMutableArray array];
+    if(self.currentlyRefreshing==-1) {
+        self.refreshQueue = [NSMutableArray array];
+    }
     int requestPassword = 0;
     for(int i=0;i<[self numberOfRowsInSection:0];i++) {
+        if(self.currentlyRefreshing==i) {
+            continue;
+        }
         if(![[self.updates objectAtIndex:i] locked].boolValue) {
-            [queue addObject:@(i)];
+            [self.refreshQueue addObject:@(i)];
         }
         else {
             if(requestPassword==0) {
                 NSString *encryptedPassword = [UPDCommon getEncryptedPassword:^(NSString *text) {
-                    BOOL emptyQueue = !queue.count;
                     if(text.length) {
+                        BOOL needsRestart = NO;
                         for(int j=0;j<[self numberOfRowsInSection:0];j++) {
                             if([[self.updates objectAtIndex:j] locked].boolValue) {
+                                if(self.currentlyRefreshing==-1) {
+                                    self.currentlyRefreshing = j;
+                                    self.refreshQueue = [NSMutableArray array];
+                                    needsRestart = YES;
+                                }
                                 int insertionIndex = 0;
-                                while(insertionIndex<queue.count&&((NSNumber *)[queue objectAtIndex:insertionIndex]).intValue<j) {
+                                while(insertionIndex<self.refreshQueue.count&&((NSNumber *)[self.refreshQueue objectAtIndex:insertionIndex]).intValue<j) {
                                     insertionIndex++;
                                 }
-                                [queue insertObject:@(j) atIndex:insertionIndex];
+                                [self.refreshQueue insertObject:@(j) atIndex:insertionIndex];
                             }
                         }
-                        if(emptyQueue) {
+                        if(needsRestart) {
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 [self.refreshView setTag:2];
                                 [self setRefreshLabelFormat:@"You've saved %@ so far."];
@@ -113,27 +126,26 @@
                                 } completion:nil];
                             });
                             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                                [self refreshRowWithQueue:queue firstRequest:YES];
+                                [self refreshRowWithFirstRequest:YES];
                             });
                         }
-                    }
-                    else if(emptyQueue) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self endRefresh];
-                        });
                     }
                 }];
                 requestPassword = (encryptedPassword.length?1:2);
             }
             if(requestPassword==1) {
-                [queue addObject:@(i)];
+                [self.refreshQueue addObject:@(i)];
             }
         }
     }
-    if(queue.count) {
+    if(self.refreshQueue.count) {
+        self.currentlyRefreshing = ((NSNumber *)[self.refreshQueue firstObject]).intValue;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self refreshRowWithQueue:queue firstRequest:YES];
+            [self refreshRowWithFirstRequest:YES];
         });
+    }
+    else {
+        self.refreshQueue = nil;
     }
 }
 
@@ -145,6 +157,8 @@
 }
 
 - (void)endRefresh {
+    self.currentlyRefreshing = -1;
+    self.refreshQueue = nil;
     [self.refreshView setTag:0];
     [self setRefreshLabelFormat:@"You've saved %@ so far.\nPull to save more!"];
     [self updateRefreshLabel];
@@ -153,9 +167,9 @@
     }];
 }
 
-- (void)refreshRowWithQueue:(NSMutableArray *)queue firstRequest:(BOOL)firstRequest {
-    int row = ((NSNumber *)[queue firstObject]).intValue;
-    [queue removeObjectAtIndex:0];
+- (void)refreshRowWithFirstRequest:(BOOL)firstRequest {
+    int row = ((NSNumber *)[self.refreshQueue firstObject]).intValue;
+    [self.refreshQueue removeObjectAtIndex:0];
     if(row<[self numberOfRowsInSection:0]) {
         UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
         if(firstRequest) {
@@ -173,16 +187,13 @@
                     }
                 }
                 [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newDifferenceOptions:newDifferenceOptions newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
-                if(queue.count) {
-                    UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:((NSNumber *)[queue firstObject]).intValue inSection:0]];
+                if(self.refreshQueue.count) {
+                    UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:((NSNumber *)[self.refreshQueue firstObject]).intValue inSection:0]];
                     [nextCell showSpinner];
-                    [self refreshRowWithQueue:queue firstRequest:firstRequest];
+                    [self refreshRowWithFirstRequest:firstRequest];
                 }
                 else {
                     [self endRefresh];
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                        [self beginRefresh];
-                    });
                 }
             }];
         };
@@ -495,6 +506,27 @@
     __unsafe_unretained UPDTableView *weakSelf = self;
     [cell setCellTapped:^{
         [weakSelf cellSelected:(int)indexPath.row];
+    }];
+    [cell setRequestRefresh:^{
+        if(self.currentlyRefreshing>-1) {
+            [self.refreshQueue insertObject:@((int)indexPath.row) atIndex:0];
+        }
+        else {
+            self.currentlyRefreshing = (int)indexPath.row;
+            self.refreshQueue = [NSMutableArray array];
+            [self.refreshQueue insertObject:@((int)indexPath.row) atIndex:0];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.refreshView setTag:2];
+                [self setRefreshLabelFormat:@"You've saved %@ so far."];
+                [self updateRefreshLabel];
+                [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST delay:UPD_TRANSITION_DELAY options:0 animations:^{
+                    [self setContentInset:UIEdgeInsetsMake(UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT, 0, 0, 0)];
+                } completion:nil];
+            });
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                [self refreshRowWithFirstRequest:YES];
+            });
+        }
     }];
     
     return cell;
