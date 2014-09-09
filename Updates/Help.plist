@@ -8,7 +8,11 @@
 	</array>
 	<array>
 		<string>How to I delete an Update when I&apos;m finished with it?</string>
-		<string>Just swipe the Update to the side on the main screen, and you&apos;ll see a Delete button, similarily to many iOS apps. Just tap that button and you&apos;ll be good to go.</string>
+		<string>Just slide the Update to the left on the main screen, and you&apos;ll see a Delete icon appear. Keep sliding, and a confirmation box will appear that will allow you to delete your Update.</string>
+	</array>
+	<array>
+		<string>Can I check a single Update instead of my whole list?</string>
+		<string>Yes you can! Slide an Update to the right to refresh only that one Update.</string>
 	</array>
 	<array>
 		<string>Updates isn&apos;t working well for me. What can I do?</string>
