@@ -17,6 +17,8 @@
 @property (nonatomic) BOOL canHide;
 @property (nonatomic, strong) UIView *circleView;
 @property (nonatomic, strong) UIView *content;
+@property (nonatomic, strong) UIImageView *deleteIcon;
+@property (nonatomic) BOOL deleteIconActivated;
 @property (nonatomic, strong) UIView *divider;
 @property (nonatomic, strong) UIImageView *faviconView;
 @property (nonatomic) BOOL hideMessageReceived;
@@ -44,6 +46,7 @@
         [self setClipsToBounds:YES];
         self.canHide = YES;
         self.hideMessageReceived = YES;
+        self.deleteIconActivated = NO;
         
         self.divider = [[UIView alloc] init];
         [self.divider setBackgroundColor:[UIColor UPDLightGreyColor]];
@@ -67,6 +70,10 @@
         self.bar = [[UIView alloc] init];
         [self.bar setBackgroundColor:[UIColor whiteColor]];
         [self.content addSubview:self.bar];
+        
+        self.deleteIcon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
+        [self.deleteIcon setImage:[UIImage imageNamed:@"Delete"]];
+        [self.content addSubview:self.deleteIcon];
         
         self.loadingCircle = [[UPDLoadingCircle alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
         [self.loadingCircle setColor:[UIColor UPDLightWhiteBlueColor]];
@@ -132,6 +139,7 @@
     }
     if(elapsedTime>=0.2) {
         [self updateScrollViewContentSize];
+        self.deleteIconActivated = NO;
         [self.loadingCircleOutline setAlpha:1];
         [self.loadingCircleSpinner setAlpha:0];
         [self.scrollView setScrollEnabled:YES];
@@ -157,6 +165,7 @@
     [self.loadingCircle setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.loadingCircleSpinner setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.loadingCircleOutline setCenter:CGPointMake(-UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
+    [self.deleteIcon setCenter:CGPointMake(self.bounds.size.width+UPD_TABLEVIEW_CELL_LEFT_WIDTH/2, self.bounds.size.height/2)];
     [self.bar setFrame:CGRectMake(0, 0, UPD_TABLEVIEW_CELL_LEFT_BAR_WIDTH, self.bounds.size.height)];
     [self.divider setFrame:CGRectMake(0, 0, self.bounds.size.width, 1)];
     
@@ -192,24 +201,43 @@
             [rotationAnimation setToValue:@(M_PI*2)];
             [self.loadingCircleSpinner.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
         }
-    }
-    if(scrollView==self.scrollView&&self.requestRefresh&&self.canHide&&self.hideMessageReceived&&scrollView.contentOffset.x<=-UPD_TABLEVIEW_CELL_LEFT_WIDTH) {
-        CGFloat velocity = [[self.scrollView panGestureRecognizer] velocityInView:self].x;
-        
-        [self.scrollView setScrollEnabled:NO];
-        [self setCanHide:NO];
-        [self setHideMessageReceived:NO];
-        [self updateScrollViewContentSize];
-        self.requestRefresh();
-        [self.loadingCircleSpinner setAlpha:1];
-        [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
-            [self.scrollView setContentOffset:CGPointMake(-sqrtf(fabs(velocity)), 0)];
-            [self.loadingCircleOutline setAlpha:0];
-        } completion:^(BOOL finished) {
+        if(self.requestRefresh&&self.canHide&&self.hideMessageReceived&&scrollView.contentOffset.x<=-UPD_TABLEVIEW_CELL_LEFT_WIDTH) {
+            CGFloat velocity = [[self.scrollView panGestureRecognizer] velocityInView:self].x;
+            
+            self.deleteIconActivated = YES;
+            [self.scrollView setScrollEnabled:NO];
+            [self setCanHide:NO];
+            [self setHideMessageReceived:NO];
+            [self updateScrollViewContentSize];
+            self.requestRefresh();
+            [self.loadingCircleSpinner setAlpha:1];
             [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
-                [self.scrollView setContentOffset:CGPointZero];
+                [self.scrollView setContentOffset:CGPointMake(-sqrtf(fabs(velocity)), 0)];
+                [self.loadingCircleOutline setAlpha:0];
+            } completion:^(BOOL finished) {
+                [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                    [self.scrollView setContentOffset:CGPointZero];
+                }];
             }];
-        }];
+        }
+        else if(self.deleteCell&&!self.deleteIconActivated&&scrollView.contentOffset.x>=UPD_TABLEVIEW_CELL_LEFT_WIDTH) {
+            CGFloat velocity = [[self.scrollView panGestureRecognizer] velocityInView:self].x;
+            self.deleteIconActivated = YES;
+            
+            [self.scrollView setScrollEnabled:NO];
+            [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH, 0)];
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                [self.scrollView setContentOffset:CGPointMake(UPD_TABLEVIEW_CELL_LEFT_WIDTH+sqrtf(fabs(velocity)), 0)];
+            } completion:^(BOOL finished) {
+                self.deleteCell();
+                [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+                    [self.scrollView setContentOffset:CGPointZero];
+                } completion:^(BOOL finished) {
+                    [self.scrollView setScrollEnabled:YES];
+                    self.deleteIconActivated = NO;
+                }];
+            }];
+        }
     }
 }
 
@@ -286,6 +314,7 @@
 
 - (void)showSpinner {
     if(self.canHide||self.hideMessageReceived) {
+        self.deleteIconActivated = YES;
         [self.scrollView setScrollEnabled:NO];
         [self setCanHide:NO];
         [self setHideMessageReceived:NO];

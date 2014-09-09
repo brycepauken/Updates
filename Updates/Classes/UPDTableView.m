@@ -17,6 +17,7 @@
 #import "CoreDataModelUpdate.h"
 #import "CoreDataModelUpdateList.h"
 #import "NSData+UPDExtensions.h"
+#import "UPDAlertView.h"
 #import "UPDAppDelegate.h"
 #import "UPDInstructionRunner.h"
 #import "UPDInternalUpdate.h"
@@ -154,6 +155,38 @@
     if(self.updateSelected) {
         self.updateSelected([self.updates objectAtIndex:row]);
     }
+}
+
+- (void)deleteRow:(int)row {
+    NSManagedObjectID *objectID = ((UPDInternalUpdate *)[self.updates objectAtIndex:row]).objectID;
+    [self.updates removeObjectAtIndex:row];
+    [self deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    if(!self.updates.count) {
+        [self setScrollEnabled:NO];
+        [self.startLabel setHidden:NO];
+    }
+    
+    NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
+    
+    [context performBlock:^{
+        NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
+        NSError *updateListFetchRequestError;
+        CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
+        if(updateList) {
+            NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
+            for(int i=0;i<(int)updates.count;i++) {
+                if([((UPDInternalUpdate *)[updates objectAtIndex:i]).objectID isEqual:objectID]) {
+                    [updates removeObjectAtIndex:i];
+                    break;
+                }
+            }
+            
+            [updateList setUpdates:updates];
+            
+            NSError *saveError;
+            [context save:&saveError];
+        }
+    }];
 }
 
 - (void)endRefresh {
@@ -507,6 +540,20 @@
     [cell setCellTapped:^{
         [weakSelf cellSelected:(int)indexPath.row];
     }];
+    [cell setDeleteCell:^{
+        UPDAlertView *alertView = [[UPDAlertView alloc] init];
+        __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+        [alertView setTitle:@"Delete"];
+        [alertView setMessage:@"Are you sure you want to delete this update? You won't be able to recover it later."];
+        [alertView setNoButtonBlock:^{
+            [weakAlertView dismiss];
+        }];
+        [alertView setYesButtonBlock:^{
+            [weakAlertView dismiss];
+            [weakSelf deleteRow:(int)indexPath.row];
+        }];
+        [alertView show];
+    }];
     [cell setRequestRefresh:^{
         if(self.currentlyRefreshing>-1) {
             [self.refreshQueue insertObject:@((int)indexPath.row) atIndex:0];
@@ -531,40 +578,6 @@
     
     return cell;
 }
-
-/*- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSManagedObjectID *objectID = ((UPDInternalUpdate *)[self.updates objectAtIndex:indexPath.row]).objectID;
-        [self.updates removeObjectAtIndex:indexPath.row];
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        if(!self.updates.count) {
-            [self setScrollEnabled:NO];
-            [self.startLabel setHidden:NO];
-        }
-        
-        NSManagedObjectContext *context = [[self appDelegate] privateObjectContext];
-        
-        [context performBlock:^{
-            NSFetchRequest *updateListFetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UpdateList"];
-            NSError *updateListFetchRequestError;
-            CoreDataModelUpdateList *updateList = [[context executeFetchRequest:updateListFetchRequest error:&updateListFetchRequestError] firstObject];
-            if(updateList) {
-                NSMutableOrderedSet *updates = [updateList.updates mutableCopy];
-                for(int i=0;i<(int)updates.count;i++) {
-                    if([((UPDInternalUpdate *)[updates objectAtIndex:i]).objectID isEqual:objectID]) {
-                        [updates removeObjectAtIndex:i];
-                        break;
-                    }
-                }
-                
-                [updateList setUpdates:updates];
-                
-                NSError *saveError;
-                [context save:&saveError];
-            }
-        }];
-    }
-}*/
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return UPD_TABLEVIEW_CELL_HEIGHT;
