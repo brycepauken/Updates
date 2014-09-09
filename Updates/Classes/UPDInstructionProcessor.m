@@ -187,7 +187,17 @@
             else {
                 [self clearPersistentData];
                 if([UPDDocumentComparator document:instruction.response isEquivalentToDocument:newResponse]) {
-                    self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                    if(self.progressBlock) {
+                        self.progressBlock(1);
+                    }
+                    if(currentStep==2) {
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                        });
+                    }
+                    else {
+                        self.completionBlock(workingInstructions, self.favicon, instruction.response, instruction.request.URL);
+                    }
                 }
                 else {
                     if(currentStep==2) {

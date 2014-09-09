@@ -210,28 +210,39 @@
         }
         UPDInternalUpdate *update = [self.updates objectAtIndex:row];
         NSDate *startDate = [NSDate date];
+        __block NSTimeInterval lastProgress = [[NSDate date] timeIntervalSince1970];
         void (^completionBlock)(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions) = ^(UPDInstructionRunnerResult result, NSString *newResponse, NSDictionary *newDifferenceOptions) {
-            [cell hideSpinnerWithContactBlock:^{
-                [cell setLoadingCircleProgress:0];
-                [cell setLastUpdated:[NSDate date]];
-                if(result>update.status.intValue) {
-                    if(result==1) {
-                        [cell setCircleColor:[UIColor UPDBrightBlueColor] animate:YES];
+            NSTimeInterval delay = [[NSDate date] timeIntervalSince1970]-lastProgress;
+            if(delay>0&&delay<1) {
+                delay = 1-delay;
+            }
+            else {
+                delay = 0;
+            }
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [cell hideSpinnerWithContactBlock:^{
+                    [cell setLoadingCircleProgress:0];
+                    [cell setLastUpdated:[NSDate date]];
+                    if(result>update.status.intValue) {
+                        if(result==1) {
+                            [cell setCircleColor:[UIColor UPDBrightBlueColor] animate:YES];
+                        }
                     }
-                }
-                [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newDifferenceOptions:newDifferenceOptions newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
-                if(self.refreshQueue.count) {
-                    UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:((NSNumber *)[self.refreshQueue firstObject]).intValue inSection:0]];
-                    [nextCell showSpinner];
-                    [self refreshRowWithFirstRequest:firstRequest];
-                }
-                else {
-                    [self endRefresh];
-                }
-            }];
+                    [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newDifferenceOptions:newDifferenceOptions newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
+                    if(self.refreshQueue.count) {
+                        UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:((NSNumber *)[self.refreshQueue firstObject]).intValue inSection:0]];
+                        [nextCell showSpinner];
+                        [self refreshRowWithFirstRequest:firstRequest];
+                    }
+                    else {
+                        [self endRefresh];
+                    }
+                }];
+            });
         };
         void (^progressBlock)(CGFloat progress) = ^(CGFloat progress) {
             [cell setLoadingCircleProgress:progress];
+            lastProgress = [[NSDate date] timeIntervalSince1970];
         };
         if(update.locked.boolValue) {
             NSString *key = [UPDCommon getEncryptedPassword:nil];

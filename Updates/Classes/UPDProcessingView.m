@@ -673,6 +673,9 @@
             if(self.completionBlock) {
                 self.completionBlock(self.nameTextField.text, self.url, self.instructions, self.favicon, self.lastResponse, self.differenceOptions, self.timerResult, self.origDate, self.locked);
             }
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(UPD_TRANSITION_DURATION*4*NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self.loadingCircle setProgress:0];
+            });
         });
     }
 }
