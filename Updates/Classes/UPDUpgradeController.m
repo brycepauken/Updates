@@ -15,7 +15,6 @@
 
 @interface UPDUpgradeController() <SKProductsRequestDelegate>
 
-@property (nonatomic, copy) void (^completionBlock)();
 @property (nonatomic, strong) SKPayment *payment;
 @property (nonatomic, strong) SKProductsRequest *request;
 @property (nonatomic, strong) UPDUpgradeController *theSelf;
@@ -24,11 +23,13 @@
 
 @implementation UPDUpgradeController
 
+static void (^_completionBlock)(UPDUpgradeStatus result);
 static BOOL _purchasedUpgrade;
 
 + (void)initialize {
     static dispatch_once_t dispatchOnceToken;
     dispatch_once(&dispatchOnceToken, ^{
+        [[SKPaymentQueue defaultQueue] addTransactionObserver:(id<SKPaymentTransactionObserver>)self];
         __block BOOL returnValue = NO;
         NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
         [context performBlockAndWait:^{
@@ -45,32 +46,54 @@ static BOOL _purchasedUpgrade;
     });
 }
 
-- (instancetype)initWithCompletionBlock:(void (^)())completionBlock {
-    self = [super init];
-    if(self) {
-        self.completionBlock = completionBlock;
-    }
-    return self;
-}
-
-- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
-    NSLog(@"yay: a: %@ b: %@",response.products,response.invalidProductIdentifiers);
-}
-
-- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
-    NSLog(@"nay");
-}
-
-+ (BOOL)purchasedUpgrade {
++ (BOOL)hasPurchasedUpgrade {
     return _purchasedUpgrade;
 }
 
-+ (void)purchaseUpgradeWithCompletionBlock:(void (^)())completionBlock {
-    UPDUpgradeController *upgradeController = [[UPDUpgradeController alloc] initWithCompletionBlock:completionBlock];
++ (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
+    if(_completionBlock) {
+        for(SKPaymentTransaction *transaction in transactions) {
+            switch (transaction.transactionState) {
+                case SKPaymentTransactionStatePurchased: case SKPaymentTransactionStateRestored:
+                    _completionBlock(UPDUpgradeStatusSucceeded);
+                    _purchasedUpgrade = YES;
+                    [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+                    break;
+                default:
+                    _completionBlock(UPDUpgradeStatusCanceled);
+                    break;
+            }
+        }
+    }
+}
+
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
+    SKProduct *upgrade = [response.products firstObject];
+    if(!upgrade||![upgrade.productIdentifier isEqualToString:@"com.kingfish.updates.unlimited"]) {
+        [self request:request didFailWithError:nil];
+    }
+    else {
+        SKPayment *payment = [SKPayment paymentWithProduct:upgrade];
+        [[SKPaymentQueue defaultQueue] addPayment:payment];
+    }
+}
+
++ (void)purchaseUpgrade {
+    UPDUpgradeController *upgradeController = [[UPDUpgradeController alloc] init];
     [upgradeController setRequest:[[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:@"com.kingfish.updates.unlimited"]]];
     [upgradeController.request setDelegate:upgradeController];
     [upgradeController.request start];
     [upgradeController setTheSelf:upgradeController];
+}
+
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
+    if(_completionBlock) {
+        _completionBlock(UPDUpgradeStatusError);
+    }
+}
+
++ (void)setCompletionBlock:(void (^)(UPDUpgradeStatus result))completionBlock {
+    _completionBlock = completionBlock;
 }
 
 @end

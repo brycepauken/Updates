@@ -8,9 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(int, UPDUpgradeStatus) {
+    UPDUpgradeStatusSucceeded,
+    UPDUpgradeStatusCanceled,
+    UPDUpgradeStatusError
+};
+
 @interface UPDUpgradeController : NSObject
 
-+ (BOOL)purchasedUpgrade;
-+ (void)purchaseUpgradeWithCompletionBlock:(void (^)())completionBlock;
++ (BOOL)hasPurchasedUpgrade;
++ (void)purchaseUpgrade;
++ (void)setCompletionBlock:(void (^)(UPDUpgradeStatus result))completionBlock;
 
 @end

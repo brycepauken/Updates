@@ -150,7 +150,7 @@
 }
 
 /*
- Return (or create and return) the main managed object context
+ Return (or create and return) the app-wide managed object context
  */
 - (NSManagedObjectContext *)privateObjectContext {
     if(_managedObjectContext != nil) {

@@ -14,10 +14,13 @@
 
 #import "UPDViewController.h"
 
+#import "CoreDataModelOption.h"
 #import "NSData+UPDExtensions.h"
 #import "NSString+UPDExtensions.h"
 #import "UPDAlertView.h"
+#import "UPDAppDelegate.h"
 #import "UPDInterface.h"
+#import "UPDUpgradeController.h"
 
 #import <arpa/inet.h>
 #import <sys/socket.h>
@@ -54,6 +57,36 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     self.registersTaps = NO;
     self.taps = [NSMutableArray new];
     
+    [UPDUpgradeController setCompletionBlock:^(UPDUpgradeStatus status) {
+        if(status==UPDUpgradeStatusSucceeded) {
+            NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
+            
+            [context performBlockAndWait:^{
+                NSFetchRequest *optionPurchasedUpgradeRequest = [[NSFetchRequest alloc] initWithEntityName:@"Option"];
+                [optionPurchasedUpgradeRequest setPredicate:[NSPredicate predicateWithFormat:@"name == %@",@"PurchasedUpgrade"]];
+                NSError *optionPurchasedUpgradeRequestError;
+                CoreDataModelOption *optionPurchasedUpgrade = [[context executeFetchRequest:optionPurchasedUpgradeRequest error:&optionPurchasedUpgradeRequestError] firstObject];
+                if(!optionPurchasedUpgrade) {
+                    optionPurchasedUpgrade = [NSEntityDescription insertNewObjectForEntityForName:@"Option" inManagedObjectContext:context];
+                    [optionPurchasedUpgrade setBoolValue:@(YES)];
+                    [optionPurchasedUpgrade setName:@"PurchasedUpgrade"];
+                }
+                
+                NSError *saveError;
+                [context save:&saveError];
+            }];
+        }
+        else if(status==UPDUpgradeStatusError) {
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Upgrade Error"];
+            [alertView setMessage:@"Something went wrong while preparing the upgrade for purchase. Please try again, or seek help if the problem continues."];
+            [alertView setOkButtonBlock:^{
+                [weakAlertView dismiss];
+            }];
+            [alertView show];
+        }
+    }];
     [self setupNetworkStatusNotification];
     [self setupHiddenAlerts];
 }
@@ -120,17 +153,17 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 - (void)tapped:(UITapGestureRecognizer *)tapGestureRecognizer {
     CGPoint touchPoint = [tapGestureRecognizer locationInView:self.view];
     if(self.registersTaps&&(touchPoint.x<=self.view.bounds.size.width*0.25||touchPoint.x>=self.view.bounds.size.width*0.75)) {
-        while([self.taps firstObject]&&[[NSDate dateWithTimeIntervalSince1970:[[[self.taps firstObject] objectAtIndex:1] doubleValue]] timeIntervalSinceNow]<-60) {
+        while([self.taps firstObject]&&[[NSDate dateWithTimeIntervalSince1970:[((NSNumber *)[[self.taps firstObject] objectAtIndex:1]) doubleValue]] timeIntervalSinceNow]<-60) {
             [self.taps removeObjectAtIndex:0];
         }
         [self.taps addObject:@[@(touchPoint.x>=self.view.bounds.size.width*0.75),@([[NSDate date] timeIntervalSince1970])]];
     
         for(NSDictionary *hiddenAlert in self.hiddenAlerts) {
-            int tapCount = [[hiddenAlert objectForKey:@"tapCount"] intValue];
+            int tapCount = [((NSNumber *)[hiddenAlert objectForKey:@"tapCount"]) intValue];
             if([hiddenAlert objectForKey:@"tapCount"]&&self.taps.count>=tapCount) {
                 NSMutableString *key = [NSMutableString new];
-                for(int i=0;i<[[hiddenAlert objectForKey:@"tapCount"] intValue];i++) {
-                    [key appendFormat:@"%i",[[[self.taps objectAtIndex:self.taps.count-tapCount+i] firstObject] intValue]];
+                for(int i=0;i<[((NSNumber *)[hiddenAlert objectForKey:@"tapCount"]) intValue];i++) {
+                    [key appendFormat:@"%i",[((NSNumber *)[[self.taps objectAtIndex:self.taps.count-tapCount+i] firstObject]) intValue]];
                 }
                 
                 NSString *hashedKey = [[NSString stringWithString:key] hashedString];

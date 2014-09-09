@@ -65,7 +65,7 @@
         self.navigationBar = [[UPDNavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.bounds.size.width, UPD_NAVIGATION_BAR_HEIGHT)];
         [self.navigationBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [self.navigationBar setAddButtonBlock:^{
-            if([weakSelf.tableView numberOfRowsInSection:0]<3||[UPDUpgradeController purchasedUpgrade]) {
+            if([weakSelf.tableView numberOfRowsInSection:0]<3||[UPDUpgradeController hasPurchasedUpgrade]) {
                 [weakSelf.preBrowserView reset];
                 [weakSelf.scrollView setTag:1];
                 [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
@@ -80,9 +80,7 @@
                 [alertView setFontSize:16];
                 [alertView setMinTextLength:6];
                 [alertView setYesButtonBlock:^{
-                    [UPDUpgradeController purchaseUpgradeWithCompletionBlock:^{
-                        NSLog(@"complete");
-                    }];
+                    [UPDUpgradeController purchaseUpgrade];
                     [weakAlertView dismiss];
                 }];
                 [alertView setNoButtonBlock:^{
