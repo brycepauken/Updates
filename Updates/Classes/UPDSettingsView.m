@@ -22,9 +22,12 @@
 @property (nonatomic, strong) UPDButton *contactButton;
 @property (nonatomic, strong) UPDButton *helpButton;
 @property (nonatomic, strong) UIView *interfaceOverlay;
+@property (nonatomic, strong) UPDButton *restoreButton;
 @property (nonatomic, strong) UILabel *saveLabel;
 @property (nonatomic, strong) UPDSwitch *saveSwitch;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UPDButton *upgradeButton;
 
 @end
 
@@ -43,6 +46,11 @@
         [self.interfaceOverlay setAutoresizingMask:UIViewAutoresizingFlexibleSize];
         [self.interfaceOverlay setBackgroundColor:[UIColor UPDOffBlackColor]];
         [self.interfaceOverlay setUserInteractionEnabled:YES];
+        
+        self.scrollView = [[UIScrollView alloc] init];
+        [self.scrollView setAutoresizingMask:UIViewAutoresizingFlexibleSize];
+        [self.scrollView setScrollEnabled:NO];
+        [self.scrollView setScrollsToTop:NO];
         
         self.titleLabel = [[UILabel alloc] init];
         [self.titleLabel setBackgroundColor:[UIColor UPDLightBlueColor]];
@@ -90,6 +98,16 @@
         [self.contactButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.contactButton setTitle:@"Contact"];
         [self addSubview:self.contactButton];
+        
+        self.upgradeButton = [[UPDButton alloc] init];
+        [self.upgradeButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self.upgradeButton setTitle:@"Upgrade"];
+        [self addSubview:self.upgradeButton];
+        
+        self.restoreButton = [[UPDButton alloc] init];
+        [self.restoreButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self.restoreButton setTitle:@"Restore Upgrade"];
+        [self addSubview:self.restoreButton];
         
         self.closeButton = [[UIButton alloc] init];
         [self.closeButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -145,13 +163,17 @@
 - (void)dismiss {
     [self setUserInteractionEnabled:NO];
     [self.interfaceOverlay setUserInteractionEnabled:NO];
+    [self.scrollView setUserInteractionEnabled:NO];
+    [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:NO];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [self setAlpha:0];
-        [self setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5)];
+        [self.scrollView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5)];
         [self.interfaceOverlay setAlpha:0];
+        [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setNeedsStatusBarAppearanceUpdate];
     } completion:^(BOOL finished) {
         [self removeFromSuperview];
         [self.interfaceOverlay removeFromSuperview];
+        [self.scrollView removeFromSuperview];
     }];
 }
 
@@ -170,7 +192,32 @@
     [self.saveSwitch setFrame:CGRectMake((self.bounds.size.width-saveWidth)/2+self.saveLabel.frame.size.width+UPD_ALERT_PADDING, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+(saveHeight-self.saveSwitch.frame.size.height)/2, self.saveSwitch.frame.size.width, self.saveSwitch.frame.size.height)];
     [self.helpButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     [self.contactButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
+    [self.upgradeButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING+self.contactButton.frame.size.height+UPD_ALERT_PADDING*2, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
+    [self.restoreButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING+self.contactButton.frame.size.height+UPD_ALERT_PADDING*2+self.upgradeButton.frame.size.height+UPD_ALERT_PADDING, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     [self.closeButton setFrame:CGRectMake(-UPD_ALERT_CANCEL_BUTTON_SIZE/2, -UPD_ALERT_CANCEL_BUTTON_SIZE/2, UPD_ALERT_CANCEL_BUTTON_SIZE, UPD_ALERT_CANCEL_BUTTON_SIZE)];
+    
+    [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, (self.superview.bounds.size.height-self.bounds.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
+    if(self.frame.origin.y+self.frame.size.height>self.superview.bounds.size.height) {
+        [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, 5+(self.superview.bounds.size.height-self.frame.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
+    }
+    
+    if(self.frame.origin.y<20) {
+        [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:YES];
+        
+        CGRect currentFrame = self.frame;
+        currentFrame.origin.y = 50;
+        [self setFrame:currentFrame];
+        
+        [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, self.bounds.size.height+100)];
+        [self.scrollView setScrollEnabled:YES];
+    }
+    else {
+        [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:NO];
+        
+        [self.scrollView setContentSize:self.scrollView.bounds.size];
+        [self.scrollView setScrollEnabled:NO];
+    }
+    [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setNeedsStatusBarAppearanceUpdate];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
@@ -182,6 +229,8 @@
     
     [self.interfaceOverlay setFrame:interface.bounds];
     [interface addSubview:self.interfaceOverlay];
+    [self.scrollView setFrame:interface.bounds];
+    [interface addSubview:self.scrollView];
     
     [self.titleLabel sizeToFit];
     [self.saveLabel sizeToFit];
@@ -190,12 +239,14 @@
     
     [self.helpButton setFrame:CGRectMake(0, 0, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     [self.contactButton setFrame:CGRectMake(0, 0, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
+    [self.upgradeButton setFrame:CGRectMake(0, 0, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
+    [self.restoreButton setFrame:CGRectMake(0, 0, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     
     [self layoutSubviews];
     
-    CGFloat frameHeight = UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING+self.contactButton.frame.size.height+UPD_ALERT_PADDING;
+    CGFloat frameHeight = UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING+self.contactButton.frame.size.height+UPD_ALERT_PADDING*2+self.upgradeButton.frame.size.height+UPD_ALERT_PADDING+self.restoreButton.frame.size.height+UPD_ALERT_PADDING;
     [self setFrame:CGRectMake((interface.bounds.size.width-UPD_ALERT_WIDTH)/2, (interface.bounds.size.height-frameHeight)/2, UPD_ALERT_WIDTH, frameHeight)];
-    [interface addSubview:self];
+    [self.scrollView addSubview:self];
     
     /*begin settings animation*/
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
@@ -215,7 +266,7 @@
     animation.removedOnCompletion = YES;
     animation.duration = UPD_TRANSITION_DURATION;
     
-    [self.layer addAnimation:animation forKey:@"popup"];
+    [self.scrollView.layer addAnimation:animation forKey:@"popup"];
     /*end settings animation*/
     
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
