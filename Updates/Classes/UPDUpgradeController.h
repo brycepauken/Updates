@@ -11,13 +11,16 @@
 typedef NS_ENUM(int, UPDUpgradeStatus) {
     UPDUpgradeStatusSucceeded,
     UPDUpgradeStatusCanceled,
-    UPDUpgradeStatusError
+    UPDUpgradeStatusError,
+    UPDUpgradeStatusNotPurchased,
+    UPDUpgradeStatusSucceededAlert
 };
 
 @interface UPDUpgradeController : NSObject
 
 + (BOOL)hasPurchasedUpgrade;
 + (void)purchaseUpgrade;
++ (void)restoreUpgrade;
 + (void)setCompletionBlock:(void (^)(UPDUpgradeStatus result))completionBlock;
 
 @end

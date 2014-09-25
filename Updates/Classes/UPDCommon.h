@@ -73,6 +73,7 @@ extern const int UPD_SWITCH_SIZE_HEIGHT;
 extern const int UPD_SWITCH_SIZE_WIDTH;
 extern const int UPD_TEXT_SEARCH_BAR_BUTTON_SIZE;
 extern const int UPD_TEXT_SEARCH_BAR_HEIGHT;
+extern const int UPD_UPGRADE_SPINNER_SIZE;
 extern const int UPD_URL_BAR_HEIGHT;
 extern const int UPD_URL_BAR_PADDING;
 extern const CGFloat UPD_BROWSER_IMAGE_OPACITY;

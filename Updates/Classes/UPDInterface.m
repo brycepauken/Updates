@@ -97,6 +97,12 @@
                 ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.registersTaps = NO;
                 [weakSettingsView dismiss];
             }];
+            [settingsView setRestoreButtonBlock:^{
+                [UPDUpgradeController restoreUpgrade];
+            }];
+            [settingsView setUpgradeButtonBlock:^{
+                [UPDUpgradeController purchaseUpgrade];
+            }];
             [settingsView show];
         }];
         [self.scrollView addSubview:self.navigationBar];

@@ -12,6 +12,8 @@
 @interface UPDSettingsView : UIView <MFMailComposeViewControllerDelegate>
 
 @property (nonatomic, copy) void (^closeButtonBlock)();
+@property (nonatomic, copy) void (^restoreButtonBlock)();
+@property (nonatomic, copy) void (^upgradeButtonBlock)();
 
 - (void)dismiss;
 - (void)show;

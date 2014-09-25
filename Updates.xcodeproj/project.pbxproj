@@ -26,6 +26,7 @@
 		02388DE319897A52004BB64A /* UPDDocumentSearcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02388DE219897A52004BB64A /* UPDDocumentSearcher.mm */; };
 		0239FCF2199DD05C001F5027 /* Help.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0239FCF1199DD05C001F5027 /* Help.plist */; };
 		0239FCF5199DD1E5001F5027 /* UPDHelpView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0239FCF4199DD1E5001F5027 /* UPDHelpView.m */; };
+		024A634F19D4B3E900654674 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 026349A619BA144900365696 /* StoreKit.framework */; };
 		024C45111975CF8B000896E4 /* UIColor+UPDColors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 024C45101975CF8B000896E4 /* UIColor+UPDColors.mm */; };
 		024C45141975D269000896E4 /* UPDInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 024C45131975D269000896E4 /* UPDInterface.m */; };
 		024C451B1975E51F000896E4 /* KingfishIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 024C45171975E51F000896E4 /* KingfishIcon.png */; };
@@ -39,7 +40,6 @@
 		0263499D19B8574E00365696 /* SmallOutlineQuarter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0263499B19B8574E00365696 /* SmallOutlineQuarter@2x.png */; };
 		026349A019B8668400365696 /* UPDHelpViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0263499F19B8668400365696 /* UPDHelpViewCell.m */; };
 		026349A519B8901600365696 /* UPDUpgradeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 026349A419B8901600365696 /* UPDUpgradeController.m */; };
-		026349A719BA144900365696 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 026349A619BA144900365696 /* StoreKit.framework */; };
 		02644070197DBBA7009CE430 /* CancelLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406E197DBBA7009CE430 /* CancelLarge.png */; };
 		02644071197DBBA7009CE430 /* CancelLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0264406F197DBBA7009CE430 /* CancelLarge@2x.png */; };
 		02644074197DBC0D009CE430 /* UPDBrowserCancelButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02644073197DBC0D009CE430 /* UPDBrowserCancelButton.m */; };
@@ -97,6 +97,7 @@
 		02AF8765197B7E7E007D06C5 /* Accept@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02AF8763197B7E7E007D06C5 /* Accept@2x.png */; };
 		02AF8768197B9DC0007D06C5 /* UPDAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF8767197B9DC0007D06C5 /* UPDAlertView.m */; };
 		02AF876B197BA831007D06C5 /* UPDAlertViewButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AF876A197BA831007D06C5 /* UPDAlertViewButton.m */; };
+		02BC259819CE8EDD004B6C5D /* UPDUpgradeSpinner.m in Sources */ = {isa = PBXBuildFile; fileRef = 02BC259719CE8EDD004B6C5D /* UPDUpgradeSpinner.m */; };
 		02C2387D1976C7A9009327F8 /* UPDNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */; };
 		02C238801976CED9009327F8 /* Add.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387E1976CED9009327F8 /* Add.png */; };
 		02C238811976CED9009327F8 /* Add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2387F1976CED9009327F8 /* Add@2x.png */; };
@@ -257,6 +258,8 @@
 		02AF8767197B9DC0007D06C5 /* UPDAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAlertView.m; path = Classes/UPDAlertView.m; sourceTree = "<group>"; };
 		02AF8769197BA831007D06C5 /* UPDAlertViewButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDAlertViewButton.h; path = Classes/UPDAlertViewButton.h; sourceTree = "<group>"; };
 		02AF876A197BA831007D06C5 /* UPDAlertViewButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDAlertViewButton.m; path = Classes/UPDAlertViewButton.m; sourceTree = "<group>"; };
+		02BC259619CE8EDD004B6C5D /* UPDUpgradeSpinner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDUpgradeSpinner.h; path = Classes/UPDUpgradeSpinner.h; sourceTree = "<group>"; };
+		02BC259719CE8EDD004B6C5D /* UPDUpgradeSpinner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDUpgradeSpinner.m; path = Classes/UPDUpgradeSpinner.m; sourceTree = "<group>"; };
 		02C2387B1976C7A9009327F8 /* UPDNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDNavigationBar.h; path = Classes/UPDNavigationBar.h; sourceTree = "<group>"; };
 		02C2387C1976C7A9009327F8 /* UPDNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDNavigationBar.m; path = Classes/UPDNavigationBar.m; sourceTree = "<group>"; };
 		02C2387E1976CED9009327F8 /* Add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Add.png; path = Resources/Images/Add.png; sourceTree = "<group>"; };
@@ -290,8 +293,8 @@
 				0253CD29197F9E960078E90E /* libxml2.2.dylib in Frameworks */,
 				023346DB199580020028DAF5 /* MessageUI.framework in Frameworks */,
 				02D251261992C3A300BBEDBE /* QuartzCore.framework in Frameworks */,
-				026349A719BA144900365696 /* StoreKit.framework in Frameworks */,
 				02D251241992C39500BBEDBE /* Security.framework in Frameworks */,
+				024A634F19D4B3E900654674 /* StoreKit.framework in Frameworks */,
 				02EB7A9A19B6953D00A93686 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,7 +305,6 @@
 		0213C22B1974FE0C006BC204 = {
 			isa = PBXGroup;
 			children = (
-				026349A619BA144900365696 /* StoreKit.framework */,
 				0213C2361974FE0C006BC204 /* Updates */,
 				0213C2351974FE0C006BC204 /* Products */,
 			);
@@ -333,6 +335,7 @@
 				023346D919957FF30028DAF5 /* MessageUI.framework */,
 				02D251251992C3A300BBEDBE /* QuartzCore.framework */,
 				02D251231992C39400BBEDBE /* Security.framework */,
+				026349A619BA144900365696 /* StoreKit.framework */,
 				02EB7A9919B6953D00A93686 /* SystemConfiguration.framework */,
 				0239FCF1199DD05C001F5027 /* Help.plist */,
 				0213C2411974FE0C006BC204 /* Images.xcassets */,
@@ -515,6 +518,8 @@
 				02901A361984B38100274AAE /* UPDTimer.m */,
 				026349A319B8901600365696 /* UPDUpgradeController.h */,
 				026349A419B8901600365696 /* UPDUpgradeController.m */,
+				02BC259619CE8EDD004B6C5D /* UPDUpgradeSpinner.h */,
+				02BC259719CE8EDD004B6C5D /* UPDUpgradeSpinner.m */,
 				02AF8752197A2F9C007D06C5 /* UPDURLProtocol.h */,
 				02AF8753197A2F9C007D06C5 /* UPDURLProtocol.m */,
 				0287539019BCDCA70026F21A /* UPDURLProtocolSwitcher.h */,
@@ -642,6 +647,7 @@
 			files = (
 				026349A019B8668400365696 /* UPDHelpViewCell.m in Sources */,
 				02C940F919B3A60B0043CD34 /* UPDLoadingCircleLayer.m in Sources */,
+				02BC259819CE8EDD004B6C5D /* UPDUpgradeSpinner.m in Sources */,
 				02934A3D19840C6A00FEBB03 /* UPDInternalUpdate.m in Sources */,
 				023346D51994C6250028DAF5 /* UPDSettingsView.m in Sources */,
 				02AF875A197B7488007D06C5 /* UPDInternalInstruction.m in Sources */,

@@ -58,7 +58,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     self.taps = [NSMutableArray new];
     
     [UPDUpgradeController setCompletionBlock:^(UPDUpgradeStatus status) {
-        if(status==UPDUpgradeStatusSucceeded) {
+        if(status==UPDUpgradeStatusSucceeded||status==UPDUpgradeStatusSucceededAlert) {
             NSManagedObjectContext *context = [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]) privateObjectContext];
             
             [context performBlockAndWait:^{
@@ -74,6 +74,17 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 
                 NSError *saveError;
                 [context save:&saveError];
+                
+                if(status==UPDUpgradeStatusSucceededAlert) {
+                    UPDAlertView *alertView = [[UPDAlertView alloc] init];
+                    __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+                    [alertView setTitle:@"Upgrade Successful"];
+                    [alertView setMessage:@"Thanks for supporting Updates!"];
+                    [alertView setOkButtonBlock:^{
+                        [weakAlertView dismiss];
+                    }];
+                    [alertView show];
+                }
             }];
         }
         else if(status==UPDUpgradeStatusError) {
@@ -81,6 +92,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             __unsafe_unretained UPDAlertView *weakAlertView = alertView;
             [alertView setTitle:@"Upgrade Error"];
             [alertView setMessage:@"Something went wrong while preparing the upgrade for purchase. Please try again, or seek help if the problem continues."];
+            [alertView setOkButtonBlock:^{
+                [weakAlertView dismiss];
+            }];
+            [alertView show];
+        }
+        else if(status==UPDUpgradeStatusNotPurchased) {
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Upgrade Error"];
+            [alertView setMessage:@"You don't appear to have purchased the upgrade yet—you can do so using the Upgrade button of the Settings page.\n\nIf this is a mistake, place contact us for assistance."];
             [alertView setOkButtonBlock:^{
                 [weakAlertView dismiss];
             }];

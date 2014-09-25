@@ -14,6 +14,7 @@
 #import "UPDInterface.h"
 #import "UPDHelpView.h"
 #import "UPDSwitch.h"
+#import "UPDUpgradeController.h"
 #import "UPDViewController.h"
 
 @interface UPDSettingsView()
@@ -28,6 +29,7 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UPDButton *upgradeButton;
+@property (nonatomic, strong) UILabel *upgradedLabel;
 
 @end
 
@@ -68,6 +70,16 @@
         [self.saveLabel setTextAlignment:NSTextAlignmentCenter];
         [self.saveLabel setTextColor:[UIColor UPDOffWhiteColor]];
         [self addSubview:self.saveLabel];
+        
+        self.upgradedLabel = [[UILabel alloc] init];
+        [self.upgradedLabel setBackgroundColor:[UIColor UPDLightBlueColor]];
+        [self.upgradedLabel setFont:[UIFont systemFontOfSize:18]];
+        [self.upgradedLabel setNumberOfLines:0];
+        [self.upgradedLabel setText:@"You have already\nupgraded Updates.\n\nThank you\nfor your support!"];
+        [self.upgradedLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.upgradedLabel setTextColor:[UIColor UPDOffWhiteColor]];
+        [self.upgradedLabel sizeToFit];
+        [self addSubview:self.upgradedLabel];
         
         self.saveSwitch = [[UPDSwitch alloc] initWithFrame:CGRectMake(0, 0, UPD_SWITCH_SIZE_WIDTH, UPD_SWITCH_SIZE_HEIGHT)];
         if([UPDCommon passwordSet]) {
@@ -158,6 +170,12 @@
             [alertView show];
         }
     }
+    else if(button==self.upgradeButton && self.upgradeButtonBlock) {
+        self.upgradeButtonBlock();
+    }
+    else if(button==self.restoreButton && self.restoreButtonBlock) {
+        self.restoreButtonBlock();
+    }
 }
 
 - (void)dismiss {
@@ -194,8 +212,12 @@
     [self.contactButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     [self.upgradeButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING+self.contactButton.frame.size.height+UPD_ALERT_PADDING*2, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
     [self.restoreButton setFrame:CGRectMake((self.bounds.size.width-UPD_SETTINGS_BUTTON_WIDTH)/2, UPD_ALERT_PADDING+self.titleLabel.frame.size.height+UPD_ALERT_PADDING+saveHeight+UPD_ALERT_PADDING+self.helpButton.frame.size.height+UPD_ALERT_PADDING+self.contactButton.frame.size.height+UPD_ALERT_PADDING*2+self.upgradeButton.frame.size.height+UPD_ALERT_PADDING, UPD_SETTINGS_BUTTON_WIDTH, UPD_SETTINGS_BUTTON_HEIGHT)];
+    [self.upgradedLabel setFrame:CGRectMake((self.bounds.size.width-self.upgradedLabel.bounds.size.width)/2, self.restoreButton.frame.origin.y-UPD_ALERT_PADDING-self.upgradedLabel.bounds.size.height/2, self.upgradedLabel.bounds.size.width, self.upgradedLabel.bounds.size.height)];
     [self.closeButton setFrame:CGRectMake(-UPD_ALERT_CANCEL_BUTTON_SIZE/2, -UPD_ALERT_CANCEL_BUTTON_SIZE/2, UPD_ALERT_CANCEL_BUTTON_SIZE, UPD_ALERT_CANCEL_BUTTON_SIZE)];
     
+    [self.upgradeButton setHidden:[UPDUpgradeController hasPurchasedUpgrade]];
+    [self.restoreButton setHidden:[UPDUpgradeController hasPurchasedUpgrade]];
+    [self.upgradedLabel setHidden:![UPDUpgradeController hasPurchasedUpgrade]];
     [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, (self.superview.bounds.size.height-self.bounds.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
     if(self.frame.origin.y+self.frame.size.height>self.superview.bounds.size.height) {
         [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, 5+(self.superview.bounds.size.height-self.frame.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
