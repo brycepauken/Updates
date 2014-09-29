@@ -74,18 +74,18 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 
                 NSError *saveError;
                 [context save:&saveError];
-                
-                if(status==UPDUpgradeStatusSucceededAlert) {
-                    UPDAlertView *alertView = [[UPDAlertView alloc] init];
-                    __unsafe_unretained UPDAlertView *weakAlertView = alertView;
-                    [alertView setTitle:@"Upgrade Successful"];
-                    [alertView setMessage:@"Thanks for supporting Updates!"];
-                    [alertView setOkButtonBlock:^{
-                        [weakAlertView dismiss];
-                    }];
-                    [alertView show];
-                }
             }];
+            [self.interface updateSettingsViewUpgradeVisibility];
+            if(status==UPDUpgradeStatusSucceededAlert) {
+                UPDAlertView *alertView = [[UPDAlertView alloc] init];
+                __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+                [alertView setTitle:@"Upgrade Successful"];
+                [alertView setMessage:@"Thanks for\nsupporting Updates!"];
+                [alertView setOkButtonBlock:^{
+                    [weakAlertView dismiss];
+                }];
+                [alertView show];
+            }
         }
         else if(status==UPDUpgradeStatusError) {
             UPDAlertView *alertView = [[UPDAlertView alloc] init];

@@ -10,4 +10,6 @@
 
 @interface UPDInterface : UIView
 
+- (void)updateSettingsViewUpgradeVisibility;
+
 @end

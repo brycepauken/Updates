@@ -136,9 +136,11 @@ static BOOL _purchasedUpgrade;
                                 _completionBlock(UPDUpgradeStatusNotPurchased);
                             }
                             else {
-                                [UPDUpgradeSpinner hide];
-                                _completionBlock(UPDUpgradeStatusSucceededAlert);
-                                _purchasedUpgrade = YES;
+                                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                                    [UPDUpgradeSpinner hide];
+                                    _purchasedUpgrade = YES;
+                                    _completionBlock(UPDUpgradeStatusSucceededAlert);
+                                });
                             }
                         }
                         else {

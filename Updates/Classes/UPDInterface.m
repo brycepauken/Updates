@@ -42,6 +42,7 @@
 @property (nonatomic, strong) UPDPreProcessingView *preProcessingView;
 @property (nonatomic, strong) UPDProcessingView *processingView;
 @property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UPDSettingsView *settingsView;
 @property (nonatomic, strong) UPDTableView *tableView;
 
 @end
@@ -91,19 +92,19 @@
         }];
         [self.navigationBar setSettingsButtonBlock:^{
             ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.registersTaps = YES;
-            UPDSettingsView *settingsView = [[UPDSettingsView alloc] init];
-            __unsafe_unretained UPDSettingsView *weakSettingsView = settingsView;
-            [settingsView setCloseButtonBlock:^{
+            weakSelf.settingsView = [[UPDSettingsView alloc] init];
+            __unsafe_unretained UPDSettingsView *weakSettingsView = weakSelf.settingsView;
+            [weakSelf.settingsView setCloseButtonBlock:^{
                 ((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController.registersTaps = NO;
                 [weakSettingsView dismiss];
             }];
-            [settingsView setRestoreButtonBlock:^{
+            [weakSelf.settingsView setRestoreButtonBlock:^{
                 [UPDUpgradeController restoreUpgrade];
             }];
-            [settingsView setUpgradeButtonBlock:^{
+            [weakSelf.settingsView setUpgradeButtonBlock:^{
                 [UPDUpgradeController purchaseUpgrade];
             }];
-            [settingsView show];
+            [weakSelf.settingsView show];
         }];
         [self.scrollView addSubview:self.navigationBar];
         
@@ -309,6 +310,12 @@
         NSError *saveError;
         [context save:&saveError];
     }];
+}
+
+- (void)updateSettingsViewUpgradeVisibility {
+    if(self.settingsView) {
+        [self.settingsView updateUpgradeVisibility];
+    }
 }
 
 @end

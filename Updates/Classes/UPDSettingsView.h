@@ -17,5 +17,6 @@
 
 - (void)dismiss;
 - (void)show;
+- (void)updateUpgradeVisibility;
 
 @end

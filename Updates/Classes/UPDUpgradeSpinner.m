@@ -59,12 +59,10 @@ typedef NS_ENUM(NSInteger, UPDUpgradeSpinnerStatus) {
     [sharedInstance setStatus:UPDUpgradeSpinnerStatusHiding];
     [sharedInstance setUserInteractionEnabled:NO];
     [sharedInstance.interfaceOverlay setUserInteractionEnabled:NO];
-    [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setHideStatusBar:NO];
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [sharedInstance setAlpha:0];
         [sharedInstance setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5)];
         [sharedInstance.interfaceOverlay setAlpha:0];
-        [((UPDAppDelegate *)[[UIApplication sharedApplication] delegate]).viewController setNeedsStatusBarAppearanceUpdate];
     } completion:^(BOOL finished) {
         [sharedInstance setStatus:UPDUpgradeSpinnerStatusHidden];
         [sharedInstance removeFromSuperview];

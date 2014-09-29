@@ -215,9 +215,7 @@
     [self.upgradedLabel setFrame:CGRectMake((self.bounds.size.width-self.upgradedLabel.bounds.size.width)/2, self.restoreButton.frame.origin.y-UPD_ALERT_PADDING-self.upgradedLabel.bounds.size.height/2, self.upgradedLabel.bounds.size.width, self.upgradedLabel.bounds.size.height)];
     [self.closeButton setFrame:CGRectMake(-UPD_ALERT_CANCEL_BUTTON_SIZE/2, -UPD_ALERT_CANCEL_BUTTON_SIZE/2, UPD_ALERT_CANCEL_BUTTON_SIZE, UPD_ALERT_CANCEL_BUTTON_SIZE)];
     
-    [self.upgradeButton setHidden:[UPDUpgradeController hasPurchasedUpgrade]];
-    [self.restoreButton setHidden:[UPDUpgradeController hasPurchasedUpgrade]];
-    [self.upgradedLabel setHidden:![UPDUpgradeController hasPurchasedUpgrade]];
+    [self updateUpgradeVisibility];
     [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, (self.superview.bounds.size.height-self.bounds.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
     if(self.frame.origin.y+self.frame.size.height>self.superview.bounds.size.height) {
         [self setFrame:CGRectMake((self.superview.bounds.size.width-self.bounds.size.width)/2, 5+(self.superview.bounds.size.height-self.frame.size.height)/2, self.bounds.size.width, self.bounds.size.height)];
@@ -294,6 +292,12 @@
     [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
         [self.interfaceOverlay setAlpha:0.8];
     }];
+}
+
+- (void)updateUpgradeVisibility {
+    [self.upgradeButton setHidden:[UPDUpgradeController hasPurchasedUpgrade]];
+    [self.restoreButton setHidden:[UPDUpgradeController hasPurchasedUpgrade]];
+    [self.upgradedLabel setHidden:![UPDUpgradeController hasPurchasedUpgrade]];
 }
 
 @end
