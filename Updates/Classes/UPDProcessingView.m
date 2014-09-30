@@ -25,6 +25,7 @@
 @interface UPDProcessingView()
 
 @property (nonatomic) BOOL animationCompleted;
+@property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic) BOOL canComplete;
 @property (nonatomic, strong) UIImageView *checkmark;
 @property (nonatomic, strong) UILabel *checkTypeLabel;
@@ -70,6 +71,16 @@
         [self setBackgroundColor:[UIColor UPDLightBlueColor]];
         self.canComplete = NO;
         __unsafe_unretained UPDProcessingView *weakSelf = self;
+        
+        self.backButton = [[UIButton alloc] initWithFrame:CGRectMake(UPD_NAVIGATION_BAR_BUTTON_PADDING-UPD_NAVIGATION_BAR_BUTTON_SIZE/2, 20+((UPD_NAVIGATION_BAR_HEIGHT-20)-UPD_NAVIGATION_BAR_BUTTON_SIZE*2)/2, UPD_NAVIGATION_BAR_BUTTON_SIZE*2, UPD_NAVIGATION_BAR_BUTTON_SIZE*2)];
+        [self.backButton addTarget:self action:@selector(backButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.backButton setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
+        [self.backButton setImage:[UIImage imageNamed:@"Cancel"] forState:UIControlStateNormal];
+        [self.backButton setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.8, 0.8)];
+        [self.backButton.layer setBorderColor:[UIColor UPDOffWhiteColor].CGColor];
+        [self.backButton.layer setBorderWidth:2];
+        [self.backButton.layer setCornerRadius:4];
+        [self addSubview:self.backButton];
         
         self.loadingCircle = [[UPDLoadingCircle alloc] initWithFrame:CGRectMake((self.bounds.size.width-UPD_CONFIRM_BUTTON_SIZE)/2, (self.bounds.size.height-UPD_CONFIRM_BUTTON_SIZE)/2, UPD_CONFIRM_BUTTON_SIZE, UPD_CONFIRM_BUTTON_SIZE)];
         [self.loadingCircle setAutoresizingMask:UIViewAutoresizingFlexibleMargins];
@@ -277,6 +288,27 @@
     return self;
 }
 
+- (void)backButtonTapped {
+    if(self.scrollView.tag) {
+        [self scrollToPage:(int)self.scrollView.tag-1 animated:YES];
+    }
+    else if(self.errorBlock) {
+        UPDAlertView *alertView = [[UPDAlertView alloc] init];
+        __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+        [alertView setTitle:@"Cancel"];
+        [alertView setMessage:@"Are you sure you want to cancel the current update?\n\nNo progress will be saved."];
+        [alertView setFontSize:16];
+        [alertView setNoButtonBlock:^{
+            [weakAlertView dismiss];
+        }];
+        [alertView setYesButtonBlock:^{
+            [weakAlertView dismiss];
+            self.errorBlock();
+        }];
+        [alertView show];
+    }
+}
+
 - (void)backgroundTapped {
     [self.nameTextField resignFirstResponder];
 }
@@ -309,8 +341,10 @@
     [self.loadingCircle setAutoresizingMask:UIViewAutoresizingNone];
     [self.outline setAutoresizingMask:UIViewAutoresizingNone];
     [self.outlineQuarter setAutoresizingMask:UIViewAutoresizingNone];
+    [self.backButton setUserInteractionEnabled:YES];
     [UIView animateWithDuration:UPD_PROCESSING_ANIMATION_DURATION animations:^{
         [self.outline setAlpha:0];
+        [self.backButton setAlpha:1];
         
         [self.checkmark setFrame:newCheckFrame];
         [self.loadingCircle setFrame:newCheckFrame];
@@ -523,6 +557,7 @@
     [self.scrollView setUserInteractionEnabled:YES];
     [self.loadingCircle setAlpha:1];
     [self.outlineQuarter setAlpha:1];
+    [self.backButton setAlpha:0];
     [self.nameTextField setText:@""];
     
     self.instructionProcessor = [[UPDInstructionProcessor alloc] init];
@@ -612,6 +647,12 @@
 }
 
 - (void)scrollToPage:(int)page animated:(BOOL)animated {
+    if(page==0) {
+        [self.backButton setImage:[UIImage imageNamed:@"Cancel"] forState:UIControlStateNormal];
+    }
+    else if(page==1) {
+        [self.backButton setImage:[UIImage imageNamed:@"Back"] forState:UIControlStateNormal];
+    }
     [self.scrollView setTag:page];
     if(animated) {
         [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
@@ -649,6 +690,10 @@
         [self.outlineQuarter.layer removeAnimationForKey:@"rotationAnimation"];
         [self.outline setAlpha:1];
         [self.outlineQuarter setAlpha:0];
+        [self.backButton setUserInteractionEnabled:NO];
+        [UIView animateWithDuration:UPD_TRANSITION_DURATION animations:^{
+            [self.backButton setAlpha:0];
+        }];
         
         CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
         

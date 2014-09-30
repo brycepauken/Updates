@@ -548,8 +548,9 @@
     [cell setDividerHidden:indexPath.row==0];
     
     __unsafe_unretained UPDTableView *weakSelf = self;
+    __unsafe_unretained UPDTableViewCell *weakCell = cell;
     [cell setCellTapped:^{
-        [weakSelf cellSelected:(int)indexPath.row];
+        [weakSelf cellSelected:(int)[weakSelf indexPathForCell:weakCell].row];
     }];
     [cell setDeleteCell:^{
         UPDAlertView *alertView = [[UPDAlertView alloc] init];
@@ -561,18 +562,18 @@
         }];
         [alertView setYesButtonBlock:^{
             [weakAlertView dismiss];
-            [weakSelf deleteRow:(int)indexPath.row];
+            [weakSelf deleteRow:(int)[weakSelf indexPathForCell:weakCell].row];
         }];
         [alertView show];
     }];
     [cell setRequestRefresh:^{
         if(self.currentlyRefreshing>-1) {
-            [self.refreshQueue insertObject:@((int)indexPath.row) atIndex:0];
+            [self.refreshQueue insertObject:@((int)[weakSelf indexPathForCell:weakCell].row) atIndex:0];
         }
         else {
-            self.currentlyRefreshing = (int)indexPath.row;
+            self.currentlyRefreshing = (int)[weakSelf indexPathForCell:weakCell].row;
             self.refreshQueue = [NSMutableArray array];
-            [self.refreshQueue insertObject:@((int)indexPath.row) atIndex:0];
+            [self.refreshQueue insertObject:@((int)[weakSelf indexPathForCell:weakCell].row) atIndex:0];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.refreshView setTag:2];
                 [self setRefreshLabelFormat:@"You've saved %@ so far."];
