@@ -201,8 +201,8 @@
                 }
                 else {
                     if(currentStep==2) {
-                        self.progressBlock((2+index)/(CGFloat)(1+workingInstructions.count));
-                        [self processAllInstructions:[self.instructions mutableCopy] fromIndex:0 currentStep:3 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue shortenedInstructionCount:shortenedInstructionCount];
+                        self.progressBlock((2+index)/(CGFloat)(1+self.instructions.count+workingInstructions.count));
+                        [self processAllInstructions:[self.instructions mutableCopy] fromIndex:0 currentStep:3 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue shortenedInstructionCount:(int)workingInstructions.count];
                     }
                     else {
                         if(self.errorBlock) {

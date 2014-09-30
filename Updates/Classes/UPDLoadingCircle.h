@@ -14,5 +14,6 @@
 
 - (CGFloat)progress;
 - (void)setProgress:(CGFloat)progress;
+- (void)setProgress:(CGFloat)progress animated:(BOOL)animated;
 
 @end

@@ -36,7 +36,19 @@
 }
 
 - (void)setProgress:(CGFloat)progress {
-    [(UPDLoadingCircleLayer *)self.layer setProgress:progress];
+    [self setProgress:progress animated:YES];
+}
+
+- (void)setProgress:(CGFloat)progress animated:(BOOL)animated {
+    if(animated) {
+        [(UPDLoadingCircleLayer *)self.layer setProgress:progress];
+    }
+    else {
+        [CATransaction begin];
+        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+        [(UPDLoadingCircleLayer *)self.layer setProgress:progress];
+        [CATransaction commit];
+    }
 }
 
 @end
