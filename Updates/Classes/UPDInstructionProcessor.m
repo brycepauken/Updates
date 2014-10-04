@@ -55,6 +55,9 @@
             lastInstruction = [workingInstructions objectAtIndex:i];
             break;
         }
+        else {
+            [workingInstructions removeObjectAtIndex:i];
+        }
     }
     if(!lastInstruction) {
         for(int i=(int)workingInstructions.count-1;i>=0;i--) {
@@ -62,10 +65,15 @@
                 lastInstruction = [workingInstructions objectAtIndex:i];
                 break;
             }
+            else {
+                [workingInstructions removeObjectAtIndex:i];
+            }
         }
     }
     if(lastInstruction) {
         lastInstructionBlock(lastInstruction);
+        self.instructions = [workingInstructions copy];
+        
         /*find a better source than this! could be an error later on!*/
         self.favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://g.etfv.co/" stringByAppendingString:lastInstruction.request.URL.absoluteString]]]];
         

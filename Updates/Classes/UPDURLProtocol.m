@@ -100,6 +100,7 @@ static BOOL _preventUnnecessaryLoading;
         [modes addObject:currentMode];
     }
     self.modes = modes;
+    self.data = [NSMutableData data];
     
     NSMutableURLRequest *mutableRequest = [self.request mutableCopy];
     [[self class] setProperty:@YES forKey:@"UseDefaultImplementation" inRequest:mutableRequest];
