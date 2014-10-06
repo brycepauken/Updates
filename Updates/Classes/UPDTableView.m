@@ -25,6 +25,7 @@
 
 @interface UPDTableView()
 
+@property (nonatomic, strong) NSMutableArray *cells;
 @property (nonatomic) int currentlyRefreshing;
 @property (nonatomic, strong) UILabel *refreshLabel;
 @property (nonatomic, strong) NSString *refreshLabelFontSize;
@@ -42,6 +43,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if(self) {
+        self.cells = [NSMutableArray new];
         [self setDataSource:self];
         [self setDelegate:self];
         
@@ -76,8 +78,6 @@
         [self.refreshView addSubview:self.refreshLabel];
         [self setRefreshLabelFormat:@"You've saved %@ so far.\nPull to save more!"];
         [self updateRefreshLabel];
-        
-        [self registerClass:[UPDTableViewCell class] forCellReuseIdentifier:@"UPDTableViewCell"];
     }
     return self;
 }
@@ -204,7 +204,7 @@
     int row = ((NSNumber *)[self.refreshQueue firstObject]).intValue;
     [self.refreshQueue removeObjectAtIndex:0];
     if(row<[self numberOfRowsInSection:0]) {
-        UPDTableViewCell *cell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+        UPDTableViewCell *cell = [self.cells objectAtIndex:row];
         if(firstRequest) {
             [cell showSpinner];
         }
@@ -230,7 +230,7 @@
                     }
                     [self saveUpdateWithObjectID:update.objectID newResponse:newResponse newDifferenceOptions:newDifferenceOptions newStatus:result updateDuration:[[NSDate date] timeIntervalSinceDate:startDate]];
                     if(self.refreshQueue.count) {
-                        UPDTableViewCell *nextCell = (UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:((NSNumber *)[self.refreshQueue firstObject]).intValue inSection:0]];
+                        UPDTableViewCell *nextCell = [self.cells objectAtIndex:((NSNumber *)[self.refreshQueue firstObject]).intValue];
                         [nextCell showSpinner];
                         [self refreshRowWithFirstRequest:firstRequest];
                     }
@@ -494,7 +494,7 @@
                 [update setOrigUpdated:update.lastUpdated];
                 [update setLastResponse:nil];
                 [update setLastUpdated:[NSDate dateWithTimeIntervalSince1970:0]];
-                [(UPDTableViewCell *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:updateIndex inSection:0]] setCircleColor:nil animate:NO];
+                [(UPDTableViewCell *)[self.cells objectAtIndex:updateIndex] setCircleColor:nil animate:NO];
             }
             updateIndex++;
         }
@@ -528,67 +528,71 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UPDTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UPDTableViewCell"];
-    if(!cell) {
-        cell = [[UPDTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"UPDTableViewCell"];
-    }
-    UPDInternalUpdate *update = [self.updates objectAtIndex:indexPath.row];
-    switch(update.status.intValue) {
-        case 1:
-            [cell setCircleColor:[UIColor UPDBrightBlueColor] animate:NO];
-            break;
-        default:
-            [cell setCircleColor:nil animate:NO];
-            break;
-    }
-    [cell setName:update.name];
-    [cell setFavicon:update.favicon];
-    [cell setLastUpdated:update.lastUpdated];
-    [cell setLockIconHidden:!update.locked.boolValue];
-    [cell setDividerHidden:indexPath.row==0];
-    
-    __unsafe_unretained UPDTableView *weakSelf = self;
-    __unsafe_unretained UPDTableViewCell *weakCell = cell;
-    [cell setCellTapped:^{
-        [weakSelf cellSelected:(int)[weakSelf indexPathForCell:weakCell].row];
-    }];
-    [cell setDeleteCell:^{
-        UPDAlertView *alertView = [[UPDAlertView alloc] init];
-        __unsafe_unretained UPDAlertView *weakAlertView = alertView;
-        [alertView setTitle:@"Delete"];
-        [alertView setMessage:@"Are you sure you want to delete this update? You won't be able to recover it later."];
-        [alertView setNoButtonBlock:^{
-            [weakAlertView dismiss];
-        }];
-        [alertView setYesButtonBlock:^{
-            [weakAlertView dismiss];
-            [weakSelf deleteRow:(int)[weakSelf indexPathForCell:weakCell].row];
-        }];
-        [alertView show];
-    }];
-    [cell setRequestRefresh:^{
-        if(self.currentlyRefreshing>-1) {
-            [self.refreshQueue insertObject:@((int)[weakSelf indexPathForCell:weakCell].row) atIndex:0];
+    if(indexPath.row>=self.cells.count||![self.cells objectAtIndex:indexPath.row]) {
+        UPDTableViewCell *cell = [[UPDTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+        
+        UPDInternalUpdate *update = [self.updates objectAtIndex:indexPath.row];
+        switch(update.status.intValue) {
+            case 1:
+                [cell setCircleColor:[UIColor UPDBrightBlueColor] animate:NO];
+                break;
+            default:
+                [cell setCircleColor:nil animate:NO];
+                break;
         }
-        else {
-            self.currentlyRefreshing = (int)[weakSelf indexPathForCell:weakCell].row;
-            self.refreshQueue = [NSMutableArray array];
-            [self.refreshQueue insertObject:@((int)[weakSelf indexPathForCell:weakCell].row) atIndex:0];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.refreshView setTag:2];
-                [self setRefreshLabelFormat:@"You've saved %@ so far."];
-                [self updateRefreshLabel];
-                [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST delay:UPD_TRANSITION_DELAY options:0 animations:^{
-                    [self setContentInset:UIEdgeInsetsMake(UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT, 0, 0, 0)];
-                } completion:nil];
-            });
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                [self refreshRowWithFirstRequest:YES];
-            });
-        }
-    }];
-    
-    return cell;
+        [cell setName:update.name];
+        [cell setFavicon:update.favicon];
+        [cell setLastUpdated:update.lastUpdated];
+        [cell setLockIconHidden:!update.locked.boolValue];
+        [cell setDividerHidden:indexPath.row==0];
+        
+        __unsafe_unretained UPDTableView *weakSelf = self;
+        __unsafe_unretained UPDTableViewCell *weakCell = cell;
+        [cell setCellTapped:^{
+            [weakSelf cellSelected:(int)[weakSelf indexPathForCell:weakCell].row];
+        }];
+        [cell setDeleteCell:^{
+            UPDAlertView *alertView = [[UPDAlertView alloc] init];
+            __unsafe_unretained UPDAlertView *weakAlertView = alertView;
+            [alertView setTitle:@"Delete"];
+            [alertView setMessage:@"Are you sure you want to delete this update? You won't be able to recover it later."];
+            [alertView setNoButtonBlock:^{
+                [weakAlertView dismiss];
+            }];
+            [alertView setYesButtonBlock:^{
+                [weakAlertView dismiss];
+                [weakSelf deleteRow:(int)[weakSelf indexPathForCell:weakCell].row];
+            }];
+            [alertView show];
+        }];
+        [cell setRequestRefresh:^{
+            if(self.currentlyRefreshing>-1) {
+                [self.refreshQueue insertObject:@((int)[weakSelf indexPathForCell:weakCell].row) atIndex:0];
+            }
+            else {
+                self.currentlyRefreshing = (int)[weakSelf indexPathForCell:weakCell].row;
+                self.refreshQueue = [NSMutableArray array];
+                [self.refreshQueue insertObject:@((int)[weakSelf indexPathForCell:weakCell].row) atIndex:0];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.refreshView setTag:2];
+                    [self setRefreshLabelFormat:@"You've saved %@ so far."];
+                    [self updateRefreshLabel];
+                    [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST delay:UPD_TRANSITION_DELAY options:0 animations:^{
+                        [self setContentInset:UIEdgeInsetsMake(UPD_TABLEVIEW_REFRESH_VIEW_HEIGHT, 0, 0, 0)];
+                    } completion:nil];
+                });
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, UPD_TRANSITION_DURATION*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                    [self refreshRowWithFirstRequest:YES];
+                });
+            }
+        }];
+        
+        [self.cells insertObject:cell atIndex:indexPath.row];
+        return cell;
+    }
+    else {
+        return [self.cells objectAtIndex:indexPath.row];
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
