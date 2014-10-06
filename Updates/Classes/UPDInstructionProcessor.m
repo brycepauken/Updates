@@ -24,7 +24,6 @@
 
 #import "UPDInstructionProcessor.h"
 
-#import <libxml/HTMLparser.h>
 #import "UPDDocumentComparator.h"
 #import "UPDDocumentRenderer.h"
 #import "UPDDocumentSearcher.h"
@@ -74,52 +73,71 @@
         lastInstructionBlock(lastInstruction);
         self.instructions = [workingInstructions copy];
         
-        /*find a better source than this! could be an error later on!*/
-        self.favicon=[[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[@"http://g.etfv.co/" stringByAppendingString:lastInstruction.request.URL.absoluteString]]]];
-        
-        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-        [queue setMaxConcurrentOperationCount:5];
-        [self clearPersistentData];
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
-        NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request];
-        UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:lastInstruction.request];
-        [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
-            UPDDocumentRenderer *renderer = [UPDDocumentRenderer new];
-            [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:lastInstruction.request.URL completionBlock:^(NSString *newResponse) {
-                [self clearPersistentData];
-                if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:newResponse]) {
-                    /*the final request works on its own, use it!*/
-                    if(self.progressBlock) {
-                        self.progressBlock(1);
+        void (^faviconCompletionBlock)() = ^{
+            NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+            [queue setMaxConcurrentOperationCount:5];
+            [self clearPersistentData];
+            NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:(id<NSURLSessionDelegate>)[UPDSessionDelegate class] delegateQueue:queue];
+            NSURLSessionDataTask *task = [session dataTaskWithRequest:lastInstruction.request];
+            UPDSessionDelegate *delegate = [[UPDSessionDelegate alloc] initWithTask:task request:lastInstruction.request];
+            [delegate setCompletionBlock:^(NSData *data, NSURLResponse *response, NSMutableDictionary *returnedCookies, NSError *error) {
+                UPDDocumentRenderer *renderer = [UPDDocumentRenderer new];
+                [renderer renderDocument:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] withBaseURL:lastInstruction.request.URL completionBlock:^(NSString *newResponse) {
+                    [self clearPersistentData];
+                    if([UPDDocumentComparator document:lastInstruction.response isEquivalentToDocument:newResponse]) {
+                        /*the final request works on its own, use it!*/
+                        if(self.progressBlock) {
+                            self.progressBlock(1);
+                        }
+                        if(self.completionBlock) {
+                            self.completionBlock([NSArray arrayWithObject:lastInstruction], self.favicon, lastInstruction.response, lastInstruction.request.URL);
+                        }
                     }
-                    if(self.completionBlock) {
-                        self.completionBlock([NSArray arrayWithObject:lastInstruction], self.favicon, lastInstruction.response, lastInstruction.request.URL);
+                    else {
+                        /*step 2*/
+                        if(workingInstructions.count>1) {
+                            for(int i=0;i<workingInstructions.count-1;i++) {
+                                if(![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&![[[workingInstructions objectAtIndex:i+1] request].HTTPMethod isEqualToString:@"POST"]) {
+                                    [workingInstructions removeObjectAtIndex:i];
+                                    i--;
+                                }
+                            }
+                            if(self.progressBlock) {
+                                self.progressBlock(1.0/(1+self.instructions.count+workingInstructions.count));
+                            }
+                            [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue shortenedInstructionCount:(int)workingInstructions.count];
+                        }
+                        else {
+                            /*using the last instruction alone doesn't work, but there's only one instruction... error*/
+                            if(self.errorBlock) {
+                                self.errorBlock();
+                            }
+                        }
+                    }
+                }];
+            }];
+            [task resume];
+        };
+        
+        NSArray *possibleFavicons = [UPDDocumentSearcher faviconURLsForDocument:lastInstruction.response baseURL:lastInstruction.request.URL];
+        dispatch_async(dispatch_get_global_queue(0,0), ^{
+            for(int i=0;i<=possibleFavicons.count;i++) {
+                if(i<possibleFavicons.count) {
+                    NSData *imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:[possibleFavicons objectAtIndex:i]]];
+                    if(imageData) {
+                        UIImage *image = [UIImage imageWithData:imageData];
+                        if(image) {
+                            self.favicon = image;
+                            break;
+                        }
                     }
                 }
                 else {
-                    /*step 2*/
-                    if(workingInstructions.count>1) {
-                        for(int i=0;i<workingInstructions.count-1;i++) {
-                            if(![[[workingInstructions objectAtIndex:i] request].HTTPMethod isEqualToString:@"POST"]&&![[[workingInstructions objectAtIndex:i+1] request].HTTPMethod isEqualToString:@"POST"]) {
-                                [workingInstructions removeObjectAtIndex:i];
-                                i--;
-                            }
-                        }
-                        if(self.progressBlock) {
-                            self.progressBlock(1.0/(1+self.instructions.count+workingInstructions.count));
-                        }
-                        [self processAllInstructions:workingInstructions fromIndex:0 currentStep:2 lastResponse:nil usingRenderer:renderer usingSession:nil withDelegateQueue:queue shortenedInstructionCount:(int)workingInstructions.count];
-                    }
-                    else {
-                        /*using the last instruction alone doesn't work, but there's only one instruction... error*/
-                        if(self.errorBlock) {
-                            self.errorBlock();
-                        }
-                    }
+                    self.favicon = [UIImage imageNamed:@"GeneralFavicon"];
                 }
-            }];
-        }];
-        [task resume];
+            }
+            faviconCompletionBlock();
+        });
     }
     else {
         /*no valid instruction found... error*/

@@ -10,6 +10,8 @@
 
 #import <libxml/HTMLparser.h>
 
+#import <iostream>
+
 @implementation UPDDocumentSearcher
 
 static const char *_enc;
@@ -77,6 +79,49 @@ static int _options;
         [returnInput replaceObjectAtIndex:i withObject:[NSMutableArray arrayWithObjects:[[[returnInput objectAtIndex:i] objectAtIndex:0] stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"],[[[returnInput objectAtIndex:i] objectAtIndex:1] stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"],nil]];
     }
     return changesMade?returnInput:nil;
+}
+
++ (NSArray *)faviconURLsForDocument:(NSString *)doc baseURL:(NSURL *)baseURL {
+    xmlNode *docNode = (xmlNode *)htmlReadDoc((xmlChar *)[[doc stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] UTF8String], NULL, _enc, _options);
+    xmlNode *htmlNode = docNode->children;
+    
+    NSString *linkedIcon;
+    while(htmlNode != NULL) {
+        xmlNode *htmlChild = htmlNode->children;
+        while(htmlChild != NULL) {
+            if(htmlChild->name) {
+                std::cout << htmlChild->name;
+            }
+            if(htmlChild->name && strcmp((char *)htmlChild->name, "head")==0) {
+                xmlNode *headChild = htmlChild->children;
+                while(headChild != NULL) {
+                    if(headChild->name && strcmp((char *)headChild->name, "link")==0) {
+                        const char *rel = (const char*)xmlGetProp(headChild, (xmlChar *)"rel");
+                        const char *href = (const char*)xmlGetProp(headChild, (xmlChar *)"href");
+                        if(rel && rel[0]!='\0' && href && href[0]!='\0' ) {
+                            NSArray *relArray = [[NSString stringWithUTF8String:rel] componentsSeparatedByString:@" "];
+                            for(NSString *relString in relArray) {
+                                if([relString isEqualToString:@"icon"]) {
+                                    NSURL *faviconURL = [NSURL URLWithString:[NSString stringWithUTF8String:href] relativeToURL:baseURL];
+                                    linkedIcon = faviconURL.absoluteString;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    headChild = headChild->next;
+                }
+                break;
+            }
+            htmlChild = htmlChild->next;
+        }
+        htmlNode = htmlNode->next;
+    }
+    NSString *rootFavicon = [NSString stringWithFormat:@"%@://%@/favicon.ico",baseURL.scheme,baseURL.host];
+    if(linkedIcon) {
+        return @[linkedIcon, rootFavicon];
+    }
+    return @[rootFavicon];
 }
 
 /*

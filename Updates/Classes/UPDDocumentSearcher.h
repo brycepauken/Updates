@@ -11,5 +11,6 @@
 @interface UPDDocumentSearcher : NSObject
 
 + (NSArray *)document:(NSString *)doc equivilantInputFieldForArray:(NSArray *)input orignalResponse:(NSString *)origDoc;
++ (NSArray *)faviconURLsForDocument:(NSString *)doc baseURL:(NSURL *)baseURL;
 
 @end

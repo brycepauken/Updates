@@ -67,6 +67,8 @@
 		02934A3D19840C6A00FEBB03 /* UPDInternalUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3C19840C6A00FEBB03 /* UPDInternalUpdate.m */; };
 		02934A4019840EBB00FEBB03 /* UPDTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A3F19840EBB00FEBB03 /* UPDTableViewCell.m */; };
 		02934A4319842F5900FEBB03 /* UPDInstructionRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 02934A4219842F5900FEBB03 /* UPDInstructionRunner.m */; };
+		029C852219E233C600584572 /* GeneralFavicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 029C852019E233C600584572 /* GeneralFavicon.png */; };
+		029C852319E233C600584572 /* GeneralFavicon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 029C852119E233C600584572 /* GeneralFavicon@2x.png */; };
 		02A5D5D2197799FA00C2A8F9 /* UPDBrowserURLBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */; };
 		02A5D5D519779A2B00C2A8F9 /* UPDBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A5D5D419779A2B00C2A8F9 /* UPDBrowserView.m */; };
 		02A733E51976F95A002A86F3 /* UPDPreBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A733E41976F95A002A86F3 /* UPDPreBrowserView.m */; };
@@ -213,6 +215,8 @@
 		02934A3F19840EBB00FEBB03 /* UPDTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDTableViewCell.m; path = Classes/UPDTableViewCell.m; sourceTree = "<group>"; };
 		02934A4119842F5900FEBB03 /* UPDInstructionRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDInstructionRunner.h; path = Classes/UPDInstructionRunner.h; sourceTree = "<group>"; };
 		02934A4219842F5900FEBB03 /* UPDInstructionRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDInstructionRunner.m; path = Classes/UPDInstructionRunner.m; sourceTree = "<group>"; };
+		029C852019E233C600584572 /* GeneralFavicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GeneralFavicon.png; sourceTree = "<group>"; };
+		029C852119E233C600584572 /* GeneralFavicon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GeneralFavicon@2x.png"; sourceTree = "<group>"; };
 		02A5D5D0197799FA00C2A8F9 /* UPDBrowserURLBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserURLBar.h; path = Classes/UPDBrowserURLBar.h; sourceTree = "<group>"; };
 		02A5D5D1197799FA00C2A8F9 /* UPDBrowserURLBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UPDBrowserURLBar.m; path = Classes/UPDBrowserURLBar.m; sourceTree = "<group>"; };
 		02A5D5D319779A2B00C2A8F9 /* UPDBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDBrowserView.h; path = Classes/UPDBrowserView.h; sourceTree = "<group>"; };
@@ -387,6 +391,8 @@
 				0287539819BECF330026F21A /* Delete@2x.png */,
 				02A733ED1977226B002A86F3 /* Forward.png */,
 				02A733EE1977226B002A86F3 /* Forward@2x.png */,
+				029C852019E233C600584572 /* GeneralFavicon.png */,
+				029C852119E233C600584572 /* GeneralFavicon@2x.png */,
 				024C45171975E51F000896E4 /* KingfishIcon.png */,
 				024C45181975E51F000896E4 /* KingfishIcon@2x.png */,
 				02D251331994492400BBEDBE /* Lock.png */,
@@ -617,6 +623,7 @@
 				02A733E8197700C4002A86F3 /* Back.png in Resources */,
 				02A7340319773560002A86F3 /* SearchEngineIconDuck@2x.png in Resources */,
 				02D251351994492400BBEDBE /* Lock.png in Resources */,
+				029C852219E233C600584572 /* GeneralFavicon.png in Resources */,
 				028D7EA8197DB41000BE0643 /* AcceptLarge.png in Resources */,
 				02C238801976CED9009327F8 /* Add.png in Resources */,
 				028D7EAE197DB41700BE0643 /* ButtonOutline.png in Resources */,
@@ -628,6 +635,7 @@
 				028D7EB1197DB41700BE0643 /* ButtonOutlineQuarter@2x.png in Resources */,
 				02A733FA197731B9002A86F3 /* SearchEngineIconBing.png in Resources */,
 				02A733F01977226B002A86F3 /* Forward@2x.png in Resources */,
+				029C852319E233C600584572 /* GeneralFavicon@2x.png in Resources */,
 				024C451C1975E51F000896E4 /* KingfishIcon@2x.png in Resources */,
 				0263499C19B8574E00365696 /* SmallOutlineQuarter.png in Resources */,
 				02A733FD197731B9002A86F3 /* SearchEngineIconGoogle@2x.png in Resources */,
