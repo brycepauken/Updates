@@ -10,6 +10,7 @@
 
 @interface UPDTextSearchView : UIView <UIWebViewDelegate>
 
+@property (nonatomic, copy) void(^cancelBlock)();
 @property (nonatomic, copy) void(^goBlock)(NSString *text, int count);
 
 - (void)loadDocument:(NSString *)doc withBaseURL:(NSURL *)baseURL;

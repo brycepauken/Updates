@@ -122,6 +122,16 @@
         
         self.textSearchView = [[UPDTextSearchView alloc] initWithFrame:CGRectMake(20, 40, self.bounds.size.width-40, self.bounds.size.height-60)];
         [self.textSearchView setAlpha:0];
+        [self.textSearchView setCancelBlock:^{
+            [weakSelf.completeOverlay setUserInteractionEnabled:NO];
+            [weakSelf.textSearchView setUserInteractionEnabled:NO];
+            [weakSelf setNeedsLayout];
+            
+            [UIView animateWithDuration:UPD_TRANSITION_DURATION_FAST animations:^{
+                [weakSelf.completeOverlay setAlpha:0];
+                [weakSelf.textSearchView setAlpha:0];
+            }];
+        }];
         [self.textSearchView setGoBlock:^(NSString *text, int count){
             weakSelf.differenceOptions = @{@"DifferenceType":@"Text", @"DifferenceText":text, @"DifferenceCount":@(count)};
             

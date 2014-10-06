@@ -18,6 +18,7 @@
 
 @interface UPDTextSearchView()
 
+@property (nonatomic, strong) UIButton *closeButton;
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic, strong) UPDTextSearchBar *searchBar;
 @property (nonatomic) BOOL shouldLoad;
@@ -57,10 +58,29 @@
         }];
         [self addSubview:self.searchBar];
         
+        self.closeButton = [[UIButton alloc] init];
+        [self.closeButton addTarget:self action:@selector(closeButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.closeButton setBackgroundColor:[UIColor UPDLightGreyBlueColor]];
+        [self.closeButton setImage:[UIImage imageNamed:@"Cancel"] forState:UIControlStateNormal];
+        [self.closeButton setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.75, 0.75)];
+        [self.closeButton.layer setCornerRadius:UPD_ALERT_CANCEL_BUTTON_SIZE*0.75];
+        [self.closeButton.layer setMasksToBounds:NO];
+        [self.closeButton.layer setShadowColor:[UIColor UPDOffBlackColor].CGColor];
+        [self.closeButton.layer setShadowOffset:CGSizeZero];
+        [self.closeButton.layer setShadowOpacity:0.5];
+        [self.closeButton.layer setShadowRadius:1];
+        [self addSubview:self.closeButton];
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
+}
+
+- (void)closeButtonTapped {
+    if(self.cancelBlock) {
+        self.cancelBlock();
+    }
 }
 
 /*
@@ -93,6 +113,7 @@
 - (void)layoutSubviews {
     [self.webView setFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height-UPD_TEXT_SEARCH_BAR_HEIGHT-self.keyboardHeight)];
     [self.searchBar setFrame:CGRectMake(0, self.bounds.size.height-UPD_TEXT_SEARCH_BAR_HEIGHT-self.keyboardHeight, self.bounds.size.width, UPD_TEXT_SEARCH_BAR_HEIGHT)];
+    [self.closeButton setFrame:CGRectMake(-UPD_ALERT_CANCEL_BUTTON_SIZE/2, -UPD_ALERT_CANCEL_BUTTON_SIZE/2, UPD_ALERT_CANCEL_BUTTON_SIZE, UPD_ALERT_CANCEL_BUTTON_SIZE)];
 }
 
 - (void)loadDocument:(NSString *)doc withBaseURL:(NSURL *)baseURL {
