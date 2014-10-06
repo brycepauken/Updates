@@ -10,8 +10,6 @@
 
 #import <libxml/HTMLparser.h>
 
-#import <iostream>
-
 @implementation UPDDocumentSearcher
 
 static const char *_enc;
@@ -89,9 +87,6 @@ static int _options;
     while(htmlNode != NULL) {
         xmlNode *htmlChild = htmlNode->children;
         while(htmlChild != NULL) {
-            if(htmlChild->name) {
-                std::cout << htmlChild->name;
-            }
             if(htmlChild->name && strcmp((char *)htmlChild->name, "head")==0) {
                 xmlNode *headChild = htmlChild->children;
                 while(headChild != NULL) {
