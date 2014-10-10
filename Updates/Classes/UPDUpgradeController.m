@@ -132,8 +132,50 @@ static BOOL _purchasedUpgrade;
                                 }
                             }
                             if(notPurchased) {
-                                [UPDUpgradeSpinner hide];
-                                _completionBlock(UPDUpgradeStatusNotPurchased);
+                                NSURL *storeURL = [NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"];
+                                NSMutableURLRequest *storeRequest = [NSMutableURLRequest requestWithURL:storeURL];
+                                [storeRequest setHTTPMethod:@"POST"];
+                                [storeRequest setHTTPBody:requestData];
+                                
+                                [NSURLConnection sendAsynchronousRequest:storeRequest queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                                    if(!connectionError) {
+                                        NSError *error;
+                                        NSDictionary *jsonResponse = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                                        if(jsonResponse) {
+                                            BOOL notPurchased = YES;
+                                            NSDictionary *receiptJSON = [jsonResponse objectForKey:@"receipt"];
+                                            if(receiptJSON) {
+                                                NSArray *inAppArray = [receiptJSON objectForKey:@"in_app"];
+                                                if(inAppArray) {
+                                                    for(NSDictionary *inApp in inAppArray) {
+                                                        if([inApp objectForKey:@"product_id"]) {
+                                                            notPurchased = NO;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if(notPurchased) {
+                                                [UPDUpgradeSpinner hide];
+                                                _completionBlock(UPDUpgradeStatusNotPurchased);
+                                            }
+                                            else {
+                                                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                                                    [UPDUpgradeSpinner hide];
+                                                    _purchasedUpgrade = YES;
+                                                    _completionBlock(UPDUpgradeStatusSucceededAlert);
+                                                });
+                                            }
+                                        }
+                                        else {
+                                            [UPDUpgradeSpinner hide];
+                                            _completionBlock(UPDUpgradeStatusError);
+                                        }
+                                    }
+                                    else {
+                                        [UPDUpgradeSpinner hide];
+                                        _completionBlock(UPDUpgradeStatusError);
+                                    }
+                                }];
                             }
                             else {
                                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
